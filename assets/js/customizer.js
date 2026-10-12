@@ -62,7 +62,8 @@
     if (laDai(id)) state.slots[i + 1] = NOI;
   }
   /** Hình charm: ảnh thật nếu có, không thì emoji/chữ. */
-  const hinh = (ch) => (ch.anh ? `<img src="${esc(ch.anh)}" alt="" draggable="false">` : `<span class="slot__face">${ch.icon}</span>`);
+  const MAT_BAC = `<img class="slot__base" src="assets/img/link-bac.webp" alt="" draggable="false">`;
+  const hinh = (ch) => (ch.anh ? `<img src="${esc(ch.anh)}" alt="" draggable="false">` : `${MAT_BAC}<span class="slot__face">${ch.icon}</span>`);
 
   /* ---------- Thông báo ---------- */
   let msgTimer;
@@ -110,6 +111,11 @@
     $("chain-price").textContent = tien(chain().gia);
     $("chain-name").textContent = "Đang chọn: " + chain().ten;
     $("bracelet").style.setProperty("--chain", chain().mau);
+    const ten = chain().ten.toLowerCase();
+    $("bracelet").style.setProperty("--link-filter",
+      ten.includes("vàng") ? "sepia(.9) saturate(2.6) hue-rotate(-12deg) brightness(1.03)" :
+      ten.includes("đen") ? "grayscale(1) brightness(.38) contrast(1.6)" :
+      ten.includes("trắng") ? "grayscale(1) brightness(1.16) contrast(.85)" : "none");
   }
 
   function renderCollections() {
@@ -148,7 +154,7 @@
       const cls = ch ? ` is-filled kieu-${ch.kieu}${ch.anh ? " has-img" : ""}` : "";
       return `<div class="slot${cls}${i === sel ? " is-selected" : ""}" data-i="${i}"
                   ${ch ? 'draggable="true"' : ""} title="${ch ? esc(ch.ten) : "Ô trống " + (i + 1)}">
-          <span class="slot__link">${ch ? hinh(ch) : ""}</span>
+          <span class="slot__link">${ch ? hinh(ch) : MAT_BAC}</span>
           ${ch ? `<button type="button" class="slot__x" data-remove="${i}" aria-label="Gỡ charm">×</button>` : ""}
           <span class="slot__num">${i + 1}</span>
         </div>`;
@@ -302,13 +308,19 @@
   document.addEventListener("dragstart", (e) => {
     const tile = e.target.closest?.(".ctile");
     const slot = e.target.closest?.(".slot.is-filled");
+    const cont = e.target.closest?.(".slot.is-cont");
     if (tile) drag = { type: "charm", id: +tile.dataset.id };
-    else if (slot) drag = { type: "slot", i: +slot.dataset.i };
+    else if (slot || cont) { drag = { type: "slot", i: chu(+(slot || cont).dataset.i), dropped: false }; (slot || cont).classList.add("is-dragging"); }
     else return;
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", "charm");
   });
-  document.addEventListener("dragend", () => { drag = null; document.querySelectorAll(".slot.is-over").forEach((s) => s.classList.remove("is-over")); });
+  document.addEventListener("dragend", () => {
+    // Kéo charm từ vòng rồi thả ra ngoài (không vào ô nào) → gỡ charm
+    if (drag?.type === "slot" && !drag.dropped && !$("stage").matches(":hover")) removeCharm(drag.i);
+    drag = null;
+    document.querySelectorAll(".slot.is-over, .slot.is-dragging").forEach((s) => s.classList.remove("is-over", "is-dragging"));
+  });
   $("bracelet").addEventListener("dragover", (e) => {
     const s = e.target.closest(".slot"); if (!s || !drag) return;
     e.preventDefault();
@@ -318,13 +330,53 @@
   $("bracelet").addEventListener("drop", (e) => {
     const s = e.target.closest(".slot"); if (!s || !drag) return;
     e.preventDefault();
+    drag.dropped = true;
     const to = +s.dataset.i;
     if (drag.type === "charm") placeCharm(drag.id, to);
     else moveCharm(drag.i, to);
   });
   // Kéo charm từ khung ra lưới = gỡ charm
   $("charm-grid").addEventListener("dragover", (e) => { if (drag?.type === "slot") e.preventDefault(); });
-  $("charm-grid").addEventListener("drop", (e) => { if (drag?.type === "slot") { e.preventDefault(); removeCharm(drag.i); } });
+  $("charm-grid").addEventListener("drop", (e) => { if (drag?.type === "slot") { e.preventDefault(); drag.dropped = true; removeCharm(drag.i); } });
+
+  // Kéo đổi chỗ bằng tay trên điện thoại (kéo thả HTML5 không chạy trên màn hình cảm ứng)
+  let cham = null; // {from, ghost, x0, y0, started}
+  $("bracelet").addEventListener("pointerdown", (e) => {
+    if (e.pointerType === "mouse") return;
+    const s = e.target.closest(".slot.is-filled, .slot.is-cont");
+    if (!s || e.target.closest("[data-remove]")) return;
+    cham = { from: chu(+s.dataset.i), x0: e.clientX, y0: e.clientY, started: false, el: s };
+  });
+  document.addEventListener("pointermove", (e) => {
+    if (!cham) return;
+    if (!cham.started) {
+      if (Math.hypot(e.clientX - cham.x0, e.clientY - cham.y0) < 8) return;
+      cham.started = true;
+      const img = cham.el.querySelector(".slot__link img:not(.slot__base)") || cham.el.querySelector("img");
+      cham.ghost = img.cloneNode();
+      cham.ghost.className = "drag-ghost";
+      cham.ghost.style.width = cham.el.offsetWidth * 1.2 + "px";
+      document.body.appendChild(cham.ghost);
+      cham.el.classList.add("is-dragging");
+    }
+    e.preventDefault();
+    cham.ghost.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -60%)`;
+    const over = document.elementFromPoint(e.clientX, e.clientY)?.closest(".slot");
+    document.querySelectorAll(".slot.is-over").forEach((x) => x !== over && x.classList.remove("is-over"));
+    over?.classList.add("is-over");
+  }, { passive: false });
+  document.addEventListener("pointerup", (e) => {
+    if (!cham) return;
+    const c = cham; cham = null;
+    if (!c.started) return;
+    c.ghost.remove();
+    document.querySelectorAll(".slot.is-over, .slot.is-dragging").forEach((x) => x.classList.remove("is-over", "is-dragging"));
+    const over = document.elementFromPoint(e.clientX, e.clientY);
+    const slot = over?.closest(".slot");
+    if (slot) moveCharm(c.from, +slot.dataset.i);
+    else if (!over?.closest("#stage")) removeCharm(c.from);
+  });
+  document.addEventListener("pointercancel", () => { if (cham?.ghost) cham.ghost.remove(); cham = null; });
 
   // Ngang / Dọc / Xoay 360
   document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {

@@ -20,6 +20,13 @@ function e($s): string
     return htmlspecialchars((string)($s ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
+/** Thêm ?v=<thời gian sửa file> để trình duyệt tự tải lại CSS/JS mới (không cần Ctrl+F5). */
+function phien_ban(string $duongDan): string
+{
+    $file = __DIR__ . '/../' . $duongDan;
+    return $duongDan . (is_file($file) ? '?v=' . filemtime($file) : '');
+}
+
 function tien($n): string
 {
     return number_format((float)$n, 0, ',', '.') . 'đ';

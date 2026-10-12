@@ -99,6 +99,27 @@ require __DIR__ . '/includes/header.php';
       <p><i>Mẹo: Kéo charm giữa các ô để đổi chỗ · Bấm × hoặc phím Delete để gỡ charm · Ctrl+Z để hoàn tác.</i></p>
     </details>
 
+    <section class="card cust-block cust-stage-card" id="block-5">
+      <div class="cust-block__head">
+        <h3 class="h-icon">✨ Khung kéo thả</h3>
+        <div class="seg">
+          <button type="button" class="is-active" data-mode="ngang">Ngang</button>
+          <button type="button" data-mode="doc">Dọc</button>
+          <button type="button" data-mode="xoay">Xoay 360</button>
+        </div>
+      </div>
+      <p class="counter">Charm tùy chỉnh: <b id="filled">0</b>/<span id="total">0</span> · <span class="muted">Còn <span id="remain">0</span> vị trí</span></p>
+      <p class="muted small stage-hint">Kéo charm giữa các ô để đổi chỗ · kéo charm ra ngoài khung để gỡ</p>
+      <div class="stage" id="stage">
+        <div class="bracelet" id="bracelet"></div>
+      </div>
+      <div class="cust-actions">
+        <button type="button" class="btn btn--light" id="undo">Hoàn tác ↶</button>
+        <button type="button" class="btn btn--light" id="redo">Làm lại ↷</button>
+        <button type="button" class="btn btn--danger-soft" id="clear">🗑 Xóa hết</button>
+      </div>
+    </section>
+
     <div class="cust-grid">
       <div class="cust-left">
         <section class="card cust-block" id="block-1">
@@ -135,26 +156,6 @@ require __DIR__ . '/includes/header.php';
       </div>
 
       <div class="cust-right">
-        <section class="card cust-block" id="block-5">
-          <div class="cust-block__head">
-            <h3 class="h-icon">✨ Khung kéo thả</h3>
-            <div class="seg">
-              <button type="button" class="is-active" data-mode="ngang">Ngang</button>
-              <button type="button" data-mode="doc">Dọc</button>
-              <button type="button" data-mode="xoay">Xoay 360</button>
-            </div>
-          </div>
-          <p class="counter">Charm tùy chỉnh: <b id="filled">0</b>/<span id="total">0</span> · <span class="muted">Còn <span id="remain">0</span> vị trí</span></p>
-          <div class="stage" id="stage">
-            <div class="bracelet" id="bracelet"></div>
-          </div>
-          <div class="cust-actions">
-            <button type="button" class="btn btn--light" id="undo">Hoàn tác ↶</button>
-            <button type="button" class="btn btn--light" id="redo">Làm lại ↷</button>
-            <button type="button" class="btn btn--danger-soft" id="clear">🗑 Xóa hết</button>
-          </div>
-        </section>
-
         <section class="card cust-block">
           <h3>Bảng tạm tính</h3>
           <div class="summary__row"><span id="chain-line">Dây</span><span id="chain-cost">0đ</span></div>

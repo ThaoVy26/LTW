@@ -30,9 +30,9 @@
     <div class="footer__copy">© <?= date('Y') ?> Charm Atelier. All rights reserved.</div>
   </div>
 </footer>
-<script src="assets/js/main.js"></script>
+<script src="<?= phien_ban('assets/js/main.js') ?>"></script>
 <?php foreach ($scripts ?? [] as $s): ?>
-<script src="<?= e($s) ?>"></script>
+<script src="<?= e(phien_ban($s)) ?>"></script>
 <?php endforeach; ?>
 </body>
 </html>
