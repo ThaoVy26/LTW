@@ -12,6 +12,7 @@
    - `database/03_charm_that.sql`: thêm nhóm charm và 46 charm thật kèm ảnh (thay cho bộ charm emoji ở file 02)
    - `database/04_san_pham_charm.sql`: đưa 46 charm vào trang Sản phẩm (mục Charm), bỏ mục Đồng hồ
    - `database/05_tach_charm.sql`: thêm 114 charm tách từ ảnh bảng mẫu (tổng 160 charm), sắp đúng thứ tự trong bảng mẫu (cột `Charm.thu_tu`)
+   - `database/06_anh_san_pham.sql`: gắn ảnh thật cho sản phẩm vòng (ảnh trong `assets/img/sp/`)
 4. Mở http://localhost/charm_atelier/
 
 Nếu MySQL của bạn có mật khẩu, sửa trong `config/database.php`.
