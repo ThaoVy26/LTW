@@ -142,10 +142,6 @@ require __DIR__ . '/includes/header.php';
         <section class="card cust-block" id="block-3">
           <h3>Bộ sưu tập</h3>
           <select id="collection" class="input" aria-label="Bộ sưu tập"></select>
-          <a class="cover" id="cover" href="#" target="_blank" rel="noopener" hidden>
-            <img id="cover-img" alt="Bảng mẫu bộ sưu tập">
-            <span>Xem bảng mẫu đầy đủ ↗</span>
-          </a>
         </section>
 
         <section class="card cust-block" id="block-4">

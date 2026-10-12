@@ -129,8 +129,6 @@
   function renderCharmGrid() {
     const col = collection();
     $("collection-name").textContent = "— " + col.ten;
-    $("cover").hidden = !col.bia;
-    if (col.bia) { $("cover").href = col.bia; $("cover-img").src = col.bia; }
     const nhanKieu = { dai: "Dài · 2 ô", day: "Dây treo" };
     $("charm-grid").innerHTML = col.charms.map((ch, i) => `
       <button type="button" class="ctile ctile--${ch.kieu}${ch.anh ? " has-img" : ""}" draggable="true" data-id="${ch.id}" title="${esc(ch.ten)} · ${tien(ch.gia)}">
