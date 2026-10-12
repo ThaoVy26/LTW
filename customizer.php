@@ -139,18 +139,7 @@ require __DIR__ . '/includes/header.php';
           <p class="muted small" id="chain-name"></p>
         </section>
 
-        <section class="card cust-block" id="block-3">
-          <h3>Bộ sưu tập</h3>
-          <select id="collection" class="input" aria-label="Bộ sưu tập"></select>
-          <div class="bst-charms" id="block-4">
-            <div class="charm-grid" id="charm-grid"></div>
-          </div>
-          <p class="muted small center-text">Bấm hoặc kéo charm lên vòng</p>
-        </section>
-      </div>
-
-      <div class="cust-right">
-        <section class="card cust-block">
+        <section class="card cust-block cust-price">
           <h3>Bảng tạm tính</h3>
           <div class="summary__row"><span id="chain-line">Dây</span><span id="chain-cost">0đ</span></div>
           <div class="summary__row"><span id="charm-line">Charm × 0</span><span id="charm-cost">0đ</span></div>
@@ -160,6 +149,17 @@ require __DIR__ . '/includes/header.php';
             <button type="button" class="btn btn--primary btn--lg" id="add-cart">🛍 Thêm vào giỏ</button>
           </div>
           <p class="cust-msg" id="msg" role="status" aria-live="polite"></p>
+        </section>
+      </div>
+
+      <div class="cust-right">
+        <section class="card cust-block" id="block-3">
+          <h3>Bộ sưu tập</h3>
+          <select id="collection" class="input" aria-label="Bộ sưu tập"></select>
+          <div class="bst-charms" id="block-4">
+            <div class="charm-grid" id="charm-grid"></div>
+          </div>
+          <p class="muted small center-text">Bấm hoặc kéo charm lên vòng</p>
         </section>
       </div>
     </div>
