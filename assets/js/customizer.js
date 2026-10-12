@@ -128,11 +128,10 @@
 
   function renderCharmGrid() {
     const col = collection();
-    $("collection-name").textContent = "— " + col.ten;
     const nhanKieu = { dai: "Dài · 2 ô", day: "Dây treo" };
     $("charm-grid").innerHTML = col.charms.map((ch, i) => `
       <button type="button" class="ctile ctile--${ch.kieu}${ch.anh ? " has-img" : ""}" draggable="true" data-id="${ch.id}" title="${esc(ch.ten)} · ${tien(ch.gia)}">
-        <span class="ctile__link">${ch.anh ? `<img src="${esc(ch.anh)}" alt="" draggable="false" loading="lazy">` : `<span class="ctile__face">${ch.icon}</span>`}</span>
+        <span class="ctile__link">${ch.anh ? `<img src="${esc(ch.anh)}" alt="" draggable="false">` : `<span class="ctile__face">${ch.icon}</span>`}</span>
         <span class="ctile__num">${nhanKieu[ch.kieu] || i + 1}</span>
         <span class="ctile__price">${tien(ch.gia)}</span>
       </button>`).join("");

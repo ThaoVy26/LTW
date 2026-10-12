@@ -142,12 +142,10 @@ require __DIR__ . '/includes/header.php';
         <section class="card cust-block" id="block-3">
           <h3>Bộ sưu tập</h3>
           <select id="collection" class="input" aria-label="Bộ sưu tập"></select>
-        </section>
-
-        <section class="card cust-block" id="block-4">
-          <h3>Lưới charm <span class="muted" id="collection-name"></span></h3>
-          <div class="charm-grid" id="charm-grid"></div>
-          <p class="muted small center-text">Lưới charm (bấm hoặc kéo vào khung)</p>
+          <div class="bst-charms" id="block-4">
+            <div class="charm-grid" id="charm-grid"></div>
+          </div>
+          <p class="muted small center-text">Bấm hoặc kéo charm lên vòng</p>
         </section>
       </div>
 

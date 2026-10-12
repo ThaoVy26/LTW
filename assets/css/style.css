@@ -621,3 +621,5 @@ select.input { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg
 /* Điện thoại: vuốt trên ô trống để cuộn vòng; giữ & kéo trên ô có charm để đổi chỗ */
 .slot { touch-action: pan-x pan-y; }
 .slot.is-filled, .slot.is-cont { touch-action: none; }
+/* Lưới charm nằm ngay dưới ô chọn bộ sưu tập */
+.bst-charms { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
