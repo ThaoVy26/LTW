@@ -25,7 +25,8 @@ $giaKhoiDiem = (int)db()->query(
  * Slide ảnh/video nào chưa có file thì tự ẩn.
  */
 $heroSlides = [
-    ['loai' => 'mau'],
+    // Ảnh chào mừng đã có sẵn chữ → không cần tiêu đề, chỉ hiện nút
+    ['loai' => 'anh',   'src' => 'assets/hero/chao-mung.webp', 'tieu_de' => '', 'mo_ta' => '', 'link' => 'customizer.php', 'nut' => 'Tự phối ngay →'],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-1.jpg', 'tieu_de' => 'Mỗi charm một câu chuyện', 'mo_ta' => 'Ghép chữ cái, cung hoàng đạo và lời nhắn riêng', 'link' => 'customizer.php'],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-2.jpg', 'tieu_de' => 'Charm Hình tone hồng', 'mo_ta' => 'Ngọt ngào cho những ngày đáng yêu', 'link' => 'customizer.php?bst=tone-hong'],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-3.jpg', 'tieu_de' => 'Charm Dây lủng lẳng', 'mo_ta' => 'Mặt treo chữ cái, nam châm đôi', 'link' => 'customizer.php?nhom=charm-day'],
@@ -120,13 +121,17 @@ require __DIR__ . '/includes/header.php';
                   <?php if ($s['loai'] === 'video'): ?>
                     <video src="<?= e($s['src']) ?>" muted playsinline preload="metadata"></video>
                   <?php else: ?>
-                    <img src="<?= e($s['src']) ?>" alt="<?= e($s['tieu_de']) ?>">
+                    <img src="<?= e($s['src']) ?>" alt="<?= e($s['tieu_de'] ?: 'Charm Atelier') ?>">
                   <?php endif; ?>
-                  <div class="media-slide__caption">
-                    <h3><?= e($s['tieu_de']) ?></h3>
-                    <p><?= e($s['mo_ta']) ?></p>
-                    <a class="btn btn--white btn--sm" href="<?= e($s['link']) ?>">Khám phá →</a>
-                  </div>
+                  <?php if ($s['tieu_de'] !== ''): ?>
+                    <div class="media-slide__caption">
+                      <h3><?= e($s['tieu_de']) ?></h3>
+                      <p><?= e($s['mo_ta']) ?></p>
+                      <a class="btn btn--white btn--sm" href="<?= e($s['link']) ?>">Khám phá →</a>
+                    </div>
+                  <?php else: ?>
+                    <a class="btn btn--white btn--sm media-slide__cta" href="<?= e($s['link']) ?>"><?= e($s['nut'] ?? 'Khám phá →') ?></a>
+                  <?php endif; ?>
                 </div>
               <?php endif; ?>
 
