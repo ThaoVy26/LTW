@@ -13,7 +13,7 @@ $trang  = max(1, (int)($_GET['page'] ?? 1));
 $nhom   = (string)($_GET['nhom'] ?? '');   // lọc nhóm charm (chỉ dùng trong danh mục Charm)
 
 $dsSapXep = [
-    'pho-bien' => ['Phổ biến',      'sp.id ASC'],
+    'pho-bien' => ['Phổ biến',      'COALESCE(n.thu_tu, 0), COALESCE(b.id, 0), COALESCE(c.thu_tu, 0), sp.id'],
     'moi'      => ['Mới nhất',      'sp.id DESC'],
     'gia-tang' => ['Giá tăng dần',  'sp.gia ASC'],
     'gia-giam' => ['Giá giảm dần',  'sp.gia DESC'],

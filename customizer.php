@@ -14,7 +14,7 @@ $bsts  = db()->query(
      FROM BoSuuTapCharm b LEFT JOIN NhomCharm n ON n.id = b.id_nhom
      ORDER BY n.thu_tu, b.id'
 )->fetchAll();
-$charms = db()->query('SELECT id, id_bo_suu_tap, ten_charm, gia, kieu, hinh_anh FROM Charm ORDER BY id')->fetchAll();
+$charms = db()->query('SELECT id, id_bo_suu_tap, ten_charm, gia, kieu, hinh_anh FROM Charm ORDER BY thu_tu, id')->fetchAll();
 
 $data = [
     'sizes'  => array_map(fn($s) => ['id' => (int)$s['id'], 'ten' => $s['ten_size'], 'so' => (int)$s['so_charm_toi_da']], $sizes),
