@@ -6,3 +6,6 @@ USE 52400092_52400313_52400041;
 
 UPDATE SanPham SET hinh_anh = 'assets/img/sp/vong-charm-hoa-co-ban.jpg'
 WHERE ten_sp = 'Vòng charm hoa cơ bản';
+
+UPDATE SanPham SET hinh_anh = 'assets/img/sp/combo-vong-doi-tinh-yeu.jpg'
+WHERE ten_sp = 'Combo vòng đôi tình yêu';
