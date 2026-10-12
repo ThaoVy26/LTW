@@ -551,9 +551,34 @@ select.input { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg
 .mini-bracelet span:has(img) { background: none; border: 0; }
 
 /* Trang chủ: các nhóm charm */
-.grid--6 { grid-template-columns: repeat(3, 1fr); }
+.grid--6 { grid-template-columns: repeat(5, 1fr); gap: 20px; }
+@media (max-width: 1180px) { .grid--6 { grid-template-columns: repeat(3, 1fr); } }
 .cat-card { position: relative; display: block; border-radius: 22px; overflow: hidden; box-shadow: var(--shadow); aspect-ratio: 1 / 1; background: var(--pink-100); }
 .cat-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
 .cat-card:hover img { transform: scale(1.05); }
 .cat-card__name { position: absolute; left: 16px; bottom: 16px; background: rgba(255,255,255,.94); color: var(--maroon); font-weight: 700; padding: 8px 16px; border-radius: 999px; font-size: 14px; box-shadow: var(--shadow); }
 @media (max-width: 760px) { .grid--6 { grid-template-columns: 1fr 1fr; gap: 14px; } .cat-card__name { left: 10px; bottom: 10px; font-size: 12px; padding: 6px 12px; } }
+
+/* ---------- Trang Sản phẩm: charm thật ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; background: #fff; border: 1px solid #ececf0; font-size: 14px; color: var(--text); transition: all .2s; }
+.chip span { font-size: 12px; color: var(--muted); }
+.chip:hover { border-color: var(--pink-200); color: var(--pink); }
+.chip.is-active { background: var(--pink); border-color: var(--pink); color: #fff; }
+.chip.is-active span { color: #ffe0ea; }
+
+/* Ảnh charm nền trong suốt: đặt giữa khung, không cắt */
+.product-card--charm .product-card__media { background: radial-gradient(circle at 50% 40%, #fff 0, #fdf0f4 70%); }
+.product-card--charm .product-card__media img { width: 100%; height: 100%; object-fit: contain; padding: 22% 18%; transition: transform .3s; filter: drop-shadow(0 8px 14px rgba(74, 13, 34, .12)); }
+.product-card--charm.kieu-day .product-card__media img { padding: 10% 28%; }
+.product-card--charm.kieu-dai .product-card__media img { padding: 22% 10%; }
+.product-card--charm:hover .product-card__media img { transform: scale(1.06); }
+.product-card__media > a > img { width: 100%; height: 100%; object-fit: cover; }
+.detail__media--charm { background: radial-gradient(circle at 50% 40%, #fff 0, #fdf0f4 70%); display: grid; place-items: center; }
+.detail__media--charm img { max-width: 70%; max-height: 80%; object-fit: contain; filter: drop-shadow(0 12px 20px rgba(74, 13, 34, .15)); }
+.cart-item__img > img { width: 100%; height: 100%; object-fit: contain; padding: 12px; background: #fff; }
+.combo-card__img > img { width: 100%; height: 100%; object-fit: contain; padding: 14%; background: radial-gradient(circle at 50% 40%, #fff 0, #fdf0f4 70%); }
+/* Banner nhóm đã có sẵn chữ + nút "Xem Thêm" → ẩn nhãn (vẫn đọc được bằng trình đọc màn hình) */
+.cat-card__name { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); border: 0; }
+.pagination { flex-wrap: wrap; }
+@media (max-width: 760px) { .pagination { gap: 6px; margin-top: 32px; } .pagination a { min-width: 34px; height: 34px; font-size: 14px; } }

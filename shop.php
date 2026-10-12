@@ -10,6 +10,7 @@ $giaMax = (int)($_GET['max'] ?? GIA_TRAN);
 $giaMax = max(0, min(GIA_TRAN, $giaMax));
 $sapXep = (string)($_GET['sort'] ?? 'pho-bien');
 $trang  = max(1, (int)($_GET['page'] ?? 1));
+$nhom   = (string)($_GET['nhom'] ?? '');   // lọc nhóm charm (chỉ dùng trong danh mục Charm)
 
 $dsSapXep = [
     'pho-bien' => ['Phổ biến',      'sp.id ASC'],
@@ -26,9 +27,25 @@ if (!isset($dsSapXep[$sapXep])) {
 $danhMuc = db()->query(
     "SELECT dm.id, dm.ten_danh_muc, COUNT(sp.id) AS so_sp
      FROM DanhMuc dm LEFT JOIN SanPham sp ON sp.id_danh_muc = dm.id AND sp.trang_thai = 'dang_ban'
-     GROUP BY dm.id ORDER BY dm.id"
+     GROUP BY dm.id HAVING so_sp > 0 ORDER BY dm.id"
 )->fetchAll();
 $tongSp = array_sum(array_column($danhMuc, 'so_sp'));
+
+/* ---- Đang xem danh mục Charm → hiện nút lọc theo nhóm charm ---- */
+$idDmCharm = (int)db()->query("SELECT id FROM DanhMuc WHERE ten_danh_muc = 'Charm' LIMIT 1")->fetchColumn();
+$dsNhom = [];
+if ($dm && $dm === $idDmCharm) {
+    $dsNhom = db()->query(
+        "SELECT n.slug, n.ten_nhom, COUNT(sp.id) AS so_sp
+         FROM NhomCharm n
+         JOIN BoSuuTapCharm b ON b.id_nhom = n.id
+         JOIN Charm c         ON c.id_bo_suu_tap = b.id
+         JOIN SanPham sp      ON sp.id_charm = c.id AND sp.trang_thai = 'dang_ban'
+         GROUP BY n.id ORDER BY n.thu_tu"
+    )->fetchAll();
+} else {
+    $nhom = '';
+}
 
 /* ---- Truy vấn sản phẩm (prepared statement) ---- */
 $where  = ["sp.trang_thai = 'dang_ban'", 'sp.gia <= ?'];
@@ -41,9 +58,17 @@ if ($tuKhoa !== '') {
     $where[]  = 'sp.ten_sp LIKE ?';
     $params[] = '%' . $tuKhoa . '%';
 }
+if ($nhom !== '') {
+    $where[]  = 'n.slug = ?';
+    $params[] = $nhom;
+}
 $whereSql = implode(' AND ', $where);
+// Nối sang charm gốc để biết nhóm / bộ sưu tập (sản phẩm thường thì các cột này NULL)
+$joinCharm = 'LEFT JOIN Charm c ON c.id = sp.id_charm
+              LEFT JOIN BoSuuTapCharm b ON b.id = c.id_bo_suu_tap
+              LEFT JOIN NhomCharm n ON n.id = b.id_nhom';
 
-$st = db()->prepare("SELECT COUNT(*) FROM SanPham sp WHERE $whereSql");
+$st = db()->prepare("SELECT COUNT(*) FROM SanPham sp $joinCharm WHERE $whereSql");
 $st->execute($params);
 $tongKetQua = (int)$st->fetchColumn();
 $soTrang    = max(1, (int)ceil($tongKetQua / SP_MOI_TRANG));
@@ -51,7 +76,8 @@ $trang      = min($trang, $soTrang);
 $offset     = ($trang - 1) * SP_MOI_TRANG;
 
 $st = db()->prepare(
-    "SELECT sp.*, dm.ten_danh_muc FROM SanPham sp JOIN DanhMuc dm ON dm.id = sp.id_danh_muc
+    "SELECT sp.*, dm.ten_danh_muc, c.kieu AS kieu_charm FROM SanPham sp JOIN DanhMuc dm ON dm.id = sp.id_danh_muc
+     $joinCharm
      WHERE $whereSql ORDER BY {$dsSapXep[$sapXep][1]} LIMIT " . SP_MOI_TRANG . " OFFSET $offset"
 );
 $st->execute($params);
@@ -77,6 +103,7 @@ require __DIR__ . '/includes/header.php';
       <h1 class="page-title">Sản phẩm</h1>
       <div class="shop-tools">
         <?php if ($dm): ?><input type="hidden" name="dm" value="<?= $dm ?>"><?php endif; ?>
+        <?php if ($nhom !== ''): ?><input type="hidden" name="nhom" value="<?= e($nhom) ?>"><?php endif; ?>
         <label class="search">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
           <input type="search" name="q" value="<?= e($tuKhoa) ?>" placeholder="Tìm kiếm sản phẩm..." aria-label="Tìm kiếm sản phẩm">
@@ -95,12 +122,12 @@ require __DIR__ . '/includes/header.php';
         <aside class="card filter">
           <div class="filter__head">
             <h3>Danh mục</h3>
-            <a href="<?= url_loc(['dm' => null, 'page' => null]) ?>">Tất cả (<?= $tongSp ?>)</a>
+            <a href="<?= url_loc(['dm' => null, 'nhom' => null, 'page' => null]) ?>">Tất cả (<?= $tongSp ?>)</a>
           </div>
           <ul class="cat-list">
-            <li><a class="<?= !$dm ? 'is-active' : '' ?>" href="<?= url_loc(['dm' => null, 'page' => null]) ?>">Tất cả <span><?= $tongSp ?></span></a></li>
+            <li><a class="<?= !$dm ? 'is-active' : '' ?>" href="<?= url_loc(['dm' => null, 'nhom' => null, 'page' => null]) ?>">Tất cả <span><?= $tongSp ?></span></a></li>
             <?php foreach ($danhMuc as $d): ?>
-              <li><a class="<?= $dm === (int)$d['id'] ? 'is-active' : '' ?>" href="<?= url_loc(['dm' => $d['id'], 'page' => null]) ?>">
+              <li><a class="<?= $dm === (int)$d['id'] ? 'is-active' : '' ?>" href="<?= url_loc(['dm' => $d['id'], 'nhom' => null, 'page' => null]) ?>">
                 <?= e($d['ten_danh_muc']) ?> <span><?= $d['so_sp'] ?></span></a></li>
             <?php endforeach; ?>
           </ul>
@@ -114,6 +141,16 @@ require __DIR__ . '/includes/header.php';
         </aside>
 
         <section>
+          <?php if ($dsNhom): ?>
+            <div class="chips" aria-label="Lọc theo nhóm charm">
+              <a class="chip<?= $nhom === '' ? ' is-active' : '' ?>" href="<?= url_loc(['nhom' => null, 'page' => null]) ?>">Tất cả charm</a>
+              <?php foreach ($dsNhom as $n): ?>
+                <a class="chip<?= $nhom === $n['slug'] ? ' is-active' : '' ?>" href="<?= url_loc(['nhom' => $n['slug'], 'page' => null]) ?>">
+                  <?= e($n['ten_nhom']) ?> <span><?= $n['so_sp'] ?></span></a>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
+
           <?php if ($tuKhoa !== ''): ?>
             <p class="result-note">Tìm thấy <b><?= $tongKetQua ?></b> sản phẩm cho "<?= e($tuKhoa) ?>"</p>
           <?php endif; ?>
@@ -126,7 +163,7 @@ require __DIR__ . '/includes/header.php';
           <?php else: ?>
             <div class="grid grid--3">
               <?php foreach ($sanPham as $sp): ?>
-                <article class="product-card">
+                <article class="product-card<?= $sp['id_charm'] ? ' product-card--charm kieu-' . e($sp['kieu_charm']) : '' ?>">
                   <div class="product-card__media">
                     <?php if ($sp['nhan']): ?><span class="badge <?= class_nhan($sp['nhan']) ?>"><?= e($sp['nhan']) ?></span><?php endif; ?>
                     <button type="button" class="wish" data-wish="<?= $sp['id'] ?>" aria-label="Yêu thích">

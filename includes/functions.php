@@ -97,7 +97,6 @@ function icon_san_pham(array $sp): string
         'Vòng cơ bản' => '<ellipse cx="12" cy="12" rx="8" ry="4.5"/>',
         'Combo'       => '<path d="M12 20s-7-4.4-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5C19 15.6 12 20 12 20z"/>',
         'Charm'       => '<path d="m12 3 2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/>',
-        'Đồng hồ'     => '<circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2"/>',
     ];
     $path = $icons[$sp['ten_danh_muc'] ?? ''] ?? $icons['Vòng cơ bản'];
     return '<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" '
@@ -110,7 +109,7 @@ function anh_san_pham(array $sp, string $nhan = 'Ảnh sản phẩm'): string
     if (!empty($sp['hinh_anh'])) {
         return '<img src="' . e($sp['hinh_anh']) . '" alt="' . e($sp['ten_sp']) . '" loading="lazy">';
     }
-    $tone = ['Vòng cơ bản' => 'tone-gray', 'Combo' => 'tone-pink', 'Charm' => 'tone-yellow', 'Đồng hồ' => 'tone-rose'];
+    $tone = ['Vòng cơ bản' => 'tone-gray', 'Combo' => 'tone-pink', 'Charm' => 'tone-yellow'];
     return '<div class="ph ' . ($tone[$sp['ten_danh_muc'] ?? ''] ?? 'tone-gray') . '">'
         . '<span class="ph__ring">' . icon_san_pham($sp) . '</span>'
         . '<span class="ph__text">' . e($nhan) . '</span></div>';
@@ -121,6 +120,7 @@ function class_nhan(?string $nhan): string
     return match ($nhan) {
         'Cặp đôi'   => 'badge--purple',
         'Tiết kiệm' => 'badge--yellow',
+        'Cá nhân hoá' => 'badge--purple',
         'Mới'       => 'badge--green',
         default     => 'badge--pink',
     };

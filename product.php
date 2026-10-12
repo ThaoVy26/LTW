@@ -3,7 +3,10 @@ require_once __DIR__ . '/includes/functions.php';
 
 $id = (int)($_GET['id'] ?? 0);
 $st = db()->prepare(
-    "SELECT sp.*, dm.ten_danh_muc FROM SanPham sp JOIN DanhMuc dm ON dm.id = sp.id_danh_muc
+    "SELECT sp.*, dm.ten_danh_muc, c.kieu AS kieu_charm, b.slug AS slug_bst, b.ten_bo_suu_tap
+     FROM SanPham sp JOIN DanhMuc dm ON dm.id = sp.id_danh_muc
+     LEFT JOIN Charm c ON c.id = sp.id_charm
+     LEFT JOIN BoSuuTapCharm b ON b.id = c.id_bo_suu_tap
      WHERE sp.id = ? AND sp.trang_thai = 'dang_ban'"
 );
 $st->execute([$id]);
@@ -33,7 +36,7 @@ require __DIR__ . '/includes/header.php';
     </nav>
 
     <div class="detail">
-      <div class="detail__media card">
+      <div class="detail__media card<?= $sp['id_charm'] ? ' detail__media--charm' : '' ?>">
         <?php if ($sp['nhan']): ?><span class="badge <?= class_nhan($sp['nhan']) ?>"><?= e($sp['nhan']) ?></span><?php endif; ?>
         <?= anh_san_pham($sp) ?>
       </div>
@@ -63,7 +66,11 @@ require __DIR__ . '/includes/header.php';
             <button class="btn btn--primary btn--lg" type="submit">Thêm vào giỏ</button>
           </form>
         <?php endif; ?>
-        <a class="link-muted" href="customizer.php">Hoặc tự thiết kế vòng của riêng bạn →</a>
+        <?php if ($sp['slug_bst']): ?>
+          <a class="btn btn--soft" href="customizer.php?bst=<?= e($sp['slug_bst']) ?>">✨ Gắn charm này lên vòng (bộ <?= e($sp['ten_bo_suu_tap']) ?>)</a>
+        <?php else: ?>
+          <a class="link-muted" href="customizer.php">Hoặc tự thiết kế vòng của riêng bạn →</a>
+        <?php endif; ?>
       </div>
     </div>
 

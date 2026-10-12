@@ -33,8 +33,7 @@ INSERT INTO NhomCharm (ten_nhom, slug, hinh_banner, mo_ta, thu_tu) VALUES
  ('Charm Dây', 'charm-day', 'assets/img/nhom/charm-day.jpg', 'Charm có mặt treo lủng lẳng: chữ cái, nam châm', 2),
  ('Charm Dài', 'charm-dai', 'assets/img/nhom/charm-dai.jpg', 'Mắt charm dài gấp đôi, chiếm 2 ô trên vòng', 3),
  ('Charm Ẩn', 'charm-an', 'assets/img/nhom/charm-an.jpg', 'Charm bạc dập nổi tinh tế', 4),
- ('Charm Trơn', 'charm-tron', 'assets/img/nhom/charm-tron.jpg', 'Mắt charm bạc trơn cơ bản', 5),
- ('Charm Yêu Cầu Cá Nhân', 'charm-ca-nhan', 'assets/img/nhom/charm-ca-nhan.jpg', 'In ảnh, khắc chữ theo yêu cầu của bạn', 6);
+ ('Charm Yêu Cầu Cá Nhân', 'charm-ca-nhan', 'assets/img/nhom/charm-ca-nhan.jpg', 'In ảnh, khắc chữ theo yêu cầu của bạn', 5);
 
 -- Tone Hồng
 INSERT INTO BoSuuTapCharm (id_nhom, ten_bo_suu_tap, slug, hinh_anh) SELECT id, 'Tone Hồng', 'tone-hong', 'assets/img/bst/tone-hong.jpg' FROM NhomCharm WHERE slug = 'charm-hinh';
@@ -116,13 +115,6 @@ SELECT b.id, x.ten, x.gia, x.kieu, x.anh FROM BoSuuTapCharm b JOIN (
   UNION ALL SELECT 'Hình Ẩn 4' AS ten, 20000 AS gia, 'thuong' AS kieu, 'assets/img/charm/hinh-an/4.webp' AS anh
   UNION ALL SELECT 'Hình Ẩn 5' AS ten, 20000 AS gia, 'thuong' AS kieu, 'assets/img/charm/hinh-an/5.webp' AS anh
 ) x WHERE b.slug = 'hinh-an';
-
--- Trơn Bạc
-INSERT INTO BoSuuTapCharm (id_nhom, ten_bo_suu_tap, slug, hinh_anh) SELECT id, 'Trơn Bạc', 'tron', 'assets/img/bst/tron.jpg' FROM NhomCharm WHERE slug = 'charm-tron';
-INSERT INTO Charm (id_bo_suu_tap, ten_charm, gia, kieu, hinh_anh)
-SELECT b.id, x.ten, x.gia, x.kieu, x.anh FROM BoSuuTapCharm b JOIN (
-  SELECT 'Trơn Bạc 1' AS ten, 12000 AS gia, 'thuong' AS kieu, 'assets/img/charm/tron/1.webp' AS anh
-) x WHERE b.slug = 'tron';
 
 -- In Ảnh
 INSERT INTO BoSuuTapCharm (id_nhom, ten_bo_suu_tap, slug, hinh_anh) SELECT id, 'In Ảnh', 'in-anh', 'assets/img/bst/in-anh.jpg' FROM NhomCharm WHERE slug = 'charm-ca-nhan';
