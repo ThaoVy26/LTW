@@ -16,26 +16,53 @@
     sizeId: DATA.sizes[0].id,
     chainId: DATA.chains[0].id,
     collectionId: DATA.collections[0]?.id,
-    slots: Array(DATA.sizes[0].so).fill(null), // mỗi phần tử: id charm hoặc null
+    slots: Array(DATA.sizes[0].so).fill(null), // mỗi ô: id charm | null (bạc trơn) | NOI (phần sau của charm dài)
     selected: 0,          // ô đang chọn (bấm charm sẽ đặt vào ô này)
     reached: 1,           // bước xa nhất đã làm (cho thanh 5 bước)
     history: [], future: [],
     editKey: null,
   };
 
+  if (DATA.start) state.collectionId = DATA.start;
   if (DATA.edit) {
     state.sizeId = DATA.edit.size_id;
     state.chainId = DATA.edit.chain_id;
     state.slots = DATA.edit.slots.slice();
     state.editKey = DATA.edit.cart_key;
     state.reached = 5;
-    const first = state.slots.find((v) => v !== null);
+    const first = state.slots.find((v) => v > 0);
     if (first) state.collectionId = charmById.get(first)?.bst ?? state.collectionId;
   }
 
   const size = () => DATA.sizes.find((s) => s.id === state.sizeId);
   const chain = () => DATA.chains.find((c) => c.id === state.chainId);
   const collection = () => DATA.collections.find((c) => c.id === state.collectionId);
+
+  /* ---------- Ô & charm dài ---------- */
+  const NOI = -1;                                          // ô thứ 2 của charm dài
+  const laCharm = (v) => v > 0;
+  const laDai = (v) => laCharm(v) && charmById.get(v).kieu === "dai";
+  const chu = (i) => (state.slots[i] === NOI ? i - 1 : i); // ô "chủ" của 1 vị trí
+  const soCharm = () => state.slots.filter(laCharm).length;
+  const soTrong = () => state.slots.filter((v) => v === null).length;
+
+  /** Gỡ charm đang chiếm vị trí i (kể cả khi i là nửa sau của charm dài). Trả về id đã gỡ. */
+  function goTai(i) {
+    if (i < 0 || i >= state.slots.length || state.slots[i] === null) return null;
+    const c = chu(i), id = state.slots[c];
+    state.slots[c] = null;
+    if (laDai(id) && state.slots[c + 1] === NOI) state.slots[c + 1] = null;
+    return id;
+  }
+  /** Ô i có đặt được charm id không (các ô cần dùng đang trống). */
+  const vuaCho = (id, i) => state.slots[i] === null && (!laDai(id) || state.slots[i + 1] === null);
+  /** Đặt charm vào i (giả định đã trống). */
+  function datTai(id, i) {
+    state.slots[i] = id;
+    if (laDai(id)) state.slots[i + 1] = NOI;
+  }
+  /** Hình charm: ảnh thật nếu có, không thì emoji/chữ. */
+  const hinh = (ch) => (ch.anh ? `<img src="${esc(ch.anh)}" alt="" draggable="false">` : `<span class="slot__face">${ch.icon}</span>`);
 
   /* ---------- Thông báo ---------- */
   let msgTimer;
@@ -86,17 +113,23 @@
   }
 
   function renderCollections() {
-    $("collection").innerHTML = DATA.collections.map((c) => `<option value="${c.id}">${esc(c.ten)} (${c.charms.length})</option>`).join("");
+    const nhom = [...new Set(DATA.collections.map((c) => c.nhom))];
+    $("collection").innerHTML = nhom.map((n) => `<optgroup label="${esc(n)}">` +
+      DATA.collections.filter((c) => c.nhom === n)
+        .map((c) => `<option value="${c.id}">${esc(c.ten)} (${c.charms.length})</option>`).join("") + "</optgroup>").join("");
     $("collection").value = state.collectionId;
   }
 
   function renderCharmGrid() {
     const col = collection();
     $("collection-name").textContent = "— " + col.ten;
+    $("cover").hidden = !col.bia;
+    if (col.bia) { $("cover").href = col.bia; $("cover-img").src = col.bia; }
+    const nhanKieu = { dai: "Dài · 2 ô", day: "Dây treo" };
     $("charm-grid").innerHTML = col.charms.map((ch, i) => `
-      <button type="button" class="ctile" draggable="true" data-id="${ch.id}" title="${esc(ch.ten)} · ${tien(ch.gia)}">
-        <span class="ctile__link"><span class="ctile__face">${ch.icon}</span></span>
-        <span class="ctile__num">${i + 1}</span>
+      <button type="button" class="ctile ctile--${ch.kieu}${ch.anh ? " has-img" : ""}" draggable="true" data-id="${ch.id}" title="${esc(ch.ten)} · ${tien(ch.gia)}">
+        <span class="ctile__link">${ch.anh ? `<img src="${esc(ch.anh)}" alt="" draggable="false" loading="lazy">` : `<span class="ctile__face">${ch.icon}</span>`}</span>
+        <span class="ctile__num">${nhanKieu[ch.kieu] || i + 1}</span>
         <span class="ctile__price">${tien(ch.gia)}</span>
       </button>`).join("");
   }
@@ -105,25 +138,32 @@
     const n = state.slots.length;
     const b = $("bracelet");
     b.style.setProperty("--n", n);
+    const sel = chu(state.selected);
     b.innerHTML = state.slots.map((id, i) => {
-      const ch = id ? charmById.get(id) : null;
-      return `<div class="slot${ch ? " is-filled" : ""}${i === state.selected ? " is-selected" : ""}" data-i="${i}"
+      if (id === NOI) {   // nửa sau của charm dài: chỉ giữ chỗ
+        return `<div class="slot is-cont${sel === i - 1 ? " is-selected" : ""}" data-i="${i}" title="${esc(charmById.get(state.slots[i - 1]).ten)}">
+            <span class="slot__link"></span><span class="slot__num">${i + 1}</span></div>`;
+      }
+      const ch = laCharm(id) ? charmById.get(id) : null;
+      const cls = ch ? ` is-filled kieu-${ch.kieu}${ch.anh ? " has-img" : ""}` : "";
+      return `<div class="slot${cls}${i === sel ? " is-selected" : ""}" data-i="${i}"
                   ${ch ? 'draggable="true"' : ""} title="${ch ? esc(ch.ten) : "Ô trống " + (i + 1)}">
-          <span class="slot__link">${ch ? `<span class="slot__face">${ch.icon}</span>` : ""}</span>
+          <span class="slot__link">${ch ? hinh(ch) : ""}</span>
           ${ch ? `<button type="button" class="slot__x" data-remove="${i}" aria-label="Gỡ charm">×</button>` : ""}
           <span class="slot__num">${i + 1}</span>
         </div>`;
     }).join("");
-    const filled = state.slots.filter(Boolean).length;
-    $("filled").textContent = filled;
+    b.classList.toggle("has-day", state.slots.some((v) => laCharm(v) && charmById.get(v).kieu === "day"));
+    $("filled").textContent = soCharm();
     $("total").textContent = n;
-    $("remain").textContent = n - filled;
+    $("remain").textContent = soTrong();
+    fitVertical();
     $("size-hint").textContent = "Gợi ý: " + size().so + " charm";
   }
 
   function renderPrice() {
     const n = state.slots.length, c = chain();
-    const used = state.slots.filter(Boolean).map((id) => charmById.get(id));
+    const used = state.slots.filter(laCharm).map((id) => charmById.get(id));
     const chainCost = n * c.gia, charmCost = used.reduce((s, ch) => s + ch.gia, 0);
     $("chain-line").textContent = `Dây (${n} × ${tien(c.gia)})`;
     $("chain-cost").textContent = tien(chainCost);
@@ -135,45 +175,69 @@
   function renderAll() { renderBracelet(); renderPrice(); renderSteps(); }
 
   /* ---------- Thao tác với ô ---------- */
+  /** Tìm chỗ trống phù hợp: ưu tiên ô đang chọn, rồi ô trống đầu tiên. */
+  function oTrongCho(id) {
+    if (vuaCho(id, state.selected)) return state.selected;
+    return state.slots.findIndex((_, i) => vuaCho(id, i));
+  }
+
   function placeCharm(charmId, index) {
-    let i = index ?? (state.slots[state.selected] === null ? state.selected : state.slots.indexOf(null));
-    if (i === -1 || i == null) return msg("Khung đã đầy! Gỡ bớt charm hoặc chọn 1 ô để thay.", "warn");
+    const n = state.slots.length;
+    let i = index != null ? chu(index) : oTrongCho(charmId);
+    if (i === -1) {
+      return msg(laDai(charmId) ? "Không còn 2 ô trống liền nhau cho charm dài. Gỡ bớt charm hoặc kéo thả vào vị trí muốn thay."
+                                : "Khung đã đầy! Gỡ bớt charm hoặc kéo thả để thay.", "warn");
+    }
+    if (laDai(charmId) && i >= n - 1) i = n - 2;   // charm dài thả vào ô cuối → lùi 1 ô
     remember();
-    state.slots[i] = charmId;
+    goTai(i);
+    if (laDai(charmId)) goTai(i + 1);
+    datTai(charmId, i);
     const next = state.slots.indexOf(null, i + 1);
     state.selected = next === -1 ? i : next;
     reach(5);
     renderAll();
-    msg(`Đã đặt "${charmById.get(charmId).ten}" vào ô ${i + 1}.`);
+    msg(`Đã đặt "${charmById.get(charmId).ten}" vào ô ${i + 1}${laDai(charmId) ? "–" + (i + 2) : ""}.`);
   }
 
   function removeCharm(i) {
-    if (state.slots[i] === null) return;
+    if (state.slots[i] == null) return;
     remember();
-    const ten = charmById.get(state.slots[i]).ten;
-    state.slots[i] = null;
-    state.selected = i;
+    const c = chu(i), id = goTai(i);
+    state.selected = c;
     renderAll();
-    msg(`Đã gỡ "${ten}" khỏi ô ${i + 1}.`);
+    msg(`Đã gỡ "${charmById.get(id).ten}" khỏi ô ${c + 1}.`);
   }
 
+  /** Kéo charm sang ô khác: charm ở đích (nếu có) chuyển về chỗ cũ nếu vừa. */
   function moveCharm(from, to) {
+    from = chu(from); to = chu(to);
     if (from === to) return;
-    remember();
-    [state.slots[from], state.slots[to]] = [state.slots[to], state.slots[from]];
+    const truoc = snap();
+    const backup = state.slots.slice();
+    const id = goTai(from);
+    if (laDai(id) && to >= state.slots.length - 1) to = state.slots.length - 2;
+    const biThay = [goTai(to), laDai(id) ? goTai(to + 1) : null].filter(Boolean);
+    datTai(id, to);
+    const khongVua = biThay.filter((x) => { if (vuaCho(x, from)) { datTai(x, from); return false; } return true; });
+    if (khongVua.length && !confirm(`Không đủ chỗ để đổi vị trí, ${khongVua.length} charm sẽ bị gỡ. Tiếp tục?`)) {
+      state.slots = backup; renderAll(); return;
+    }
+    state.history.push(truoc); state.future = [];
     state.selected = to;
     renderAll();
   }
 
   function changeSize(newId) {
     const s = DATA.sizes.find((x) => x.id === newId);
-    const lost = state.slots.slice(s.so).filter(Boolean).length;
+    const lost = state.slots.slice(s.so).filter(laCharm).length + (laDai(state.slots[s.so - 1]) ? 1 : 0);
     if (lost && !confirm(`Size mới chỉ có ${s.so} ô, ${lost} charm ở cuối sẽ bị gỡ. Tiếp tục?`)) {
       $("size").value = state.sizeId; return;
     }
     remember();
     state.sizeId = newId;
     state.slots = Array.from({ length: s.so }, (_, i) => state.slots[i] ?? null);
+    if (laDai(state.slots[s.so - 1])) state.slots[s.so - 1] = null; // charm dài bị cắt đôi
     state.selected = Math.min(state.selected, s.so - 1);
     reach(2);
     renderAll();
@@ -182,7 +246,7 @@
 
   /* ---------- Gọi API lưu / thêm giỏ ---------- */
   async function send(action) {
-    if (action === "cart" && !state.slots.some(Boolean)) return msg("Bạn chưa chọn charm nào!", "err");
+    if (action === "cart" && !state.slots.some(laCharm)) return msg("Bạn chưa chọn charm nào!", "err");
     const btn = $(action === "cart" ? "add-cart" : "save");
     btn.disabled = true;
     try {
@@ -229,8 +293,8 @@
     const x = e.target.closest("[data-remove]");
     if (x) return removeCharm(+x.dataset.remove);
     const s = e.target.closest(".slot"); if (!s) return;
-    state.selected = +s.dataset.i; renderBracelet();
-    if (!state.slots[state.selected]) msg(`Đã chọn ô ${state.selected + 1} — bấm 1 charm bên trái để đặt vào.`, "info");
+    state.selected = chu(+s.dataset.i); renderBracelet();
+    if (state.slots[state.selected] === null) msg(`Đã chọn ô ${state.selected + 1} — bấm 1 charm bên trái để đặt vào.`, "info");
   });
 
   // Kéo thả (HTML5 Drag & Drop)
@@ -272,12 +336,19 @@
     }
     document.querySelectorAll(".seg button").forEach((x) => x.classList.toggle("is-active", x === b));
     stage.classList.toggle("is-vertical", mode === "doc");
+    fitVertical();
   }));
+
+  /** Chế độ Dọc: xoay cả vòng 90°, tăng chiều cao khung cho vừa. */
+  function fitVertical() {
+    const stage = $("stage"), b = $("bracelet");
+    stage.style.minHeight = stage.classList.contains("is-vertical") ? b.offsetWidth + 80 + "px" : "";
+  }
 
   $("undo").addEventListener("click", undo);
   $("redo").addEventListener("click", redo);
   $("clear").addEventListener("click", () => {
-    if (!state.slots.some(Boolean)) return msg("Khung đang trống.", "warn");
+    if (!state.slots.some(laCharm)) return msg("Khung đang trống.", "warn");
     if (!confirm("Gỡ tất cả charm khỏi vòng?")) return;
     remember(); state.slots = state.slots.map(() => null); state.selected = 0; renderAll(); msg("Đã xoá hết charm.");
   });
@@ -296,7 +367,7 @@
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); e.shiftKey ? redo() : undo(); }
     else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") { e.preventDefault(); redo(); }
     else if (e.key === "Delete" || e.key === "Backspace") removeCharm(state.selected);
-    else if (e.key === "ArrowRight") { state.selected = Math.min(state.slots.length - 1, state.selected + 1); renderBracelet(); }
+    else if (e.key === "ArrowRight") { state.selected = Math.min(state.slots.length - 1, state.selected + (laDai(state.slots[state.selected]) ? 2 : 1)); renderBracelet(); }
     else if (e.key === "ArrowLeft") { state.selected = Math.max(0, state.selected - 1); renderBracelet(); }
   });
 

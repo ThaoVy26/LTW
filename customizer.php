@@ -9,24 +9,37 @@ require_once __DIR__ . '/includes/functions.php';
 $sizes = db()->query('SELECT id, ten_size, so_charm_toi_da FROM KichThuocTay ORDER BY so_charm_toi_da')->fetchAll();
 // Dây đen xếp cuối cho giống thứ tự trên Figma (bạc, vàng, trắng, đen)
 $days  = db()->query("SELECT id, ten_day, gia_charm_bac FROM DayVong ORDER BY ten_day LIKE '%Đen%', id")->fetchAll();
-$bsts  = db()->query('SELECT id, ten_bo_suu_tap FROM BoSuuTapCharm ORDER BY id')->fetchAll();
-$charms = db()->query('SELECT id, id_bo_suu_tap, ten_charm, gia, hinh_anh FROM Charm ORDER BY id')->fetchAll();
+$bsts  = db()->query(
+    'SELECT b.id, b.ten_bo_suu_tap, b.slug, b.hinh_anh, n.ten_nhom, n.slug AS slug_nhom
+     FROM BoSuuTapCharm b LEFT JOIN NhomCharm n ON n.id = b.id_nhom
+     ORDER BY n.thu_tu, b.id'
+)->fetchAll();
+$charms = db()->query('SELECT id, id_bo_suu_tap, ten_charm, gia, kieu, hinh_anh FROM Charm ORDER BY id')->fetchAll();
 
 $data = [
     'sizes'  => array_map(fn($s) => ['id' => (int)$s['id'], 'ten' => $s['ten_size'], 'so' => (int)$s['so_charm_toi_da']], $sizes),
     'chains' => array_map(fn($d) => ['id' => (int)$d['id'], 'ten' => $d['ten_day'], 'gia' => (int)$d['gia_charm_bac'], 'mau' => mau_day($d['ten_day'])], $days),
     'collections' => [],
+    'start'  => null,
     'edit'   => null,
     'csrf'   => csrf_token(),
 ];
+// Mở sẵn 1 bộ sưu tập: customizer.php?bst=tone-hong hoặc ?nhom=charm-hinh
+$moBst  = (string)($_GET['bst'] ?? '');
+$moNhom = (string)($_GET['nhom'] ?? '');
 foreach ($bsts as $b) {
     $ds = array_values(array_filter($charms, fn($c) => (int)$c['id_bo_suu_tap'] === (int)$b['id']));
     $data['collections'][] = [
-        'id' => (int)$b['id'], 'ten' => $b['ten_bo_suu_tap'],
+        'id' => (int)$b['id'], 'ten' => $b['ten_bo_suu_tap'], 'nhom' => $b['ten_nhom'] ?? 'Khác', 'bia' => $b['hinh_anh'],
         'charms' => array_map(fn($c) => [
-            'id' => (int)$c['id'], 'ten' => $c['ten_charm'], 'gia' => (int)$c['gia'], 'icon' => icon_charm($c['hinh_anh']),
+            'id'   => (int)$c['id'], 'ten' => $c['ten_charm'], 'gia' => (int)$c['gia'], 'kieu' => $c['kieu'],
+            'anh'  => la_anh($c['hinh_anh']) ? $c['hinh_anh'] : null,
+            'icon' => icon_charm($c['hinh_anh']),
         ], $ds),
     ];
+    if ($data['start'] === null && (($moBst && $b['slug'] === $moBst) || ($moNhom && $b['slug_nhom'] === $moNhom))) {
+        $data['start'] = (int)$b['id'];
+    }
 }
 
 // Sửa thiết kế đã có trong giỏ: customizer.php?edit=ID
@@ -36,6 +49,12 @@ if ($editId && ($tk = lay_thiet_ke($editId))) {
     foreach ($tk['slots'] as $s) {
         if (array_key_exists($s['vi_tri_slot'], $slots)) {
             $slots[$s['vi_tri_slot']] = $s['id_charm'] !== null ? (int)$s['id_charm'] : null;
+        }
+    }
+    // Charm dài chiếm thêm ô kế tiếp (đánh dấu -1)
+    foreach ($tk['slots'] as $s) {
+        if ($s['kieu'] === 'dai' && array_key_exists($s['vi_tri_slot'] + 1, $slots)) {
+            $slots[$s['vi_tri_slot'] + 1] = -1;
         }
     }
     $data['edit'] = [
@@ -75,6 +94,7 @@ require __DIR__ . '/includes/header.php';
         <li>Chọn loại dây vòng phù hợp về màu sắc và chất liệu.</li>
         <li>Chọn bộ sưu tập và mẫu charm bạn muốn dùng.</li>
         <li>Kéo thả charm vào đúng vị trí bạn muốn trên vòng (hoặc bấm 1 ô rồi bấm charm).</li>
+        <li><b>Charm dài</b> chiếm 2 ô liền nhau · <b>Charm yêu cầu cá nhân</b>: gửi ảnh / chữ muốn in ở bước thanh toán.</li>
       </ol>
       <p><i>Mẹo: Kéo charm giữa các ô để đổi chỗ · Bấm × hoặc phím Delete để gỡ charm · Ctrl+Z để hoàn tác.</i></p>
     </details>
@@ -101,6 +121,10 @@ require __DIR__ . '/includes/header.php';
         <section class="card cust-block" id="block-3">
           <h3>Bộ sưu tập</h3>
           <select id="collection" class="input" aria-label="Bộ sưu tập"></select>
+          <a class="cover" id="cover" href="#" target="_blank" rel="noopener" hidden>
+            <img id="cover-img" alt="Bảng mẫu bộ sưu tập">
+            <span>Xem bảng mẫu đầy đủ ↗</span>
+          </a>
         </section>
 
         <section class="card cust-block" id="block-4">

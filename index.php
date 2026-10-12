@@ -26,15 +26,22 @@ $giaKhoiDiem = (int)db()->query(
  */
 $heroSlides = [
     ['loai' => 'mau'],
-    ['loai' => 'anh',   'src' => 'assets/hero/slide-1.jpg', 'tieu_de' => 'BST Mùa Xuân ' . date('Y'), 'mo_ta' => 'Những chiếc charm pastel cho ngày nắng nhẹ', 'link' => 'shop.php'],
-    ['loai' => 'video', 'src' => 'assets/hero/slide-2.mp4', 'tieu_de' => 'Ghép charm trong 30 giây', 'mo_ta' => 'Tháo lắp dễ dàng, đổi phong cách mỗi ngày', 'link' => 'customizer.php'],
-    ['loai' => 'anh',   'src' => 'assets/hero/slide-3.jpg', 'tieu_de' => 'Combo Love Story', 'mo_ta' => 'Quà tặng cho người thương', 'link' => 'shop.php?dm=' . $idCombo],
+    ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-1.jpg', 'tieu_de' => 'Mỗi charm một câu chuyện', 'mo_ta' => 'Ghép chữ cái, cung hoàng đạo và lời nhắn riêng', 'link' => 'customizer.php'],
+    ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-2.jpg', 'tieu_de' => 'Charm Hình tone hồng', 'mo_ta' => 'Ngọt ngào cho những ngày đáng yêu', 'link' => 'customizer.php?bst=tone-hong'],
+    ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-3.jpg', 'tieu_de' => 'Charm Dây lủng lẳng', 'mo_ta' => 'Mặt treo chữ cái, nam châm đôi', 'link' => 'customizer.php?nhom=charm-day'],
     ['loai' => 'khuyen_mai'],
+    ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-4.jpg', 'tieu_de' => 'Quà tặng người thương', 'mo_ta' => 'Đóng hộp quà miễn phí cho mọi đơn', 'link' => 'shop.php?dm=' . $idCombo],
+    ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-5.jpg', 'tieu_de' => 'In ảnh & khắc chữ', 'mo_ta' => 'Gửi ảnh của bạn, Charm Atelier làm phần còn lại', 'link' => 'customizer.php?nhom=charm-ca-nhan'],
+    ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-6.jpg', 'tieu_de' => 'Tự phối vòng của riêng bạn', 'mo_ta' => 'Hơn 45 mẫu charm để lựa chọn', 'link' => 'customizer.php'],
+    // Thêm video: ['loai' => 'video', 'src' => 'assets/hero/ten-video.mp4', 'tieu_de' => '...', 'mo_ta' => '...', 'link' => '...'],
 ];
 $heroSlides = array_values(array_filter(
     $heroSlides,
     fn($s) => !isset($s['src']) || is_file(__DIR__ . '/' . $s['src'])
 ));
+
+// 6 nhóm charm (banner) — có bảng NhomCharm từ 03_charm_that.sql
+$nhomCharm = db()->query('SELECT * FROM NhomCharm ORDER BY thu_tu')->fetchAll();
 
 $tieuDe  = 'Trang chủ';
 $menu    = 'trang-chu';
@@ -133,6 +140,23 @@ require __DIR__ . '/includes/header.php';
         <?php endif; ?>
       </div>
     </section>
+
+    <?php if ($nhomCharm): ?>
+    <section class="section">
+      <div class="section__head">
+        <h2>Bộ sưu tập charm</h2>
+        <p>Chọn một dòng charm để bắt đầu phối vòng của bạn</p>
+      </div>
+      <div class="grid grid--6">
+        <?php foreach ($nhomCharm as $n): ?>
+          <a class="cat-card" href="customizer.php?nhom=<?= e($n['slug']) ?>" title="<?= e($n['mo_ta']) ?>">
+            <img src="<?= e($n['hinh_banner']) ?>" alt="<?= e($n['ten_nhom']) ?>" loading="lazy">
+            <span class="cat-card__name"><?= e($n['ten_nhom']) ?> →</span>
+          </a>
+        <?php endforeach; ?>
+      </div>
+    </section>
+    <?php endif; ?>
 
     <section class="section">
       <div class="section__head">

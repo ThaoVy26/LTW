@@ -126,11 +126,17 @@ function class_nhan(?string $nhan): string
     };
 }
 
+/** Chuỗi có phải đường dẫn file ảnh không (phân biệt với emoji tạm). */
+function la_anh(?string $hinh): bool
+{
+    return (bool)preg_match('/\.(png|jpe?g|webp|gif|svg)$/i', (string)$hinh);
+}
+
 /** Charm: hinh_anh là đường dẫn ảnh thì hiện <img>, còn lại hiện emoji/chữ. */
 function icon_charm(?string $hinh): string
 {
     $hinh = (string)$hinh;
-    if (preg_match('/\.(png|jpe?g|webp|gif|svg)$/i', $hinh)) {
+    if (la_anh($hinh)) {
         return '<img src="' . e($hinh) . '" alt="">';
     }
     return e($hinh !== '' ? $hinh : '•');
@@ -282,7 +288,7 @@ function lay_thiet_ke(int $id): ?array
         return null;
     }
     $st = db()->prepare(
-        'SELECT ct.vi_tri_slot, ct.id_charm, c.ten_charm, c.gia, c.hinh_anh
+        'SELECT ct.vi_tri_slot, ct.id_charm, c.ten_charm, c.gia, c.kieu, c.hinh_anh
          FROM ChiTietThietKe ct LEFT JOIN Charm c ON c.id = ct.id_charm
          WHERE ct.id_thiet_ke = ? ORDER BY ct.vi_tri_slot'
     );

@@ -9,6 +9,7 @@
 3. Vào http://localhost/phpmyadmin, chọn tab **Import** và import lần lượt:
    - `database/01_schema.sql`: tạo CSDL và các bảng
    - `database/02_seed.sql`: dữ liệu mẫu (sản phẩm, charm, mã giảm giá)
+   - `database/03_charm_that.sql`: thêm nhóm charm và 47 charm thật kèm ảnh (thay cho bộ charm emoji ở file 02)
 4. Mở http://localhost/charm_atelier/
 
 Nếu MySQL của bạn có mật khẩu, sửa trong `config/database.php`.
@@ -61,4 +62,6 @@ charm_atelier/
 - **Giá luôn tính ở server:** giỏ hàng chỉ lưu `id` và số lượng trong SESSION. Giá được đọc lại từ DB, và giá thiết kế do `api/design.php` tự tính.
 - **Ảnh:** khi có ảnh thật, chỉ cần `UPDATE SanPham SET hinh_anh = 'uploads/sp/abc.jpg'` (tương tự với cột `Charm.hinh_anh`), code sẽ tự hiện `<img>`.
 - `02_seed.sql` có thêm cột `SanPham.nhan` (badge Bán chạy / Cặp đôi...) và dây **Trơn Trắng**. Nhớ cập nhật lại file thiết kế CSDL.
+- **Charm thật** (`03_charm_that.sql`): 6 nhóm (bảng `NhomCharm`), 12 bộ sưu tập, 47 charm. Cột `Charm.kieu` gồm `thuong` (1 ô), `dai` (chiếm 2 ô) và `day` (có mặt treo). Ảnh nằm trong `assets/img/charm/<bộ sưu tập>/`, ảnh bìa trong `assets/img/bst/`, banner nhóm trong `assets/img/nhom/`.
+- **Giá charm hiện là giá tạm:** trơn 12k · ẩn 20k · hình 25k · dây chữ 35k · dây nam châm 39k · dài 45k · khắc 45k · in ảnh 55k · dây in ảnh 65k.
 - Mã giảm giá để test: `CHARM10` (-10k), `FREESHIP` (-30k), `SALE15` (-15%), `HETHAN` (đã hết hạn).

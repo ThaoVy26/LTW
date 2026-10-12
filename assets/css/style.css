@@ -390,10 +390,10 @@ select.input { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg
 
 .counter { font-size: 17px; color: var(--text); margin-bottom: 30px; }
 .counter b { color: var(--ink); }
-.stage { border: 2px dashed #f5b8cb; border-radius: 16px; padding: 52px 40px; background: #fffafb; perspective: 900px; overflow-x: auto; display: flex; justify-content: center; transition: padding .3s; }
-.bracelet { --n: 14; --chain: linear-gradient(135deg, #f5f6f8, #b9bec7); background: #fff; border: 1px solid #eef0f3; border-radius: 14px; box-shadow: var(--shadow); padding: 22px 26px 14px; display: grid; grid-template-columns: repeat(var(--n), minmax(26px, 42px)); gap: 0; transition: transform .4s; }
+.stage { border: 2px dashed #f5b8cb; border-radius: 16px; padding: 44px 16px; background: #fffafb; perspective: 900px; overflow-x: auto; display: flex; justify-content: center; transition: padding .3s; }
+.bracelet { --n: 14; --chain: linear-gradient(135deg, #f5f6f8, #b9bec7); background: #fff; border: 1px solid #eef0f3; border-radius: 14px; box-shadow: var(--shadow); padding: 22px 16px 14px; display: grid; grid-template-columns: repeat(var(--n), minmax(24px, 46px)); gap: 0; transition: transform .4s; }
 .slot { position: relative; display: grid; justify-items: center; gap: 10px; cursor: pointer; }
-.slot__link { width: 100%; height: 38px; border: 1px solid #b8bdc6; border-radius: 3px; background: var(--chain); box-shadow: inset 0 -6px 8px rgba(0,0,0,.06), inset 0 4px 6px rgba(255,255,255,.7); display: grid; place-items: center; transition: transform .15s; }
+.slot__link { width: 100%; aspect-ratio: 240 / 197; position: relative; border: 1px solid #b8bdc6; border-radius: 3px; background: var(--chain); box-shadow: inset 0 -6px 8px rgba(0,0,0,.06), inset 0 4px 6px rgba(255,255,255,.7); display: grid; place-items: center; transition: transform .15s; }
 .slot__face { width: 76%; height: 74%; border-radius: 2px; background: #fff; border: 1px solid #dfe2e7; display: grid; place-items: center; font-size: 15px; font-weight: 800; color: var(--maroon); line-height: 1; overflow: hidden; }
 .slot__face img { width: 100%; height: 100%; object-fit: contain; }
 .slot__num { font-size: 13px; color: #6b7280; }
@@ -404,10 +404,10 @@ select.input { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg
 .slot:hover .slot__x, .slot.is-selected .slot__x { display: grid; place-items: center; }
 .slot.is-filled { cursor: grab; }
 /* Dọc: xoay cả dây 90 độ */
-.stage.is-vertical { padding: 40px; }
-.stage.is-vertical .bracelet { grid-template-columns: auto; padding: 18px 22px; }
-.stage.is-vertical .slot { grid-template-columns: 46px 24px; align-items: center; gap: 8px; }
-.stage.is-vertical .slot__link { height: 30px; }
+.stage.is-vertical { align-items: center; overflow: hidden; }
+.stage.is-vertical .bracelet { transform: rotate(90deg); }
+.stage.is-vertical.is-spinning .bracelet { animation-name: spin3dV; }
+@keyframes spin3dV { from { transform: rotate(90deg) rotateY(0); } to { transform: rotate(90deg) rotateY(360deg); } }
 /* Xoay 360 */
 .stage.is-spinning .bracelet { animation: spin3d 1.8s cubic-bezier(.45, .05, .35, 1); }
 @keyframes spin3d { from { transform: rotateY(0); } to { transform: rotateY(360deg); } }
@@ -520,3 +520,40 @@ select.input { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg
   .story__nav { width: 36px; height: 36px; font-size: 22px; }
   .promo__code { font-size: 40px; }
 }
+
+/* ---------- Charm có ảnh thật (03_charm_that.sql) ---------- */
+/* Ô trên vòng */
+.slot.has-img .slot__link { background: none; border: 0; box-shadow: none; display: block; }
+.slot.has-img .slot__link img { display: block; width: 100%; height: auto; pointer-events: none; position: relative; z-index: 2; }
+.slot.kieu-dai .slot__link img { position: absolute; left: 0; top: 0; width: 200%; }   /* trải sang ô kế bên */
+.slot.kieu-day .slot__link img { position: absolute; left: 0; top: 0; }                /* mặt treo thòng xuống */
+.slot.is-cont .slot__link { background: none; border-color: transparent; box-shadow: none; }
+.slot.is-cont { cursor: grab; }
+.bracelet.has-day .slot__num { margin-top: 58px; }
+.slot.is-selected.has-img .slot__link, .slot.is-cont.is-selected .slot__link { outline-offset: 2px; }
+.slot.kieu-dai.is-selected .slot__link { outline: 0; }
+.slot.kieu-dai.is-selected .slot__link img { outline: 2.5px solid var(--pink); outline-offset: 1px; border-radius: 4px; }
+.slot.is-cont.is-selected .slot__link { outline: 0; }
+
+/* Ô trong lưới charm */
+.ctile.has-img .ctile__link { width: 100%; height: 72px; background: none; border: 0; }
+.ctile.has-img .ctile__link img { max-width: 100%; max-height: 72px; object-fit: contain; pointer-events: none; }
+.ctile--dai .ctile__num, .ctile--day .ctile__num { font-size: 11px; color: var(--pink-dark); font-weight: 600; }
+
+/* Ảnh bìa (bảng mẫu) của bộ sưu tập */
+.cover { display: block; position: relative; margin-top: 16px; border-radius: 14px; overflow: hidden; border: 1px solid #f3d2dc; }
+.cover img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; transition: transform .3s; }
+.cover:hover img { transform: scale(1.04); }
+.cover span { position: absolute; right: 10px; bottom: 10px; background: rgba(255,255,255,.92); color: var(--pink); font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 999px; }
+
+/* Ảnh charm trong giỏ hàng */
+.mini-bracelet img { width: 100%; height: 100%; object-fit: contain; }
+.mini-bracelet span:has(img) { background: none; border: 0; }
+
+/* Trang chủ: các nhóm charm */
+.grid--6 { grid-template-columns: repeat(3, 1fr); }
+.cat-card { position: relative; display: block; border-radius: 22px; overflow: hidden; box-shadow: var(--shadow); aspect-ratio: 1 / 1; background: var(--pink-100); }
+.cat-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+.cat-card:hover img { transform: scale(1.05); }
+.cat-card__name { position: absolute; left: 16px; bottom: 16px; background: rgba(255,255,255,.94); color: var(--maroon); font-weight: 700; padding: 8px 16px; border-radius: 999px; font-size: 14px; box-shadow: var(--shadow); }
+@media (max-width: 760px) { .grid--6 { grid-template-columns: 1fr 1fr; gap: 14px; } .cat-card__name { left: 10px; bottom: 10px; font-size: 12px; padding: 6px 12px; } }
