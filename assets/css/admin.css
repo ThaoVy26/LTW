@@ -1,0 +1,93 @@
+/* =====================================================================
+   Trang quản trị — admin.css
+   Dùng lại biến màu và nút trong style.css. Thứ tự:
+   1. Khung  2. Menu bên trái  3. Thanh trên  4. Thẻ & bảng  5. Form  6. Đăng nhập
+   ===================================================================== */
+
+/* ---------- 1. Khung ---------- */
+body.admin { display: flex; min-height: 100vh; background: var(--bg); }
+.ad-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.ad-content { padding: 8px 32px 56px; flex: 1; }
+.ad-flash { padding: 0 32px; }
+
+/* ---------- 2. Menu bên trái ---------- */
+.ad-side { width: 236px; flex-shrink: 0; background: #fff; border-right: 1px solid var(--line); padding: 26px 18px; display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100vh; }
+.ad-side .logo { font-size: 28px; }
+.ad-side__tag { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
+.ad-menu { display: flex; flex-direction: column; gap: 2px; }
+.ad-menu__link { padding: 10px 14px; border-radius: 10px; font-weight: 500; color: var(--text); transition: background .15s, color .15s; }
+.ad-menu__link:hover { background: var(--pink-50); color: var(--pink); }
+.ad-menu__link.is-active { background: var(--pink-100); color: var(--pink-dark); font-weight: 700; }
+.ad-side__shop { margin-top: auto; font-size: 13px; color: var(--muted); padding: 10px 14px; }
+.ad-side__shop:hover { color: var(--pink); }
+
+/* ---------- 3. Thanh trên ---------- */
+.ad-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 28px 32px 20px; }
+.ad-top__title { font-size: 26px; font-weight: 700; }
+.ad-user { display: flex; align-items: center; gap: 14px; font-size: 14px; }
+.ad-user__name { font-weight: 600; color: var(--ink); }
+.ad-user__link { color: var(--muted); }
+.ad-user__link:hover { color: var(--pink); }
+
+/* ---------- 4. Thẻ & bảng ---------- */
+.ad-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; }
+.ad-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 22px; }
+.ad-card__label { font-size: 13px; color: var(--muted); font-weight: 500; }
+.ad-card__value { font-size: 28px; font-weight: 800; color: var(--ink); margin-top: 6px; line-height: 1.15; }
+.ad-card__value--pink { color: var(--pink); }
+.ad-card__note { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+.ad-box { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px 24px; margin-bottom: 24px; }
+.ad-box__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.ad-box__title { font-size: 17px; font-weight: 700; }
+
+.ad-table-wrap { overflow-x: auto; }
+.ad-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.ad-table th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.ad-table td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.ad-table tr:last-child td { border-bottom: 0; }
+.ad-table .num { text-align: right; white-space: nowrap; }
+.ad-empty { padding: 28px 12px; text-align: center; color: var(--muted); }
+
+/* nhãn trạng thái đơn hàng */
+.tt { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+.tt--cho_xac_nhan { background: #fff4d6; color: #92580a; }
+.tt--dang_giao    { background: #e0edff; color: #1e4fa3; }
+.tt--hoan_tat     { background: #e3f7ea; color: #166534; }
+.tt--huy          { background: #f1f1f4; color: #6b7280; }
+
+/* ---------- 5. Form ---------- */
+.ad-form { max-width: 460px; }
+.ad-field { margin-bottom: 16px; }
+.ad-field label { display: block; font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.ad-field input { width: 100%; border: 1px solid #e3e3e8; border-radius: 12px; padding: 12px 16px; background: #fff; outline: none; transition: border-color .2s, box-shadow .2s; }
+.ad-field input:focus { border-color: var(--pink); box-shadow: 0 0 0 3px var(--pink-100); }
+.ad-field__hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+/* ---------- 6. Đăng nhập ---------- */
+body.dn { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--pink-50); }
+.dn-card { width: 100%; max-width: 400px; background: #fff; border-radius: 22px; box-shadow: 0 12px 40px rgba(224, 24, 95, .10); padding: 38px 34px 34px; }
+.dn-card .logo { display: block; text-align: center; font-size: 38px; margin-bottom: 4px; }
+.dn-card__sub { text-align: center; color: var(--muted); margin-bottom: 26px; font-size: 14px; }
+.dn-card .flash { margin-bottom: 16px; }
+.dn-back { display: block; text-align: center; margin-top: 18px; font-size: 13px; color: var(--muted); }
+.dn-back:hover { color: var(--pink); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1000px) {
+  .ad-cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 820px) {
+  body.admin { flex-direction: column; }
+  .ad-side { width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .ad-side__tag { margin: 0; }
+  .ad-menu { flex-direction: row; width: 100%; overflow-x: auto; order: 3; padding-bottom: 4px; }
+  .ad-menu__link { white-space: nowrap; }
+  .ad-side__shop { margin: 0 0 0 auto; padding: 0; }
+  .ad-top { flex-direction: column; align-items: flex-start; padding: 20px 16px 14px; }
+  .ad-content { padding: 4px 16px 40px; }
+  .ad-flash { padding: 0 16px; }
+}
+@media (max-width: 480px) {
+  .ad-cards { grid-template-columns: 1fr; }
+}
