@@ -11,6 +11,7 @@ $menuItems = [
     'trang-chu'   => ['index.php', 'Trang chủ'],
     'san-pham'    => ['shop.php', 'Sản phẩm'],
     'tu-thiet-ke' => ['customizer.php', 'Tự thiết kế'],
+    'tra-cuu'     => ['track-order.php', 'Tra cứu đơn'],
 ];
 ?>
 <!DOCTYPE html>
