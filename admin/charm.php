@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../includes/vy_catalog.php';
+require_once __DIR__ . '/../includes/catalog.php';
 require_once __DIR__ . '/../includes/auth.php';
 yeu_cau_admin();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
