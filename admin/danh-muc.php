@@ -40,6 +40,8 @@ if (isset($_GET['edit'])) {
     $edit = $s->fetch();
 }
 $rows = db()->query('SELECT d.*, (SELECT COUNT(*) FROM SanPham s WHERE s.id_danh_muc=d.id) so_sp FROM DanhMuc d ORDER BY id DESC')->fetchAll();
+$tieuDe = 'Danh mục';
+$menu = 'danh-muc';
 require __DIR__ . '/../includes/admin_header.php'; ?>
 <h1>Danh mục</h1>
 <section>

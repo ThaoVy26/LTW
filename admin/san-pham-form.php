@@ -43,6 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 $cats = db()->query('SELECT id,ten_danh_muc FROM DanhMuc ORDER BY ten_danh_muc')->fetchAll();
+$tieuDe = ($id ? 'Sửa sản phẩm' : 'Thêm sản phẩm');
+$menu = 'san-pham';
 require __DIR__ . '/../includes/admin_header.php'; ?>
 <h1>
     <?= $id ? 'Sửa' : 'Thêm' ?> sản phẩm</h1>
@@ -87,7 +89,7 @@ require __DIR__ . '/../includes/admin_header.php'; ?>
             <input type="file" name="hinh_anh" accept="image/jpeg,image/png,image/webp">
         </label>
         <?php if (!empty($item['hinh_anh'])): ?>
-        <img class="thumb" src="../uploads/<?= e(basename($item['hinh_anh'])) ?>" alt="Ảnh hiện tại">
+        <img class="thumb" src="../<?= e($item['hinh_anh']) ?>" alt="Ảnh hiện tại">
         <?php endif; ?>
         <button>Lưu sản phẩm</button>
     </form>

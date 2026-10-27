@@ -47,6 +47,8 @@ $s->bindValue($i, ($page - 1) * $limit, PDO::PARAM_INT);
 $s->execute();
 $rows = $s->fetchAll();
 $cats = db()->query('SELECT id,ten_danh_muc FROM DanhMuc ORDER BY ten_danh_muc')->fetchAll();
+$tieuDe = 'Sản phẩm';
+$menu = 'san-pham';
 require __DIR__ . '/../includes/admin_header.php'; ?>
 <h1>Sản phẩm</h1>
 <p>
@@ -80,7 +82,7 @@ require __DIR__ . '/../includes/admin_header.php'; ?>
     <tr>
         <td>
             <?php if ($r['hinh_anh']): ?>
-            <img class="thumb" src="../uploads/<?= e(basename($r['hinh_anh'])) ?>" alt="">
+            <img class="thumb" src="../<?= e($r['hinh_anh']) ?>" alt="">
             <?php endif; ?>
         </td>
         <td>

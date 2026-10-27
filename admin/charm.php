@@ -24,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect('charm.php');
 }
 $rows = db()->query('SELECT c.*,b.ten_bo_suu_tap FROM Charm c JOIN BoSuuTapCharm b ON b.id=c.id_bo_suu_tap ORDER BY c.id DESC')->fetchAll();
+$tieuDe = 'Charm';
+$menu = 'charm';
 require __DIR__ . '/../includes/admin_header.php'; ?>
 <h1>Quản lý charm</h1>
 <p>Chỉnh sửa tên, giá, ảnh và trạng thái hiển thị.</p>
@@ -36,7 +38,7 @@ require __DIR__ . '/../includes/admin_header.php'; ?>
         <h3>#<?= e($r['id']) ?> • <?= e($r['ten_bo_suu_tap']) ?>
         </h3>
         <?php if ($r['hinh_anh']): ?>
-        <img class="thumb" src="../uploads/<?= e(basename($r['hinh_anh'])) ?>" alt="">
+        <img class="thumb" src="../<?= e($r['hinh_anh']) ?>" alt="">
         <?php endif; ?>
         <label>Tên
             <input name="ten_charm" maxlength="150" required value="<?= e($r['ten_charm']) ?>">

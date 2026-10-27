@@ -1,4 +1,3 @@
-
 <?php
 
 require_once __DIR__ . '/functions.php';
@@ -65,5 +64,5 @@ function upload_anh(string $field, string $old = ''): string
         throw new RuntimeException('Không thể lưu ảnh.');
     }
 
-    return $name;
+    return 'uploads/' . $name;
 }
