@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/don_hang.php';
+require_once __DIR__ . '/../includes/admin_ui.php';
 yeu_cau_admin();
 
 const DON_MOI_TRANG = 10;
@@ -29,9 +30,9 @@ if ($q !== '') {
     $tham[] = ['%' . $q . '%', PDO::PARAM_STR];
     $tham[] = ['%' . $q . '%', PDO::PARAM_STR];
     // Gõ "#CA000012", "CA12" hoặc "12" thì tìm theo mã đơn
-    if (preg_match('/^#?(?:CA)?0*(\d{1,9})$/i', $q, $m)) {
+    if (($maDon = don_tach_ma($q)) !== null) {
         $dk     .= ' OR d.id = ?';
-        $tham[]  = [(int)$m[1], PDO::PARAM_INT];
+        $tham[]  = [$maDon, PDO::PARAM_INT];
     }
     $where[] = '(' . $dk . ')';
 }
@@ -130,18 +131,7 @@ require __DIR__ . '/../includes/admin_header.php';
       </table>
     </div>
 
-    <?php if ($soTrang > 1): ?>
-    <nav class="dh-pagination" aria-label="Phân trang">
-      <?php if ($trang > 1): ?><a href="<?= e(don_url(['trang' => $trang - 1])) ?>">‹</a><?php else: ?><span class="is-disabled">‹</span><?php endif; ?>
-      <?php for ($i = 1; $i <= $soTrang; $i++): ?>
-        <?php if ($i === 1 || $i === $soTrang || abs($i - $trang) <= 2): ?>
-          <a class="<?= $i === $trang ? 'is-active' : '' ?>" href="<?= e(don_url(['trang' => $i])) ?>"><?= $i ?></a>
-        <?php elseif (abs($i - $trang) === 3): ?><span>…</span>
-        <?php endif; ?>
-      <?php endfor; ?>
-      <?php if ($trang < $soTrang): ?><a href="<?= e(don_url(['trang' => $trang + 1])) ?>">›</a><?php else: ?><span class="is-disabled">›</span><?php endif; ?>
-    </nav>
-    <?php endif; ?>
+    <?= ad_phan_trang($trang, $soTrang, fn(int $p): string => don_url(['trang' => $p])) ?>
     <?php endif; ?>
   </section>
 </div>

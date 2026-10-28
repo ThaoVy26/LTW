@@ -1,0 +1,18 @@
+/* Trang mã giảm giá (Mỹ Anh). Tiền tố mg-; bảng, tab, tìm kiếm dùng lại từ admin-don-hang.css. */
+.mg-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.mg-head .dh__sub { margin: 0; }
+.mg-form { max-width: 620px; }
+.mg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.mg-field { margin-bottom: 16px; }
+.mg-field label { display: block; font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.mg-field input, .mg-field select { width: 100%; border: 1px solid #e3e3e8; border-radius: 12px; padding: 11px 14px; background: #fff; outline: none; font: inherit; transition: border-color .2s, box-shadow .2s; }
+.mg-field input:focus, .mg-field select:focus { border-color: var(--pink); box-shadow: 0 0 0 3px var(--pink-100); }
+.mg-field input[readonly] { background: var(--bg); color: var(--muted); }
+#ma_code { text-transform: uppercase; }
+.mg-field.has-error input, .mg-field.has-error select { border-color: #f08aa6; }
+.mg-err { color: #9f1239; font-size: 13px; margin-top: 4px; }
+.mg-unit { font-weight: 500; color: var(--muted); }
+.mg-check { display: flex; align-items: center; gap: 8px; font-size: 14px; margin: 4px 0 18px; }
+.mg-actions { display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
+.mg-actions form { margin: 0; }
+@media (max-width: 560px) { .mg-row { grid-template-columns: 1fr; gap: 0; } }

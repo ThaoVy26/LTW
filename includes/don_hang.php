@@ -33,6 +33,18 @@ function don_ma(int $id): string
     return '#CA' . str_pad((string)$id, 6, '0', STR_PAD_LEFT);
 }
 
+/**
+ * Tách số đơn từ chuỗi người dùng nhập: "12", "#12", "CA000012", "#CA000012" => 12.
+ * Không hợp lệ thì trả null. (Dùng chung cho admin/don-hang.php và track-order.php)
+ */
+function don_tach_ma(string $s): ?int
+{
+    if (preg_match('/^#?(?:CA)?0*(\d{1,9})$/i', trim($s), $m) && (int)$m[1] >= 1) {
+        return (int)$m[1];
+    }
+    return null;
+}
+
 function don_nhan_trang_thai(?string $tt): string
 {
     return DON_TRANG_THAI[(string)$tt] ?? (string)$tt;

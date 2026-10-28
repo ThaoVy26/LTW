@@ -59,6 +59,12 @@ require __DIR__ . '/../includes/admin_header.php';
     <h2 class="dh__ma"><?= e(don_ma($id)) ?>
       <span class="<?= e(class_trang_thai_don($tt)) ?>"><?= e(don_nhan_trang_thai($tt)) ?></span></h2>
     <div class="dh__sub">Đặt lúc <?= e(date('H:i d/m/Y', strtotime((string)$don['ngay_dat']))) ?></div>
+    <div class="dh-actions" style="margin-top:10px">
+      <a class="btn btn--light btn--sm" href="hoa-don.php?id=<?= (int)$id ?>" target="_blank" rel="noopener">In hoá đơn</a>
+      <?php if (preg_match('/^0\d{9}$/', (string)$don['sdt_nhan'])): ?>
+        <a class="btn btn--light btn--sm" href="khach-hang.php?sdt=<?= e($don['sdt_nhan']) ?>">Lịch sử khách này</a>
+      <?php endif; ?>
+    </div>
   </div>
 
   <div class="dh-grid">

@@ -1,0 +1,8 @@
+# Tự chuẩn hoá kiểu xuống dòng (tránh nhiễu CRLF/LF giữa các máy Windows)
+* text=auto
+
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.gif binary
