@@ -19,6 +19,7 @@ $maDon   = '#CA' . str_pad((string)$id, 6, '0', STR_PAD_LEFT);
 $tieuDe = 'Đặt hàng thành công';
 require __DIR__ . '/includes/header.php';
 ?>
+<link rel="stylesheet" href="<?= e(phien_ban('assets/css/in-an.css')) ?>" media="print">
 <main class="page">
   <div class="container container--narrow">
     <div class="card success">
@@ -41,7 +42,8 @@ require __DIR__ . '/includes/header.php';
         <div class="summary__total"><span>Tổng cộng:</span><span><?= tien($don['tong_tien']) ?></span></div>
       </div>
 
-      <div class="success__actions">
+      <div class="success__actions no-print">
+        <button type="button" class="btn btn--light" onclick="window.print()">In / Lưu PDF</button>
         <a class="btn btn--outline" href="shop.php">Tiếp tục mua sắm</a>
         <a class="btn btn--primary" href="index.php">Về trang chủ</a>
       </div>

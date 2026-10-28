@@ -27,12 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $loi = 'Bạn đã tra cứu sai quá nhiều lần. Vui lòng thử lại sau ' . (int)ceil(($tc['khoa_den'] - time()) / 60) . ' phút.';
     } elseif (!preg_match('/^0\d{9}$/', $sdt)) {
         $loi = 'Số điện thoại gồm 10 số, bắt đầu bằng 0.';
-    } elseif (!preg_match('/^#?(?:CA)?0*(\d{1,9})$/i', $maDon, $m) || (int)$m[1] < 1) {
+    } elseif (($idDon = don_tach_ma($maDon)) === null) {
         // Chấp nhận "12", "#12", "CA000012", "#CA000012"
         $loi = 'Mã đơn không hợp lệ. Ví dụ: #CA000012.';
     } else {
         $st = db()->prepare('SELECT * FROM DonHang WHERE id = ? AND sdt_nhan = ?');
-        $st->execute([(int)$m[1], $sdt]);
+        $st->execute([$idDon, $sdt]);
         $don = $st->fetch() ?: null;
 
         if ($don) {
@@ -57,25 +57,14 @@ $tieuDe = 'Tra cứu đơn hàng';
 $menu   = 'tra-cuu';
 require __DIR__ . '/includes/header.php';
 ?>
-<style>
-.track-form { padding: 32px; margin-bottom: 24px; }
-.track-steps { display: flex; justify-content: space-between; list-style: none; margin: 8px 0 4px; padding: 0; position: relative; }
-.track-steps::before { content: ""; position: absolute; left: 12%; right: 12%; top: 15px; height: 3px; background: var(--line); }
-.track-steps li { flex: 1; text-align: center; font-size: 13px; color: var(--muted); position: relative; }
-.track-steps li span { display: grid; place-items: center; width: 32px; height: 32px; margin: 0 auto 6px; border-radius: 50%; background: #fff; border: 2px solid var(--line); font-weight: 700; position: relative; z-index: 1; }
-.track-steps li.is-done { color: var(--ink); font-weight: 600; }
-.track-steps li.is-done span { background: var(--pink); border-color: var(--pink); color: #fff; }
-.track-cancel { background: var(--pink-50); border: 1px solid var(--pink-200); color: var(--pink-dark); border-radius: 12px; padding: 12px 16px; text-align: center; font-weight: 600; }
-.track-result { padding: 32px; }
-.track-note { margin-top: 14px; font-size: 14px; }
-@media (max-width: 520px) { .track-form, .track-result { padding: 20px; } .track-steps li { font-size: 12px; } }
-</style>
+<link rel="stylesheet" href="<?= e(phien_ban('assets/css/track-order.css')) ?>">
+<link rel="stylesheet" href="<?= e(phien_ban('assets/css/in-an.css')) ?>" media="print">
 <main class="page">
   <div class="container container--narrow">
-    <h1 class="page-title page-title--lg" style="margin-bottom:8px">Tra cứu đơn hàng</h1>
-    <p class="muted" style="margin-bottom:24px">Nhập số điện thoại đặt hàng và mã đơn (có trong trang đặt hàng thành công) để xem trạng thái đơn. Không cần tài khoản.</p>
+    <h1 class="page-title page-title--lg no-print" style="margin-bottom:8px">Tra cứu đơn hàng</h1>
+    <p class="muted no-print" style="margin-bottom:24px">Nhập số điện thoại đặt hàng và mã đơn (có trong trang đặt hàng thành công) để xem trạng thái đơn. Không cần tài khoản.</p>
 
-    <form method="post" class="card track-form" novalidate>
+    <form method="post" class="card track-form no-print" novalidate>
       <?= csrf_field() ?>
       <div class="row2">
         <label class="field">
@@ -121,6 +110,7 @@ require __DIR__ . '/includes/header.php';
         <div class="summary__total"><span>Tổng cộng:</span><span><?= tien($don['tong_tien']) ?></span></div>
       </div>
       <p class="muted track-note">Cần hỗ trợ? Liên hệ Charm Atelier qua email trong phần chân trang, nhớ kèm mã đơn.</p>
+      <button type="button" class="btn btn--light btn--sm no-print" style="margin-top:14px" onclick="window.print()">In / Lưu PDF</button>
     </div>
     <?php endif; ?>
   </div>

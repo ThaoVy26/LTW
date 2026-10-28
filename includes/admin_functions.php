@@ -4,15 +4,12 @@
  */
 declare(strict_types=1);
 
+require_once __DIR__ . '/don_hang.php';   // DON_TRANG_THAI: nguồn duy nhất của danh sách trạng thái đơn
+
 /** Trạng thái đơn hàng: mã lưu trong CSDL => tên hiển thị. */
 function ds_trang_thai_don(): array
 {
-    return [
-        'cho_xac_nhan' => 'Chờ xác nhận',
-        'dang_giao'    => 'Đang giao',
-        'hoan_tat'     => 'Hoàn tất',
-        'huy'          => 'Đã huỷ',
-    ];
+    return DON_TRANG_THAI;
 }
 
 function ten_trang_thai_don(?string $ma): string
