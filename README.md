@@ -13,7 +13,11 @@
    - `database/04_san_pham_charm.sql`: đưa 46 charm vào trang Sản phẩm (mục Charm), bỏ mục Đồng hồ
    - `database/05_tach_charm.sql`: thêm 114 charm tách từ ảnh bảng mẫu (tổng 160 charm), sắp đúng thứ tự trong bảng mẫu (cột `Charm.thu_tu`)
    - `database/06_anh_san_pham.sql`: gắn ảnh thật cho sản phẩm vòng (ảnh trong `assets/img/sp/`)
-4. Mở http://localhost/charm_atelier/
+   - `database/07_admin.sql`: bảng `TaiKhoan` và tài khoản quản trị (`admin` / `admin`)
+   - `database/08_vy_catalog.sql`: thêm cột `SanPham.gia_nhap` và `Charm.trang_thai` (quản lý sản phẩm / charm)
+4. Mở http://localhost/charm_atelier/ (khách) và http://localhost/charm_atelier/admin/ (quản trị: `admin` / `admin`, nên đổi mật khẩu sau khi đăng nhập).
+
+Hướng dẫn chi tiết từng bước: xem `readme.txt`.
 
 Nếu MySQL của bạn có mật khẩu, sửa trong `config/database.php`.
 
@@ -54,10 +58,11 @@ charm_atelier/
 | Thanh toán: kiểm tra form (JS + PHP), 3 phương thức, upload ảnh, lưu đơn bằng transaction, trừ kho | ✅ |
 | Trang chính sách / FAQ | ✅ (nội dung tĩnh) |
 | Responsive điện thoại | ✅ |
-| Đăng nhập / đăng ký khách hàng | ⏳ Chưa làm |
-| Tra cứu đơn hàng, lịch sử đơn | ⏳ Chưa làm |
-| Ảnh sản phẩm / charm thật | ⏳ Đang dùng ảnh giả lập (icon / emoji) |
-| Trang Admin (Back-end) | ⏳ Chưa làm |
+| Đăng nhập / đăng ký khách hàng | Không làm: khách mua không cần tài khoản, chỉ chủ shop (admin) đăng nhập |
+| Tra cứu đơn hàng bằng SĐT + mã đơn (`track-order.php`), in / lưu PDF | ✅ |
+| Ảnh sản phẩm / charm thật | ✅ |
+| Admin: đăng nhập, sản phẩm / danh mục / charm, đơn hàng (hoàn kho khi huỷ), khách hàng, mã giảm giá, hoá đơn | ✅ |
+| Admin: thống kê | ⏳ Đang làm (Quỳnh) |
 
 ## 4. Ghi chú kỹ thuật
 
