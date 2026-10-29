@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/vy_catalog.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/admin_ui.php';
 yeu_cau_admin();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_post();
@@ -50,76 +51,41 @@ $cats = db()->query('SELECT id,ten_danh_muc FROM DanhMuc ORDER BY ten_danh_muc')
 $tieuDe = 'Sản phẩm';
 $menu = 'san-pham';
 require __DIR__ . '/../includes/admin_header.php'; ?>
-<h1>Sản phẩm</h1>
-<p>
-    <a class="button" href="san-pham-form.php">+ Thêm sản phẩm</a>
-</p>
-<form method="get" class="filters">
-
-    <input name="q" placeholder="Tìm theo tên" value="<?= e($q) ?>">
-
-    <select name="cat">
-        <option value="0">Tất cả danh mục</option>
-        <?php foreach ($cats as $c): ?>
-        <option value="<?= e($c['id']) ?>" <?= $cat == (int) $c['id'] ? 'selected' : '' ?>>
-            <?= e($c['ten_danh_muc']) ?>
-        </option>
-        <?php endforeach; ?>
-    </select>
-    <button>Tìm kiếm</button>
-</form>
-<table>
-    <tr>
-        <th>Ảnh</th>
-        <th>Tên</th>
-        <th>Danh mục</th>
-        <th>Giá</th>
-        <th>Tồn</th>
-        <th>Trạng thái</th>
-        <th>Thao tác</th>
-    </tr>
+<link rel="stylesheet" href="../assets/css/admin-san-pham.css">
+<div class="sp-admin">
+<section class="ad-box">
+  <div class="sp-toolbar">
+    <form method="get" class="sp-filters">
+      <div class="ad-field"><label for="q">Tìm sản phẩm</label><input id="q" type="search" name="q" maxlength="200" placeholder="Nhập tên sản phẩm" value="<?= e($q) ?>"></div>
+      <div class="ad-field"><label for="cat">Danh mục</label><select id="cat" name="cat"><option value="0">Tất cả danh mục</option>
+        <?php foreach ($cats as $c): ?><option value="<?= (int)$c['id'] ?>" <?= $cat === (int)$c['id'] ? 'selected' : '' ?>><?= e($c['ten_danh_muc']) ?></option><?php endforeach; ?>
+      </select></div>
+      <button class="btn btn--primary btn--sm">Tìm kiếm</button>
+      <?php if ($q !== '' || $cat): ?><a class="btn btn--light btn--sm" href="san-pham.php">Xóa bộ lọc</a><?php endif; ?>
+    </form>
+    <a class="btn btn--primary btn--sm" href="san-pham-form.php">+ Thêm sản phẩm</a>
+  </div>
+  <p class="sp-muted"><?= (int)$total ?> sản phẩm · Trang <?= $page ?> / <?= $pages ?></p>
+  <div class="ad-table-wrap"><table class="ad-table sp-table">
+    <thead><tr><th>Ảnh</th><th>Tên sản phẩm</th><th>Danh mục</th><th class="num">Giá bán</th><th class="num">Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+    <tbody>
     <?php foreach ($rows as $r): ?>
-    <tr>
-        <td>
-            <?php if ($r['hinh_anh']): ?>
-            <img class="thumb" src="../<?= e($r['hinh_anh']) ?>" alt="">
-            <?php endif; ?>
-        </td>
-        <td>
-            <?= e($r['ten_sp']) ?>
-        </td>
-        <td>
-            <?= e($r['ten_danh_muc']) ?>
-        </td>
-        <td>
-            <?= tien($r['gia']) ?>
-        </td>
-        <td>
-            <?= e($r['so_luong_ton']) ?>
-        </td>
-        <td>
-            <?= e($r['trang_thai']) ?>
-        </td>
-        <td>
-            <a href="san-pham-form.php?id=<?= e($r['id']) ?>">Sửa</a>
-            <form class="inline" method="post" onsubmit="return confirm('Xoá sản phẩm?')">
-                <?= csrf_field() ?>
-
-                <input type="hidden" name="action" value="delete">
-
-                <input type="hidden" name="id" value="<?= e($r['id']) ?>">
-                <button class="danger" <?= $r['da_ban'] ? 'disabled' : '' ?>>Xoá</button>
-            </form>
-        </td>
-    </tr>
+      <tr>
+        <td><?php if ($r['hinh_anh']): ?><img class="sp-thumb" src="../<?= e($r['hinh_anh']) ?>" alt="<?= e($r['ten_sp']) ?>" loading="lazy"><?php else: ?><span class="sp-no-image">Chưa có ảnh</span><?php endif; ?></td>
+        <td class="sp-name"><?= e($r['ten_sp']) ?></td><td><?= e($r['ten_danh_muc']) ?></td>
+        <td class="num"><?= tien($r['gia']) ?></td><td class="num"><?= (int)$r['so_luong_ton'] ?></td>
+        <td><span class="sp-badge <?= $r['trang_thai'] === 'dang_ban' ? 'sp-badge--on' : 'sp-badge--off' ?>"><?= $r['trang_thai'] === 'dang_ban' ? 'Đang bán' : 'Ngừng bán' ?></span></td>
+        <td><div class="sp-actions"><a class="btn btn--light btn--sm" href="san-pham-form.php?id=<?= (int)$r['id'] ?>">Sửa</a>
+          <form method="post" onsubmit="return confirm('Xóa sản phẩm này?')">
+            <?= csrf_field() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= (int)$r['id'] ?>">
+            <button class="btn btn--sm sp-delete" <?= $r['da_ban'] ? 'disabled title="Sản phẩm đã có trong đơn hàng"' : '' ?>>Xóa</button>
+          </form></div></td>
+      </tr>
     <?php endforeach; ?>
-</table>
-<p>Trang <?= e($page) ?> / <?= e($pages) ?> • <?= e($total) ?> sản phẩm</p>
-<div class="pagination">
-    <?php for ($j = 1; $j <= $pages; $j++): ?>
-    <a href="?<?= e(http_build_query(['q' => $q, 'cat' => $cat, 'page' => $j])) ?>">
-        <?= e($j) ?>
-    </a>
-    <?php endfor; ?>
+    <?php if (!$rows): ?><tr><td colspan="7" class="ad-empty">Không có sản phẩm phù hợp.</td></tr><?php endif; ?>
+    </tbody>
+  </table></div>
+  <?= ad_phan_trang($page, $pages, fn(int $p): string => '?' . http_build_query(['q' => $q, 'cat' => $cat, 'page' => $p])) ?>
+</section>
 </div>
 <?php require __DIR__ . '/../includes/admin_footer.php'; ?>
