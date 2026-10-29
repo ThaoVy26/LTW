@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS TaiKhoan (
 );
 
 INSERT INTO TaiKhoan (ten_dang_nhap, mat_khau_hash, ho_ten)
-VALUES ('admin', '$2y$10$mbUAcWo6PtEGlfRSYiG1V.9pOh2ha.1Ez/JCFuIvr2r9MvZYY23.u', 'Quản trị viên');
+VALUES ('admin', '$2y$10$e5l/mCnTSYgbpBLmZxfgmeo2H.B8QcpGJJAtwmkl4uTnAxVlJVs.q', 'Quản trị viên');
