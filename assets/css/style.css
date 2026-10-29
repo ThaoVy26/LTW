@@ -640,3 +640,29 @@ select.input { appearance: none; background: #fff url("data:image/svg+xml,%3Csvg
 .detail__media:not(.detail__media--charm) > img { width: 100%; height: 100%; object-fit: cover; }
 .combo-card__img > img[src*="/sp/"] { object-fit: cover; padding: 0; background: none; }
 .cart-item__img > img[src*="/sp/"] { object-fit: cover; padding: 0; }
+
+/* ---------- Bổ sung: điện thoại, phí ship, phân trang ---------- */
+.ship-note { margin: -6px 0 16px; padding: 8px 12px; border-radius: 10px; background: var(--pink-50); color: var(--pink-dark); font-size: 13px; }
+.pagination__dots { align-self: center; color: var(--muted); padding: 0 2px; }
+
+/* Bộ lọc thu gọn: máy tính luôn mở, ẩn tiêu đề; điện thoại bấm để mở */
+.filter-toggle > summary { display: none; list-style: none; cursor: pointer; font-weight: 600; color: var(--ink); }
+.filter-toggle > summary::-webkit-details-marker { display: none; }
+@media (max-width: 960px) {
+  .filter { padding: 14px 18px; }
+  .filter-toggle > summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; }
+  .filter-toggle > summary::after { content: "▾"; color: var(--pink); }
+  .filter-toggle[open] > summary { padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
+  .filter-toggle[open] > summary::after { content: "▴"; }
+  .pagination { gap: 6px; margin-top: 36px; flex-wrap: wrap; }
+  .pagination a { min-width: 38px; height: 38px; }
+
+  /* Trang Tự thiết kế: thanh tổng tiền + nút luôn nằm dưới màn hình */
+  .cust-price { position: sticky; bottom: 0; z-index: 20; border-radius: 16px 16px 0 0; box-shadow: 0 -8px 24px rgba(17, 24, 39, .12); padding: 14px 18px; }
+  .cust-price h3, .cust-price .summary__row { display: none; }
+  .cust-price .summary__total { border-top: 0; padding-top: 0; margin: 0 0 10px; font-size: 16px; }
+  .cust-price .summary__total span:last-child { font-size: 22px; }
+  .cust-price .cust-buttons { gap: 10px; }
+  .cust-price .btn--lg { padding: 11px 12px; font-size: 15px; }
+  .cust-price .cust-msg { margin-top: 8px; min-height: 0; }
+}

@@ -26,7 +26,9 @@ if (!isset($dsSapXep[$sapXep])) {
 /* ---- Danh mục kèm số lượng sản phẩm ---- */
 $danhMuc = db()->query(
     "SELECT dm.id, dm.ten_danh_muc, COUNT(sp.id) AS so_sp
-     FROM DanhMuc dm LEFT JOIN SanPham sp ON sp.id_danh_muc = dm.id AND sp.trang_thai = 'dang_ban'
+     FROM DanhMuc dm
+     LEFT JOIN SanPham sp ON sp.id_danh_muc = dm.id AND sp.trang_thai = 'dang_ban'
+         AND (sp.id_charm IS NULL OR sp.id_charm IN (SELECT id FROM Charm WHERE trang_thai = 'hien'))
      GROUP BY dm.id HAVING so_sp > 0 ORDER BY dm.id"
 )->fetchAll();
 $tongSp = array_sum(array_column($danhMuc, 'so_sp'));
@@ -39,7 +41,7 @@ if ($dm && $dm === $idDmCharm) {
         "SELECT n.slug, n.ten_nhom, COUNT(sp.id) AS so_sp
          FROM NhomCharm n
          JOIN BoSuuTapCharm b ON b.id_nhom = n.id
-         JOIN Charm c         ON c.id_bo_suu_tap = b.id
+         JOIN Charm c         ON c.id_bo_suu_tap = b.id AND c.trang_thai = 'hien'
          JOIN SanPham sp      ON sp.id_charm = c.id AND sp.trang_thai = 'dang_ban'
          GROUP BY n.id ORDER BY n.thu_tu"
     )->fetchAll();
@@ -48,7 +50,7 @@ if ($dm && $dm === $idDmCharm) {
 }
 
 /* ---- Truy vấn sản phẩm (prepared statement) ---- */
-$where  = ["sp.trang_thai = 'dang_ban'", 'sp.gia <= ?'];
+$where  = ["sp.trang_thai = 'dang_ban'", "(c.id IS NULL OR c.trang_thai = 'hien')", 'sp.gia <= ?'];
 $params = [$giaMax];
 if ($dm) {
     $where[]  = 'sp.id_danh_muc = ?';
@@ -92,6 +94,7 @@ function url_loc(array $doi): string
 }
 
 $tieuDe  = 'Sản phẩm';
+$moTa    = 'Vòng tay Italian Charm, combo và hơn 150 charm lẻ. Lọc theo danh mục, khoảng giá, nhóm charm.';
 $menu    = 'san-pham';
 $scripts = ['assets/js/shop.js'];
 require __DIR__ . '/includes/header.php';
@@ -120,6 +123,8 @@ require __DIR__ . '/includes/header.php';
 
       <div class="shop-layout">
         <aside class="card filter">
+          <details class="filter-toggle" id="filter-toggle" open>
+          <summary>Bộ lọc <span class="muted small">(danh mục, khoảng giá)</span></summary>
           <div class="filter__head">
             <h3>Danh mục</h3>
             <a href="<?= url_loc(['dm' => null, 'nhom' => null, 'page' => null]) ?>">Tất cả (<?= $tongSp ?>)</a>
@@ -138,6 +143,7 @@ require __DIR__ . '/includes/header.php';
             <span>0đ</span><b id="gia-text">0đ – <?= tien($giaMax) ?></b><span><?= tien(GIA_TRAN) ?></span>
           </div>
           <a class="btn btn--dashed btn--block" href="shop.php">Đặt lại bộ lọc</a>
+          </details>
         </aside>
 
         <section>
@@ -166,9 +172,6 @@ require __DIR__ . '/includes/header.php';
                 <article class="product-card<?= $sp['id_charm'] ? ' product-card--charm kieu-' . e($sp['kieu_charm']) : '' ?>">
                   <div class="product-card__media">
                     <?php if ($sp['nhan']): ?><span class="badge <?= class_nhan($sp['nhan']) ?>"><?= e($sp['nhan']) ?></span><?php endif; ?>
-                    <button type="button" class="wish" data-wish="<?= $sp['id'] ?>" aria-label="Yêu thích">
-                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5C19 15.6 12 20 12 20z"/></svg>
-                    </button>
                     <a href="product.php?id=<?= $sp['id'] ?>"><?= anh_san_pham($sp) ?></a>
                   </div>
                   <div class="product-card__body">
@@ -188,7 +191,11 @@ require __DIR__ . '/includes/header.php';
               <nav class="pagination" aria-label="Phân trang">
                 <a class="<?= $trang === 1 ? 'is-disabled' : '' ?>" href="<?= url_loc(['page' => max(1, $trang - 1)]) ?>" aria-label="Trang trước">‹</a>
                 <?php for ($i = 1; $i <= $soTrang; $i++): ?>
-                  <a class="<?= $i === $trang ? 'is-active' : '' ?>" href="<?= url_loc(['page' => $i]) ?>"><?= $i ?></a>
+                  <?php if ($i === 1 || $i === $soTrang || abs($i - $trang) <= 1): ?>
+                    <a class="<?= $i === $trang ? 'is-active' : '' ?>" href="<?= url_loc(['page' => $i]) ?>"><?= $i ?></a>
+                  <?php elseif (abs($i - $trang) === 2): ?>
+                    <span class="pagination__dots" aria-hidden="true">…</span>
+                  <?php endif; ?>
                 <?php endfor; ?>
                 <a class="<?= $trang === $soTrang ? 'is-disabled' : '' ?>" href="<?= url_loc(['page' => min($soTrang, $trang + 1)]) ?>" aria-label="Trang sau">›</a>
               </nav>

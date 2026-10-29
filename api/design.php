@@ -39,13 +39,13 @@ $slots   = array_map(fn($v) => $v === null ? null : (int)$v, array_values($slots
 $idDung  = array_values(array_unique(array_filter($slots, fn($v) => $v !== null && $v !== O_NOI)));
 $charm   = [];
 if ($idDung) {
-    $st = db()->prepare('SELECT id, gia, kieu FROM Charm WHERE id IN (' . implode(',', array_fill(0, count($idDung), '?')) . ')');
+    $st = db()->prepare('SELECT id, gia, kieu FROM Charm WHERE trang_thai = "hien" AND id IN (' . implode(',', array_fill(0, count($idDung), '?')) . ')');
     $st->execute($idDung);
     foreach ($st->fetchAll() as $c) {
         $charm[(int)$c['id']] = $c;
     }
     if (count($charm) !== count($idDung)) {
-        tra_json(['ok' => false, 'message' => 'Có charm không còn tồn tại.'], 422);
+        tra_json(['ok' => false, 'message' => 'Có charm không còn được bán.'], 422);
     }
 }
 if ($action === 'cart' && !$idDung) {

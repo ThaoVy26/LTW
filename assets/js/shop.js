@@ -1,9 +1,13 @@
-/* shop.js — trang Sản phẩm: tự submit bộ lọc, thanh giá, thêm giỏ bằng fetch, yêu thích */
+/* shop.js — trang Sản phẩm: tự submit bộ lọc, thanh giá, thêm giỏ bằng fetch, bộ lọc thu gọn trên điện thoại */
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("filter-form");
   const range = document.getElementById("gia-max");
   const giaText = document.getElementById("gia-text");
   const tien = (n) => Number(n).toLocaleString("vi-VN") + "đ";
+
+  // Điện thoại / máy tính bảng: bộ lọc thu gọn sẵn để thấy sản phẩm ngay
+  const hop = document.getElementById("filter-toggle");
+  if (hop && window.matchMedia("(max-width: 960px)").matches) hop.removeAttribute("open");
 
   // Đổi sắp xếp → lọc lại ngay
   form.querySelectorAll("[data-autosubmit]").forEach((el) => el.addEventListener("change", () => form.submit()));
@@ -42,17 +46,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }));
 
-  // Yêu thích: lưu trong trình duyệt
-  const KEY = "yeu_thich";
-  let fav = [];
-  try { fav = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
-  document.querySelectorAll("[data-wish]").forEach((b) => {
-    const id = b.dataset.wish;
-    b.classList.toggle("is-on", fav.includes(id));
-    b.addEventListener("click", () => {
-      fav = fav.includes(id) ? fav.filter((x) => x !== id) : [...fav, id];
-      b.classList.toggle("is-on", fav.includes(id));
-      try { localStorage.setItem(KEY, JSON.stringify(fav)); } catch (e) {}
-    });
-  });
 });

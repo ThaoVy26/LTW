@@ -7,24 +7,26 @@ $st = db()->prepare(
      FROM SanPham sp JOIN DanhMuc dm ON dm.id = sp.id_danh_muc
      LEFT JOIN Charm c ON c.id = sp.id_charm
      LEFT JOIN BoSuuTapCharm b ON b.id = c.id_bo_suu_tap
-     WHERE sp.id = ? AND sp.trang_thai = 'dang_ban'"
+     WHERE sp.id = ? AND sp.trang_thai = 'dang_ban' AND (c.id IS NULL OR c.trang_thai = 'hien')"
 );
 $st->execute([$id]);
 $sp = $st->fetch();
 if (!$sp) {
-    http_response_code(404);
-    flash('loi', 'Không tìm thấy sản phẩm.');
-    chuyen_trang('shop.php');
+    require __DIR__ . '/404.php';   // trang 404 thân thiện, mã trạng thái 404
+    exit;
 }
 
 $st = db()->prepare(
     "SELECT sp.*, dm.ten_danh_muc FROM SanPham sp JOIN DanhMuc dm ON dm.id = sp.id_danh_muc
-     WHERE sp.id_danh_muc = ? AND sp.id <> ? AND sp.trang_thai = 'dang_ban' ORDER BY RAND() LIMIT 4"
+     WHERE sp.id_danh_muc = ? AND sp.id <> ? AND sp.trang_thai = 'dang_ban'
+       AND (sp.id_charm IS NULL OR sp.id_charm IN (SELECT id FROM Charm WHERE trang_thai = 'hien'))
+     ORDER BY RAND() LIMIT 4"
 );
 $st->execute([$sp['id_danh_muc'], $sp['id']]);
 $lienQuan = $st->fetchAll();
 
 $tieuDe = $sp['ten_sp'];
+$moTa   = mb_substr(trim(strip_tags((string)$sp['mo_ta'])) ?: ($sp['ten_sp'] . ' tại Charm Atelier.'), 0, 155);
 $menu   = 'san-pham';
 require __DIR__ . '/includes/header.php';
 ?>
