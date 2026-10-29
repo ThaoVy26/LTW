@@ -5,7 +5,12 @@
  */
 declare(strict_types=1);
 
+// Mốc "hôm nay" của thống kê phải khớp giờ Việt Nam (XAMPP mặc định dùng múi giờ khác)
+date_default_timezone_set('Asia/Ho_Chi_Minh');
+
 if (session_status() === PHP_SESSION_NONE) {
+    // Cookie phiên: JavaScript không đọc được, không gửi kèm khi bị nhúng từ trang khác
+    session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax']);
     session_start();
 }
 require_once __DIR__ . '/../config/database.php';

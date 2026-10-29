@@ -1,0 +1,5 @@
+# Thư mục chứa ảnh người dùng tải lên: không cho chạy mã PHP trong đây
+<FilesMatch "\.(php|phtml|phar)$">
+    Require all denied
+</FilesMatch>
+Options -Indexes
