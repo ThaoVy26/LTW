@@ -61,9 +61,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $ghiChu = $du['ghi_chu'] . ($tenAnh ? ($du['ghi_chu'] ? ' | ' : '') . 'Ảnh: uploads/' . $tenAnh : '');
 
-            $pdo->prepare('INSERT INTO KhachHang (ho_ten, so_dien_thoai, email, dia_chi) VALUES (?, ?, ?, ?)')
-                ->execute([$du['ho_ten'], $du['sdt'], $du['email'] ?: null, $du['dia_chi']]);
-            $idKh = (int)$pdo->lastInsertId();
+            // Cùng số điện thoại thì dùng lại hồ sơ khách cũ (cập nhật thông tin mới nhất), không tạo khách mới
+            $tim = $pdo->prepare('SELECT id FROM KhachHang WHERE so_dien_thoai = ? ORDER BY id DESC LIMIT 1');
+            $tim->execute([$du['sdt']]);
+            $idKh = (int)$tim->fetchColumn();
+            if ($idKh) {
+                $pdo->prepare('UPDATE KhachHang SET ho_ten = ?, email = COALESCE(?, email), dia_chi = ? WHERE id = ?')
+                    ->execute([$du['ho_ten'], $du['email'] ?: null, $du['dia_chi'], $idKh]);
+            } else {
+                $pdo->prepare('INSERT INTO KhachHang (ho_ten, so_dien_thoai, email, dia_chi) VALUES (?, ?, ?, ?)')
+                    ->execute([$du['ho_ten'], $du['sdt'], $du['email'] ?: null, $du['dia_chi']]);
+                $idKh = (int)$pdo->lastInsertId();
+            }
 
             $pdo->prepare(
                 'INSERT INTO DonHang (id_khach_hang, id_ma_giam_gia, ho_ten_nhan, sdt_nhan, dia_chi_giao,
