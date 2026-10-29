@@ -91,3 +91,24 @@ body.dn { min-height: 100vh; display: flex; align-items: center; justify-content
 @media (max-width: 480px) {
   .ad-cards { grid-template-columns: 1fr; }
 }
+
+/* ---------- 7. Thống kê ---------- */
+.tk-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.tk-tab { padding: 7px 16px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-size: 14px; font-weight: 500; transition: all .15s; }
+.tk-tab:hover { border-color: var(--pink); color: var(--pink); }
+.tk-tab.is-active { background: var(--pink); border-color: var(--pink); color: #fff; }
+.tk-range { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-bottom: 12px; font-size: 13px; color: var(--muted); }
+.tk-range label { display: flex; flex-direction: column; gap: 4px; }
+.tk-range input[type="date"] { border: 1px solid #e3e3e8; border-radius: 10px; padding: 7px 10px; background: #fff; color: var(--ink); }
+.tk-ky { margin-bottom: 18px; font-size: 14px; color: var(--muted); }
+.tk-ky b { color: var(--ink); }
+.tk-chart { width: 100%; height: auto; display: block; }
+.tk-grid { stroke: var(--line); stroke-width: 1; }
+.tk-txt { fill: var(--muted); font-size: 11px; font-family: var(--font); }
+.tk-bar { fill: var(--pink); }
+.tk-bar:hover { fill: var(--pink-dark); }
+.tk-hai-cot { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.tk-thumb { display: inline-block; width: 28px; height: 28px; border-radius: 8px; object-fit: cover; vertical-align: middle; margin-right: 8px; background: var(--pink-50); }
+.tk-trang { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 16px; font-size: 14px; }
+.tk-trang a { color: var(--pink); font-weight: 600; }
+@media (max-width: 820px) { .tk-hai-cot { grid-template-columns: 1fr; gap: 0; } }
