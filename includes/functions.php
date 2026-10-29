@@ -15,7 +15,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/../config/database.php';
 
-const PHI_VAN_CHUYEN = 30000;
+const PHI_VAN_CHUYEN   = 30000;
+const NGUONG_MIEN_PHI  = 500000;   // đơn từ mức này được miễn phí vận chuyển
 const SP_MOI_TRANG   = 6;
 
 /* ---------------- Tiện ích chung ---------------- */
@@ -180,7 +181,11 @@ function gio(): array
 
 function gio_them_san_pham(int $idSp, int $soLuong = 1): array
 {
-    $st = db()->prepare("SELECT id, ten_sp, so_luong_ton FROM SanPham WHERE id = ? AND trang_thai = 'dang_ban'");
+    $st = db()->prepare(
+        "SELECT sp.id, sp.ten_sp, sp.so_luong_ton FROM SanPham sp
+         LEFT JOIN Charm c ON c.id = sp.id_charm
+         WHERE sp.id = ? AND sp.trang_thai = 'dang_ban' AND (c.id IS NULL OR c.trang_thai = 'hien')"
+    );
     $st->execute([$idSp]);
     $sp = $st->fetch();
     if (!$sp) {
@@ -246,6 +251,31 @@ function gio_chi_tiet(): array
 }
 
 /** Tính tiền giỏ + mã giảm giá đang áp dụng. */
+/**
+ * Tìm mã và kiểm tra điều kiện áp dụng theo giá trị giỏ hàng.
+ * Trả về [mã hoặc null, lý do khi không dùng được].
+ */
+function kiem_tra_ma_giam_gia(string $code, int $tamTinh): array
+{
+    $ma = tim_ma_giam_gia($code);
+    if (!$ma) {
+        return [null, 'Mã "' . strtoupper(trim($code)) . '" không hợp lệ hoặc đã hết hạn.'];
+    }
+    $toiThieu = (int)($ma['don_toi_thieu'] ?? 0);
+    if ($toiThieu > 0 && $tamTinh < $toiThieu) {
+        return [null, 'Mã ' . $ma['ma_code'] . ' chỉ áp dụng cho đơn từ ' . tien($toiThieu)
+            . ' (bạn cần mua thêm ' . tien($toiThieu - $tamTinh) . ').'];
+    }
+    if (($ma['luot_toi_da'] ?? null) !== null) {
+        $st = db()->prepare("SELECT COUNT(*) FROM DonHang WHERE id_ma_giam_gia = ? AND trang_thai_don <> 'huy'");
+        $st->execute([$ma['id']]);
+        if ((int)$st->fetchColumn() >= (int)$ma['luot_toi_da']) {
+            return [null, 'Mã ' . $ma['ma_code'] . ' đã hết lượt sử dụng.'];
+        }
+    }
+    return [$ma, ''];
+}
+
 function gio_tinh_tien(?array $dong = null): array
 {
     $dong ??= gio_chi_tiet();
@@ -253,18 +283,22 @@ function gio_tinh_tien(?array $dong = null): array
     foreach ($dong as $d) {
         $tam += $d['don_gia'] * $d['so_luong'];
     }
-    $ship = $dong ? PHI_VAN_CHUYEN : 0;
+    $ship = ($dong && $tam < NGUONG_MIEN_PHI) ? PHI_VAN_CHUYEN : 0;
     $ma   = null;
     $giam = 0;
     if (!empty($_SESSION['ma_giam_gia'])) {
-        $ma = tim_ma_giam_gia($_SESSION['ma_giam_gia']);
+        [$ma, $lyDo] = kiem_tra_ma_giam_gia($_SESSION['ma_giam_gia'], $tam);
         if ($ma) {
             $giam = $ma['loai_giam'] === 'phan_tram'
                 ? (int)round($tam * $ma['gia_tri'] / 100)
                 : (int)$ma['gia_tri'];
+            if ($ma['loai_giam'] === 'phan_tram' && ($ma['giam_toi_da'] ?? null) !== null) {
+                $giam = min($giam, (int)$ma['giam_toi_da']);
+            }
             $giam = min($giam, $tam + $ship);
         } else {
             unset($_SESSION['ma_giam_gia']);
+            flash('loi', $lyDo);   // vd: giỏ giảm xuống dưới mức đơn tối thiểu
         }
     }
     return ['tam' => $tam, 'ship' => $ship, 'giam' => $giam, 'tong' => $tam + $ship - $giam, 'ma' => $ma];

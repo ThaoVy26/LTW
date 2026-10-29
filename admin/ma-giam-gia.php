@@ -37,7 +37,8 @@ function mg_so_don_da_dung(int $id): int
 
 /* ---------------- Xử lý POST ---------------- */
 $loi = [];
-$du  = ['id' => 0, 'ma_code' => '', 'loai_giam' => 'so_tien', 'gia_tri' => '', 'ngay_bat_dau' => '', 'ngay_het_han' => '', 'bat' => '1'];
+$du  = ['id' => 0, 'ma_code' => '', 'loai_giam' => 'so_tien', 'gia_tri' => '', 'ngay_bat_dau' => '', 'ngay_het_han' => '', 'bat' => '1',
+       'don_toi_thieu' => '', 'giam_toi_da' => '', 'luot_toi_da' => ''];
 $hienForm = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -87,6 +88,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'ngay_bat_dau' => trim((string)($_POST['ngay_bat_dau'] ?? '')),
             'ngay_het_han' => trim((string)($_POST['ngay_het_han'] ?? '')),
             'bat'          => isset($_POST['bat']) ? '1' : '',
+            'don_toi_thieu' => trim((string)($_POST['don_toi_thieu'] ?? '')),
+            'giam_toi_da'  => trim((string)($_POST['giam_toi_da'] ?? '')),
+            'luot_toi_da'  => trim((string)($_POST['luot_toi_da'] ?? '')),
         ];
 
         // Mã đã có đơn dùng thì giữ nguyên tên mã (để lịch sử đơn không bị khó hiểu)
@@ -126,6 +130,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $loi['gia_tri'] = 'Số tiền giảm tối đa 10.000.000đ.';
         }
 
+        // Điều kiện áp dụng (để trống = không giới hạn)
+        $toiThieu = 0; $giamToiDa = null; $luotToiDa = null;
+        if ($du['don_toi_thieu'] !== '') {
+            $toiThieu = ad_so_nguyen($du['don_toi_thieu']);
+            if ($toiThieu === null) { $loi['don_toi_thieu'] = 'Đơn tối thiểu phải là số nguyên không âm.'; $toiThieu = 0; }
+        }
+        if ($du['giam_toi_da'] !== '') {
+            $giamToiDa = ad_so_nguyen($du['giam_toi_da']);
+            if ($giamToiDa === null || $giamToiDa < 1) $loi['giam_toi_da'] = 'Mức giảm tối đa phải là số nguyên lớn hơn 0.';
+        }
+        if ($du['luot_toi_da'] !== '') {
+            $luotToiDa = ad_so_nguyen($du['luot_toi_da']);
+            if ($luotToiDa === null || $luotToiDa < 1) $loi['luot_toi_da'] = 'Số lượt dùng tối đa phải là số nguyên lớn hơn 0.';
+        }
+
         $bd = $du['ngay_bat_dau'] === '' ? null : ad_ngay($du['ngay_bat_dau']);
         $hh = $du['ngay_het_han'] === '' ? null : ad_ngay($du['ngay_het_han']);
         if ($du['ngay_bat_dau'] !== '' && $bd === null) $loi['ngay_bat_dau'] = 'Ngày bắt đầu không hợp lệ.';
@@ -139,13 +158,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 if ($id > 0) {
                     $pdo->prepare(
-                        'UPDATE MaGiamGia SET ma_code = ?, loai_giam = ?, gia_tri = ?, ngay_bat_dau = ?, ngay_het_han = ?, trang_thai = ? WHERE id = ?'
-                    )->execute([$du['ma_code'], $du['loai_giam'], $giaTri, $bd, $hh, $trangThai, $id]);
+                        'UPDATE MaGiamGia SET ma_code = ?, loai_giam = ?, gia_tri = ?, ngay_bat_dau = ?, ngay_het_han = ?, trang_thai = ?,
+                            don_toi_thieu = ?, giam_toi_da = ?, luot_toi_da = ? WHERE id = ?'
+                    )->execute([$du['ma_code'], $du['loai_giam'], $giaTri, $bd, $hh, $trangThai, $toiThieu, $giamToiDa, $luotToiDa, $id]);
                     flash('ok', 'Đã cập nhật mã ' . $du['ma_code'] . '.');
                 } else {
                     $pdo->prepare(
-                        'INSERT INTO MaGiamGia (ma_code, loai_giam, gia_tri, ngay_bat_dau, ngay_het_han, trang_thai) VALUES (?, ?, ?, ?, ?, ?)'
-                    )->execute([$du['ma_code'], $du['loai_giam'], $giaTri, $bd, $hh, $trangThai]);
+                        'INSERT INTO MaGiamGia (ma_code, loai_giam, gia_tri, ngay_bat_dau, ngay_het_han, trang_thai, don_toi_thieu, giam_toi_da, luot_toi_da)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                    )->execute([$du['ma_code'], $du['loai_giam'], $giaTri, $bd, $hh, $trangThai, $toiThieu, $giamToiDa, $luotToiDa]);
                     flash('ok', 'Đã tạo mã ' . $du['ma_code'] . '.');
                 }
                 chuyen_trang('ma-giam-gia.php');
@@ -170,6 +191,9 @@ if (!$hienForm) {
                 'id' => (int)$m['id'], 'ma_code' => $m['ma_code'], 'loai_giam' => $m['loai_giam'],
                 'gia_tri' => (string)(int)$m['gia_tri'], 'ngay_bat_dau' => (string)$m['ngay_bat_dau'],
                 'ngay_het_han' => (string)$m['ngay_het_han'], 'bat' => $m['trang_thai'] === 'hoat_dong' ? '1' : '',
+                'don_toi_thieu' => (int)($m['don_toi_thieu'] ?? 0) > 0 ? (string)(int)$m['don_toi_thieu'] : '',
+                'giam_toi_da' => ($m['giam_toi_da'] ?? null) !== null ? (string)(int)$m['giam_toi_da'] : '',
+                'luot_toi_da' => ($m['luot_toi_da'] ?? null) !== null ? (string)(int)$m['luot_toi_da'] : '',
             ];
         } else {
             flash('loi', 'Không tìm thấy mã giảm giá.');
@@ -293,6 +317,29 @@ require __DIR__ . '/../includes/admin_header.php';
         </div>
       </div>
 
+      <div class="mg-row">
+        <div class="mg-field<?= isset($loi['don_toi_thieu']) ? ' has-error' : '' ?>">
+          <label for="don_toi_thieu">Đơn tối thiểu (đ)</label>
+          <input id="don_toi_thieu" name="don_toi_thieu" value="<?= e($du['don_toi_thieu']) ?>" inputmode="numeric" placeholder="VD: 300000">
+          <?= mg_o_loi($loi, 'don_toi_thieu') ?>
+          <div class="ad-field__hint">Để trống nếu áp dụng cho mọi đơn.</div>
+        </div>
+        <div class="mg-field<?= isset($loi['giam_toi_da']) ? ' has-error' : '' ?>">
+          <label for="giam_toi_da">Giảm tối đa (đ), cho mã %</label>
+          <input id="giam_toi_da" name="giam_toi_da" value="<?= e($du['giam_toi_da']) ?>" inputmode="numeric" placeholder="VD: 50000">
+          <?= mg_o_loi($loi, 'giam_toi_da') ?>
+          <div class="ad-field__hint">Để trống nếu không giới hạn.</div>
+        </div>
+      </div>
+      <div class="mg-row">
+        <div class="mg-field<?= isset($loi['luot_toi_da']) ? ' has-error' : '' ?>">
+          <label for="luot_toi_da">Số lượt dùng tối đa</label>
+          <input id="luot_toi_da" name="luot_toi_da" value="<?= e($du['luot_toi_da']) ?>" inputmode="numeric" placeholder="VD: 100">
+          <?= mg_o_loi($loi, 'luot_toi_da') ?>
+          <div class="ad-field__hint">Chỉ tính đơn chưa huỷ. Để trống nếu không giới hạn.</div>
+        </div>
+      </div>
+
       <label class="mg-check">
         <input type="checkbox" name="bat" value="1"<?= $du['bat'] === '1' ? ' checked' : '' ?>>
         Đang bật (khách áp dụng được trong khoảng ngày trên)
@@ -338,7 +385,15 @@ require __DIR__ . '/../includes/admin_header.php';
         <?php foreach ($dsMa as $m): [$nhan, $lop] = MG_TINH_TRANG[$m['tinh_trang']]; ?>
           <tr>
             <td class="ma"><?= e($m['ma_code']) ?></td>
-            <td><b><?= $m['loai_giam'] === 'phan_tram' ? (int)$m['gia_tri'] . '%' : '-' . tien($m['gia_tri']) ?></b></td>
+            <td><b><?= $m['loai_giam'] === 'phan_tram' ? (int)$m['gia_tri'] . '%' : '-' . tien($m['gia_tri']) ?></b>
+              <?php
+                $dk = [];
+                if ((int)($m['don_toi_thieu'] ?? 0) > 0) $dk[] = 'đơn từ ' . tien($m['don_toi_thieu']);
+                if (($m['giam_toi_da'] ?? null) !== null && $m['loai_giam'] === 'phan_tram') $dk[] = 'giảm tối đa ' . tien($m['giam_toi_da']);
+                if (($m['luot_toi_da'] ?? null) !== null) $dk[] = 'tối đa ' . (int)$m['luot_toi_da'] . ' lượt';
+              ?>
+              <?php if ($dk): ?><div class="dh-muted"><?= e(implode(' · ', $dk)) ?></div><?php endif; ?>
+            </td>
             <td>
               <?php if ($m['ngay_bat_dau'] === null && $m['ngay_het_han'] === null): ?>
                 <span class="dh-muted">Không giới hạn</span>

@@ -91,7 +91,10 @@ function nut_gio(string $action, string $key, string $nhan, string $class = '', 
         <?php endif; ?>
 
         <div class="summary__row"><span>Tạm tính:</span><span><?= tien($tien['tam']) ?></span></div>
-        <div class="summary__row"><span>Phí vận chuyển:</span><span><?= tien($tien['ship']) ?></span></div>
+        <div class="summary__row"><span>Phí vận chuyển:</span><span><?= ($tien['tam'] > 0 && $tien['ship'] === 0) ? 'Miễn phí' : tien($tien['ship']) ?></span></div>
+        <?php if ($tien['ship'] > 0 && $tien['tam'] < NGUONG_MIEN_PHI): ?>
+          <p class="ship-note">Mua thêm <b><?= tien(NGUONG_MIEN_PHI - $tien['tam']) ?></b> để được miễn phí vận chuyển.</p>
+        <?php endif; ?>
         <div class="summary__row"><span>Giảm giá:</span><span>-<?= tien($tien['giam']) ?></span></div>
         <div class="summary__total"><span>Tổng cộng:</span><span><?= tien($tien['tong']) ?></span></div>
 

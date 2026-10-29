@@ -66,9 +66,10 @@ switch ($action) {
             unset($_SESSION['ma_giam_gia']);
             ket_thuc(false, 'Vui lòng nhập mã giảm giá.', $quayLai);
         }
-        if (!tim_ma_giam_gia($code)) {
+        [$ma, $lyDo] = kiem_tra_ma_giam_gia($code, gio_tinh_tien()['tam']);
+        if (!$ma) {
             unset($_SESSION['ma_giam_gia']);
-            ket_thuc(false, 'Mã "' . $code . '" không hợp lệ hoặc đã hết hạn.', $quayLai);
+            ket_thuc(false, $lyDo, $quayLai);
         }
         $_SESSION['ma_giam_gia'] = $code;
         ket_thuc(true, 'Đã áp dụng mã ' . $code . '.', $quayLai);
