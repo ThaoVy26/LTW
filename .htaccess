@@ -1,0 +1,31 @@
+# Cấu hình Apache cho Charm Atelier. Mỗi khối đặt trong <IfModule> nên thiếu module cũng không gây lỗi.
+
+# Không liệt kê nội dung thư mục
+Options -Indexes
+
+# Không cho tải file SQL (cấu trúc và dữ liệu CSDL) qua trình duyệt
+<FilesMatch "\.sql$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Lưu ảnh, CSS, JS trong trình duyệt để trang tải nhanh hơn
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/png  "access plus 30 days"
+    ExpiresByType image/webp "access plus 30 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+    ExpiresByType text/css   "access plus 7 days"
+    ExpiresByType application/javascript "access plus 7 days"
+</IfModule>
+
+# Nén dữ liệu văn bản khi gửi đi
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

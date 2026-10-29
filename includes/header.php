@@ -6,6 +6,9 @@
  */
 $tieuDe ??= 'Trang chủ';
 $menu   ??= '';
+$moTa   ??= 'Charm Atelier: bán và tự thiết kế vòng tay Italian Charm. Chọn size, chọn dây, kéo thả charm theo cách của riêng bạn.';
+$goc    = (!empty($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
+        . rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/') . '/';
 $soLuongGio = gio_dem();
 $menuItems = [
     'trang-chu'   => ['index.php', 'Trang chủ'],
@@ -20,6 +23,12 @@ $menuItems = [
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= e($tieuDe) ?> · Charm Atelier</title>
+<meta name="description" content="<?= e($moTa) ?>">
+<meta property="og:type" content="website">
+<meta property="og:title" content="<?= e($tieuDe) ?> · Charm Atelier">
+<meta property="og:description" content="<?= e($moTa) ?>">
+<meta property="og:image" content="<?= e($goc) ?>assets/hero/chao-mung.webp">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">

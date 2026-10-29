@@ -160,7 +160,7 @@ function o_loi(array $loi, string $k): string
               </label>
             </div>
             <label class="field<?= isset($loi['email']) ? ' has-error' : '' ?>">
-              <span>Email (để nhận xác nhận đơn)</span>
+              <span>Email (tuỳ chọn)</span>
               <input name="email" type="email" value="<?= e($du['email']) ?>" autocomplete="email">
               <?= o_loi($loi, 'email') ?>
             </label>
