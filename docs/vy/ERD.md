@@ -6,6 +6,15 @@ Sơ đồ đối chiếu với metadata của DB kiểm thử sau khi import sch
 
 `PK`: khóa chính; `FK`: khóa ngoại; `?`: cột cho phép NULL. Chân quạ: phía nhiều; vòng tròn ở phía cha: quan hệ tùy chọn. `TaiKhoan` quản trị độc lập nên không có đường nối.
 
+## Bố cục ảnh
+
+Đã bỏ tiêu đề lớn phía trên. Các bảng được đặt cố định theo nhóm, đường nối vuông góc không cắt nhau và không đi xuyên nội dung bảng. Phía bảng con, đường nối kết thúc ở dòng cột FK tương ứng; phía bảng cha, tham chiếu khóa chính `id` như danh sách bên dưới.
+
+- Đầu bảng hồng: danh mục, sản phẩm và dữ liệu charm.
+- Đầu bảng xanh dương: dây vòng, kích thước và thiết kế tùy chỉnh.
+- Đầu bảng xanh lá: khách hàng, mã giảm giá và đơn hàng.
+- Đầu bảng xám: `TaiKhoan`, dùng riêng cho đăng nhập quản trị. Bảng này không có khóa ngoại và không được bảng nào khác tham chiếu trong schema hiện tại; vẫn giữ trong ERD để đủ 14 bảng.
+
 ## Cập nhật MaGiamGia theo migration 11
 
 | Cột mới | Kiểu dữ liệu | Cho phép NULL | Mặc định |
@@ -35,4 +44,4 @@ Cả ba cột đã có trong PNG, SVG và nguồn DOT. Migration 10 chỉ thêm 
 | ThietKeTuyChinh | id_kich_thuoc | KichThuocTay.id |
 | ThietKeTuyChinh | id_day_vong | DayVong.id |
 
-Nguồn có thể sửa: [erd.dot](erd.dot). Bản vector để phóng to: [erd.svg](erd.svg). Xuất lại bằng Graphviz: `dot -Tpng -Gdpi=150 erd.dot -o erd.png` và `dot -Tsvg erd.dot -o erd.svg`.
+Nguồn có thể sửa: [erd.dot](erd.dot). Bản vector để phóng to: [erd.svg](erd.svg). Nguồn DOT chứa tọa độ cố định của bảng và đường nối. Xuất lại bằng Graphviz để giữ bố cục: `neato -n2 -Tpng -Gdpi=180 erd.dot -o erd.png` và `neato -n2 -Tsvg erd.dot -o erd.svg`.
