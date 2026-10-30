@@ -62,8 +62,9 @@
     if (laDai(id)) state.slots[i + 1] = NOI;
   }
   /** Hình charm: ảnh thật nếu có, không thì emoji/chữ. */
-  const MAT_BAC = `<img class="slot__base" src="assets/img/link-bac.webp" alt="" draggable="false">`;
-  const hinh = (ch) => (ch.anh ? `<img src="${esc(ch.anh)}" alt="" draggable="false">` : `${MAT_BAC}<span class="slot__face">${ch.icon}</span>`);
+  // mắt xích trống: ảnh bạc, hoặc ảnh hồng khi chọn dây Trơn Hồng
+  const matBac = () => `<img class="slot__base" src="assets/img/link-${chain().ten.toLowerCase().includes("hồng") ? "hong" : "bac"}.webp?v=2" alt="" draggable="false">`;
+  const hinh = (ch) => (ch.anh ? `<img src="${esc(ch.anh)}" alt="" draggable="false">` : `${matBac()}<span class="slot__face">${ch.icon}</span>`);
 
   /* ---------- Thông báo ---------- */
   let msgTimer;
@@ -151,7 +152,7 @@
       const cls = ch ? ` is-filled kieu-${ch.kieu}${ch.anh ? " has-img" : ""}` : "";
       return `<div class="slot${cls}${i === sel ? " is-selected" : ""}" data-i="${i}"
                   ${ch ? 'draggable="true"' : ""} title="${ch ? esc(ch.ten) : "Ô trống " + (i + 1)}">
-          <span class="slot__link">${ch ? hinh(ch) : MAT_BAC}</span>
+          <span class="slot__link">${ch ? hinh(ch) : matBac()}</span>
           ${ch ? `<button type="button" class="slot__x" data-remove="${i}" aria-label="Gỡ charm">×</button>` : ""}
           <span class="slot__num">${i + 1}</span>
         </div>`;
@@ -265,7 +266,7 @@
         const cnt = $("cart-count"); if (cnt) cnt.textContent = data.cart_count;
         msg(`${esc(data.message)} <a href="cart.php">Xem giỏ hàng →</a>`, "ok", true);
       } else {
-        msg(`${esc(data.message)} <a href="customizer.php?edit=${data.id}">Mở lại thiết kế</a>`, "ok", true);
+        msg(esc(data.message));
       }
     } catch (e) {
       msg("Không kết nối được máy chủ, vui lòng thử lại.", "err");
@@ -279,7 +280,7 @@
 
   $("chains").addEventListener("click", (e) => {
     const d = e.target.closest("[data-id]"); if (!d) return;
-    state.chainId = +d.dataset.id; reach(3); renderChains(); renderPrice();
+    state.chainId = +d.dataset.id; reach(3); renderChains(); renderBracelet(); renderPrice();
   });
 
   $("collection").addEventListener("change", (e) => {
@@ -378,11 +379,7 @@
   // Ngang / Dọc / Xoay 360
   document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
     const mode = b.dataset.mode, stage = $("stage");
-    if (mode === "xoay") {
-      stage.classList.remove("is-spinning"); void stage.offsetWidth; stage.classList.add("is-spinning");
-      setTimeout(() => stage.classList.remove("is-spinning"), 1800);
-      return;
-    }
+    if (mode === "xoay") return open360();
     document.querySelectorAll(".seg button").forEach((x) => x.classList.toggle("is-active", x === b));
     stage.classList.toggle("is-vertical", mode === "doc");
     fitVertical();
@@ -419,6 +416,79 @@
     else if (e.key === "ArrowRight") { state.selected = Math.min(state.slots.length - 1, state.selected + (laDai(state.slots[state.selected]) ? 2 : 1)); renderBracelet(); }
     else if (e.key === "ArrowLeft") { state.selected = Math.max(0, state.selected - 1); renderBracelet(); }
   });
+
+  /* ---------- Xem vòng 360° (3D, tự xoay, kéo để xoay tay) ---------- */
+  const v360 = { raf: 0, ang: 0, tilt: -22, auto: true, drag: null, last: 0, gl: null };
+  const scripts = {};
+  const loadScript = (src) => (scripts[src] ||= new Promise((ok, fail) => {
+    const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = fail; document.head.appendChild(s);
+  }));
+
+  function items3d() {
+    return state.slots.map((v, i) => {
+      if (v === NOI) { const ch = charmById.get(state.slots[i - 1]); return ch.anh ? { type: "img", url: ch.anh, kind: "dai", part: 1 } : { type: "empty" }; }
+      const ch = laCharm(v) ? charmById.get(v) : null;
+      if (!ch) return { type: "empty" };
+      return ch.anh ? { type: "img", url: ch.anh, kind: ch.kieu, part: 0 } : { type: "icon", icon: ch.icon };
+    });
+  }
+  function tint3d() {
+    const t = chain().ten.toLowerCase();
+    return t.includes("vàng") ? "vang" : t.includes("đen") ? "den" : t.includes("hồng") ? "hong" : t.includes("trắng") ? "trang" : "bac";
+  }
+
+  function tick360(t) {
+    if (v360.auto && !v360.drag) v360.ang -= ((t - (v360.last || t)) / 1000) * 28;   // ~28°/giây
+    v360.last = t;
+    v360.gl.pose(v360.ang, v360.tilt); v360.gl.render();
+    v360.raf = requestAnimationFrame(tick360);
+  }
+
+  function setAuto(on) {
+    v360.auto = on;
+    $("v360-toggle").textContent = on ? "⏸ Dừng xoay" : "▶ Tiếp tục xoay";
+  }
+
+  async function open360() {
+    if (!state.slots.some(laCharm)) return msg("Bạn chưa chọn charm nào để xem!", "warn");
+    $("v360").hidden = false;
+    document.body.classList.add("v360-open");
+    try {
+      await loadScript("assets/js/vendor/three.min.js");
+      await loadScript("assets/js/ring3d.js?v=9");
+      v360.gl = window.Ring3D.create($("v360-scene"), { items: items3d(), tint: tint3d() });
+    } catch (err) {
+      close360();
+      return msg("Trình duyệt không hiển thị được vòng 3D.", "warn");
+    }
+    v360.ang = 0; v360.tilt = -22; v360.last = 0;
+    setAuto(!matchMedia("(prefers-reduced-motion: reduce)").matches);
+    cancelAnimationFrame(v360.raf);
+    v360.raf = requestAnimationFrame(tick360);
+    $("v360-close").focus();
+  }
+
+  function close360() {
+    $("v360").hidden = true;
+    document.body.classList.remove("v360-open");
+    cancelAnimationFrame(v360.raf);
+    if (v360.gl) { v360.gl.dispose(); v360.gl = null; }
+  }
+
+  $("v360-close").addEventListener("click", close360);
+  $("v360-toggle").addEventListener("click", () => setAuto(!v360.auto));
+  $("v360").addEventListener("click", (e) => { if (e.target === $("v360")) close360(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("v360").hidden) close360(); });
+  $("v360-scene").addEventListener("pointerdown", (e) => { v360.drag = { x: e.clientX, y: e.clientY }; $("v360-scene").setPointerCapture(e.pointerId); });
+  $("v360-scene").addEventListener("pointermove", (e) => {
+    if (!v360.drag) return;
+    v360.ang += (e.clientX - v360.drag.x) * 0.6;
+    v360.tilt = Math.max(-70, Math.min(0, v360.tilt + (e.clientY - v360.drag.y) * 0.3));
+    v360.drag = { x: e.clientX, y: e.clientY };
+  });
+  const endDrag = () => { v360.drag = null; };
+  $("v360-scene").addEventListener("pointerup", endDrag);
+  $("v360-scene").addEventListener("pointercancel", endDrag);
 
   /* ---------- Khởi tạo ---------- */
   renderSize(); renderChains(); renderCollections(); renderCharmGrid(); renderAll();
