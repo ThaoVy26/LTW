@@ -6,6 +6,8 @@ Sơ đồ đối chiếu với metadata của DB kiểm thử sau khi import sch
 
 `PK`: khóa chính; `FK`: khóa ngoại; `?`: cột cho phép NULL. Chân quạ: phía nhiều; vòng tròn ở phía cha: quan hệ tùy chọn. `TaiKhoan` quản trị độc lập nên không có đường nối.
 
+Các ký hiệu vòng tròn, vạch và chân quạ đã được phóng lớn, tăng độ đậm và nối liền với đường quan hệ để nhìn rõ khi xem/in. Ý nghĩa quan hệ và dữ liệu schema giữ nguyên.
+
 ## Bố cục ảnh
 
 Đã bỏ tiêu đề lớn phía trên. Mỗi bảng có ba cột **KEY / ATTRIBUTE / DATA TYPE**, đường kẻ từng dòng và chữ tối để đọc rõ khi in. Các bảng được đặt cố định theo nhóm, đường nối vuông góc không cắt nhau và không đi xuyên nội dung bảng. Phía bảng con, đường nối kết thúc ở dòng cột FK tương ứng; phía bảng cha, tham chiếu khóa chính `id` như danh sách bên dưới.
