@@ -8,7 +8,7 @@ Sơ đồ đối chiếu với metadata của DB kiểm thử sau khi import sch
 
 ## Bố cục ảnh
 
-Đã bỏ tiêu đề lớn phía trên. Các bảng được đặt cố định theo nhóm, đường nối vuông góc không cắt nhau và không đi xuyên nội dung bảng. Phía bảng con, đường nối kết thúc ở dòng cột FK tương ứng; phía bảng cha, tham chiếu khóa chính `id` như danh sách bên dưới.
+Đã bỏ tiêu đề lớn phía trên. Mỗi bảng có ba cột **KEY / ATTRIBUTE / DATA TYPE**, đường kẻ từng dòng và chữ tối để đọc rõ khi in. Các bảng được đặt cố định theo nhóm, đường nối vuông góc không cắt nhau và không đi xuyên nội dung bảng. Phía bảng con, đường nối kết thúc ở dòng cột FK tương ứng; phía bảng cha, tham chiếu khóa chính `id` như danh sách bên dưới.
 
 - Đầu bảng hồng: danh mục, sản phẩm và dữ liệu charm.
 - Đầu bảng xanh dương: dây vòng, kích thước và thiết kế tùy chỉnh.
@@ -44,4 +44,4 @@ Cả ba cột đã có trong PNG, SVG và nguồn DOT. Migration 10 chỉ thêm 
 | ThietKeTuyChinh | id_kich_thuoc | KichThuocTay.id |
 | ThietKeTuyChinh | id_day_vong | DayVong.id |
 
-Nguồn có thể sửa: [erd.dot](erd.dot). Bản vector để phóng to: [erd.svg](erd.svg). Nguồn DOT chứa tọa độ cố định của bảng và đường nối. Xuất lại bằng Graphviz để giữ bố cục: `neato -n2 -Tpng -Gdpi=180 erd.dot -o erd.png` và `neato -n2 -Tsvg erd.dot -o erd.svg`.
+Nguồn có thể sửa: [erd.dot](erd.dot). Bản vector để chèn báo cáo và phóng to: [erd.svg](erd.svg), [erd.pdf](erd.pdf). PNG được xuất ở 300 DPI; nên dùng SVG trong Word hoặc PDF khi xem/in để giữ chữ sắc nét. Nguồn DOT chứa tọa độ cố định của bảng và đường nối. Xuất lại bằng Graphviz để giữ bố cục: `neato -n2 -Tpng -Gdpi=300 erd.dot -o erd.png`, `neato -n2 -Tsvg erd.dot -o erd.svg` và `neato -n2 -Tpdf erd.dot -o erd.pdf`.
