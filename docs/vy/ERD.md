@@ -1,6 +1,6 @@
 # ERD Charm Atelier
 
-Sơ đồ đối chiếu với metadata của DB kiểm thử sau khi import schema repo 01–11 ngày 30/10/2026: **14 bảng, 14 khóa ngoại**. Đây là schema repo trong MySQL tạm độc lập, không phải bản chụp DB starter local.
+Sơ đồ đối chiếu với metadata của DB kiểm thử sau khi import schema repo 01–16 ngày 30/10/2026, bản main `899ea7f`: **14 bảng, 14 khóa ngoại**. Đây là schema repo trong MySQL tạm độc lập, không phải bản chụp DB starter local. SQL 12–16 chỉ thay đổi dữ liệu, không thêm bảng/cột/khóa ngoại so với bản SQL 11.
 
 ![ERD](erd.png)
 

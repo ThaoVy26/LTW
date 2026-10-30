@@ -1,5 +1,7 @@
 # Kiểm thử phần sản phẩm
 
+**Kết quả mới nhất sau đổi màu và import 01–16:** [KIEM_THU_01_16.md](KIEM_THU_01_16.md). Ảnh trong thư mục `screenshots/` đã được thay bằng bản màu mới từ main `899ea7f`. Các phần ghi kết quả ngày 29/10 bên dưới được giữ làm lịch sử kiểm thử.
+
 Ngày: 29/10/2026. PHP 8.0.30, MariaDB qua XAMPP, Chrome headless. Dùng DB kiểm thử riêng dựng từ schema 01–09, không sửa dữ liệu DB local. Tài khoản/mật khẩu kiểm thử chỉ tồn tại trong DB kiểm thử.
 
 ## Đã đạt
@@ -22,11 +24,11 @@ Tổng cộng 60 điểm kiểm tra trình duyệt đã đạt, gồm các lư�
 
 ## Ảnh minh chứng
 
-Đã thay toàn bộ 12 ảnh bằng ảnh chụp **cửa sổ Chrome thật có thanh tab và thanh địa chỉ** ngày 30/10/2026. Chụp nguyên cửa sổ bằng Windows PrintWindow, không ghép ảnh trang với thanh địa chỉ giả. Import thành công SQL 01–11 trên MariaDB tạm độc lập, cổng 3307; bản web chụp ảnh chạy tại `127.0.0.1:8091`.
+Đã thay toàn bộ 12 ảnh bằng ảnh chụp **cửa sổ Chrome thật có thanh tab và thanh địa chỉ** ngày 30/10/2026 theo màu mới của main `899ea7f`. Chụp nguyên cửa sổ bằng Windows PrintWindow, không ghép ảnh trang với thanh địa chỉ giả. Import thành công SQL 01–16 trên MariaDB tạm độc lập, cổng 3307; bản web chụp ảnh chạy tại `127.0.0.1:8091`. Có thêm ba ảnh minh chứng lỗi ảnh và màu phân trang; xem báo cáo mới.
 
 Viewport CSS thực tế lúc chụp: desktop **1266×686**, tablet **786×686**, mobile **501×686**. Đây là kiểm tra responsive bằng thay đổi độ rộng cửa sổ Chrome trên máy tính; không phải thiết bị di động thật. Kích thước pixel ảnh lớn hơn do DPI Windows. Metadata từng ảnh nằm trong [capture-info.json](screenshots/capture-info.json).
 
-Trong đợt chụp lại, cả bốn trang đều tải thành công, không lỗi PHP, không tràn chiều ngang toàn trang, ảnh thu nhỏ đang nhìn thấy tải được. Bộ 60 điểm kiểm tra thao tác phía trên là kết quả ngày 29/10, không phải kiểm thử lại toàn bộ luồng ngày 30/10.
+Trong đợt chụp lại, cả bốn trang mặc định đều tải thành công, không lỗi PHP, không tràn chiều ngang toàn trang, ảnh thu nhỏ đang nhìn thấy tải được. Bộ 60 điểm kiểm tra thao tác đã được chạy lại trên màu mới và dữ liệu 01–16; kết quả và các vấn đề còn lại nằm trong báo cáo mới.
 
 | Trang | Desktop | Tablet | Mobile |
 |---|---|---|---|
@@ -40,4 +42,4 @@ Trong đợt chụp lại, cả bốn trang đều tải thành công, không l�
 - Điện thoại thật. Yêu cầu ảnh có thanh địa chỉ cho báo cáo đã được hoàn tất bằng bộ ảnh Chrome ngày 30/10.
 - Biểu đồ lợi nhuận khi có đơn hoàn tất; repo hiện chưa có trang `admin/thong-ke.php` của Quỳnh.
 - Luồng khách ẩn charm Q8 cần kiểm thử khi tích hợp; việc lưu trạng thái admin không tự thay đổi truy vấn trang khách.
-- Migration 10–11 đã import thành công để cập nhật ERD và chụp ảnh; vẫn cần kiểm thử toàn bộ luồng nghiệp vụ khi chốt dữ liệu nhóm.
+- SQL 01–16 đã import thành công từ DB trống để cập nhật ERD và chụp ảnh; vẫn cần kiểm thử toàn bộ luồng nghiệp vụ khi chốt dữ liệu nhóm.

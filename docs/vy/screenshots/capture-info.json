@@ -1,7 +1,7 @@
 {
   "date": "2026-10-30",
   "method": "Windows PrintWindow of isolated visible Chrome window, including native browser address bar. No compositing.",
-  "database": "Isolated MariaDB 3307 with repository SQL 01–11",
+  "database": "Isolated MariaDB 3307 with repository SQL 01–16",
   "screenshots": [
     {
       "file": "san-pham-desktop.png",
@@ -10,6 +10,11 @@
       "title": "Sản phẩm · Quản trị Charm Atelier",
       "width": 1266,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
@@ -22,6 +27,11 @@
       "title": "Sửa sản phẩm · Quản trị Charm Atelier",
       "width": 1266,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
@@ -34,6 +44,11 @@
       "title": "Danh mục · Quản trị Charm Atelier",
       "width": 1266,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
@@ -46,6 +61,11 @@
       "title": "Charm · Quản trị Charm Atelier",
       "width": 1266,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
@@ -58,6 +78,11 @@
       "title": "Sản phẩm · Quản trị Charm Atelier",
       "width": 786,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
@@ -70,6 +95,11 @@
       "title": "Sửa sản phẩm · Quản trị Charm Atelier",
       "width": 786,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
@@ -82,6 +112,11 @@
       "title": "Danh mục · Quản trị Charm Atelier",
       "width": 786,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
@@ -94,6 +129,11 @@
       "title": "Charm · Quản trị Charm Atelier",
       "width": 786,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
@@ -106,6 +146,11 @@
       "title": "Sản phẩm · Quản trị Charm Atelier",
       "width": 501,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
@@ -118,6 +163,11 @@
       "title": "Sửa sản phẩm · Quản trị Charm Atelier",
       "width": 501,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
@@ -130,6 +180,11 @@
       "title": "Danh mục · Quản trị Charm Atelier",
       "width": 501,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
@@ -142,10 +197,40 @@
       "title": "Charm · Quản trị Charm Atelier",
       "width": 501,
       "height": 686,
+      "theme": {
+        "sidebar": "rgb(252, 147, 160)",
+        "text": "rgb(74, 13, 34)",
+        "primary": "rgb(204, 69, 96)"
+      },
       "ready": "complete",
       "overflow": false,
       "error": false,
       "imageErrors": 0
+    }
+  ],
+  "main_commit": "899ea7f",
+  "tested_commit": "0b4fdd7",
+  "additional_evidence": [
+    {
+      "file": "loi-anh-day-chu-A-desktop.png",
+      "url": "http://127.0.0.1:8091/admin/san-pham.php?q=Charm%20D%C3%A2y%20Ch%E1%BB%AF%20A",
+      "broken": [
+        "../assets/img/charm/day-chu/g01.webp"
+      ]
+    },
+    {
+      "file": "loi-anh-day-chu-W-desktop.png",
+      "url": "http://127.0.0.1:8091/admin/san-pham.php?q=Charm%20D%C3%A2y%20Ch%E1%BB%AF%20W",
+      "broken": [
+        "../assets/img/charm/day-chu/g22.webp"
+      ]
+    },
+    {
+      "file": "phan-trang-mau-moi-desktop.png",
+      "url": "http://127.0.0.1:8091/admin/san-pham.php",
+      "text": "rgb(255, 255, 255)",
+      "background": "rgb(252, 147, 160)",
+      "contrast": 2.14
     }
   ]
 }
