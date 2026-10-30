@@ -7,7 +7,6 @@ if (!isset($dsTrang[$p])) {
     $p = 'giao-hang';
 }
 
-// Nội dung tĩnh — sau này có thể chuyển vào bảng CSDL để admin sửa
 $noiDung = [
     'giao-hang' => [
         ['Phạm vi & thời gian', 'Giao toàn quốc. Nội thành TP.HCM 1–2 ngày, tỉnh thành khác 3–5 ngày làm việc.'],

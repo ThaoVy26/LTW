@@ -1,13 +1,8 @@
 <?php
-/**
- * Hoá đơn in / lưu PDF cho một đơn hàng. (Mỹ Anh, B10)
- * Trang riêng, gọn (không có menu admin) để in ra đẹp một trang A4:
- * bấm "In / Lưu PDF" rồi chọn máy in "Lưu thành PDF".
- * Số tiền lấy từ các cột đã lưu trong DonHang lúc đặt, không tính lại.
- */
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/don_hang.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 
 $id = (int)($_GET['id'] ?? 0);
@@ -29,7 +24,7 @@ $dong = don_lay_dong_hang($id);
 $huy  = $don['trang_thai_don'] === 'huy';
 $ma   = don_ma($id);
 
-/** Mô tả ngắn cho dòng vòng tự thiết kế: size, dây và tên các charm theo thứ tự vị trí. */
+// mô tả 1 thiết kế để in lên hoá đơn
 function hd_mo_ta_thiet_ke(int $idThietKe): string
 {
     $tk = lay_thiet_ke($idThietKe);

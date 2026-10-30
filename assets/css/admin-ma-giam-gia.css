@@ -1,4 +1,3 @@
-/* Trang mã giảm giá (Mỹ Anh). Tiền tố mg-; bảng, tab, tìm kiếm dùng lại từ admin-don-hang.css. */
 .mg-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .mg-head .dh__sub { margin: 0; }
 .mg-form { max-width: 620px; }

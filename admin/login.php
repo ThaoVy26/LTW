@@ -1,7 +1,4 @@
 <?php
-/**
- * Đăng nhập quản trị.
- */
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 
@@ -13,6 +10,7 @@ $loi      = '';
 $tenCu    = '';
 $conKhoa  = giay_con_khoa();
 
+// kiểm tra đăng nhập admin (sai nhiều lần thì bị khoá)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tenCu = trim((string)($_POST['ten_dang_nhap'] ?? ''));
 

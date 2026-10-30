@@ -1,15 +1,9 @@
 <?php
-/**
- * Khách hàng: danh sách + lịch sử mua của từng khách. (Mỹ Anh)
- *
- * checkout.php tạo MỘT dòng KhachHang mới cho MỖI đơn, nên cùng một người đặt 3 lần sẽ có 3 dòng.
- * Vì vậy ở đây "một khách" = một số điện thoại (DonHang.sdt_nhan), gom từ bảng DonHang.
- * Quy ước chung của nhóm: đơn đã huỷ KHÔNG tính vào số đơn và tổng tiền.
- */
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/don_hang.php';
 require_once __DIR__ . '/../includes/admin_ui.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 
 const KH_MOI_TRANG = 10;
@@ -21,7 +15,6 @@ const KH_SAP_XEP = [
 
 $pdo = db();
 
-/* =============== Chi tiết một khách: ?sdt=0901234567 =============== */
 $sdt = (string)($_GET['sdt'] ?? '');
 if ($sdt !== '') {
     if (!preg_match('/^0\d{9}$/', $sdt)) {
@@ -46,7 +39,7 @@ if ($sdt !== '') {
         $soDon++;
         $tongTien += (int)$d['tong_tien'];
     }
-    foreach ($dsDon as $d) { $dsTen[$d['ho_ten_nhan']] = true; }   // không đặt tên $ten: admin_header.php dùng biến này
+    foreach ($dsDon as $d) { $dsTen[$d['ho_ten_nhan']] = true; }
     $dsTen = array_keys($dsTen);
 
     $st = $pdo->prepare('SELECT DISTINCT email FROM KhachHang WHERE so_dien_thoai = ? AND email IS NOT NULL AND email <> "" ORDER BY email');
@@ -110,13 +103,11 @@ if ($sdt !== '') {
     exit;
 }
 
-/* =============== Danh sách khách =============== */
 $q     = mb_substr(trim((string)($_GET['q'] ?? '')), 0, 50);
 $sx    = (string)($_GET['sx'] ?? 'moi');
 if (!isset(KH_SAP_XEP[$sx])) { $sx = 'moi'; }
 $trang = max(1, (int)($_GET['trang'] ?? 1));
 
-// Tìm theo tên hoặc SĐT, nhưng vẫn tính số liệu trên TẤT CẢ đơn của khách đó
 $where = '';
 $tham  = [];
 if ($q !== '') {
@@ -149,7 +140,6 @@ $st->bindValue(count($tham) + 2, ($trang - 1) * KH_MOI_TRANG, PDO::PARAM_INT);
 $st->execute();
 $dsKhach = $st->fetchAll();
 
-// Thẻ tóm tắt (toàn bộ khách, không phụ thuộc ô tìm kiếm)
 $tomTat = $pdo->query(
     "SELECT COUNT(*) AS khach, COALESCE(SUM(n >= 2), 0) AS quen, COALESCE(SUM(tien), 0) AS doanh_thu
      FROM (SELECT sdt_nhan,
@@ -158,6 +148,7 @@ $tomTat = $pdo->query(
            FROM DonHang GROUP BY sdt_nhan) t"
 )->fetch();
 
+// tạo link giữ nguyên bộ lọc khách hàng
 function kh_url(array $doi = []): string
 {
     global $q, $sx, $trang;

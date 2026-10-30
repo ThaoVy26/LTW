@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/vy_catalog.php';
 require_once __DIR__ . '/../includes/auth.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_post();
@@ -21,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('ok', 'Đã lưu danh mục.');
         }
         elseif ($act === 'delete' && $id) {
+            // danh mục còn sản phẩm thì không cho xoá
             $s = db()->prepare('SELECT COUNT(*) FROM SanPham WHERE id_danh_muc=?');
             $s->execute([$id]);
             if ($s->fetchColumn()) throw new RuntimeException('Danh mục đang có sản phẩm, không thể xoá.');

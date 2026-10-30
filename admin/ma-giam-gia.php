@@ -1,13 +1,9 @@
 <?php
-/**
- * Quản lý mã giảm giá: danh sách, thêm, sửa, bật/tắt, xoá (chỉ mã chưa có đơn nào dùng). (Mỹ Anh)
- * Mọi thao tác ghi đều là POST có CSRF. Luật áp mã ở giỏ hàng nằm trong tim_ma_giam_gia()
- * (includes/functions.php): mã phải ở trạng thái 'hoat_dong' và nằm trong khoảng ngày.
- */
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/don_hang.php';
 require_once __DIR__ . '/../includes/admin_ui.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 
 const MG_MOI_TRANG = 10;
@@ -18,7 +14,6 @@ const MG_TINH_TRANG = [
     'het_han'   => ['Hết hạn',       'tt tt--cho_xac_nhan'],
     'tat'       => ['Đã tắt',        'tt tt--huy'],
 ];
-// Cùng cách tính với tim_ma_giam_gia(): dùng CURDATE() của MySQL để khớp tuyệt đối với giỏ hàng.
 const MG_SQL_TINH_TRANG = "CASE
     WHEN m.trang_thai <> 'hoat_dong' THEN 'tat'
     WHEN m.ngay_het_han IS NOT NULL AND m.ngay_het_han < CURDATE() THEN 'het_han'
@@ -27,7 +22,7 @@ const MG_SQL_TINH_TRANG = "CASE
 
 $pdo = db();
 
-/** Số đơn (kể cả đã huỷ) đã dùng mã này: > 0 thì không được xoá hay đổi tên mã. */
+// đếm số đơn đã dùng mã này
 function mg_so_don_da_dung(int $id): int
 {
     $st = db()->prepare('SELECT COUNT(*) FROM DonHang WHERE id_ma_giam_gia = ?');
@@ -35,12 +30,12 @@ function mg_so_don_da_dung(int $id): int
     return (int)$st->fetchColumn();
 }
 
-/* ---------------- Xử lý POST ---------------- */
 $loi = [];
 $du  = ['id' => 0, 'ma_code' => '', 'loai_giam' => 'so_tien', 'gia_tri' => '', 'ngay_bat_dau' => '', 'ngay_het_han' => '', 'bat' => '1',
        'don_toi_thieu' => '', 'giam_toi_da' => '', 'luot_toi_da' => ''];
 $hienForm = false;
 
+// bật tắt, xoá, thêm, sửa mã giảm giá
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hanhDong = (string)($_POST['hanh_dong'] ?? '');
     $id = (int)($_POST['id'] ?? 0);
@@ -93,7 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'luot_toi_da'  => trim((string)($_POST['luot_toi_da'] ?? '')),
         ];
 
-        // Mã đã có đơn dùng thì giữ nguyên tên mã (để lịch sử đơn không bị khó hiểu)
         if ($id > 0) {
             $st = $pdo->prepare('SELECT ma_code FROM MaGiamGia WHERE id = ?');
             $st->execute([$id]);
@@ -130,7 +124,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $loi['gia_tri'] = 'Số tiền giảm tối đa 10.000.000đ.';
         }
 
-        // Điều kiện áp dụng (để trống = không giới hạn)
         $toiThieu = 0; $giamToiDa = null; $luotToiDa = null;
         if ($du['don_toi_thieu'] !== '') {
             $toiThieu = ad_so_nguyen($du['don_toi_thieu']);
@@ -178,7 +171,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-/* ---------------- Mở form thêm / sửa (GET) ---------------- */
 if (!$hienForm) {
     if (isset($_GET['them'])) {
         $hienForm = true;
@@ -203,7 +195,6 @@ if (!$hienForm) {
 }
 $maKhoa = $hienForm && $du['id'] > 0 && mg_so_don_da_dung((int)$du['id']) > 0;
 
-/* ---------------- Danh sách ---------------- */
 $tt = (string)($_GET['tt'] ?? '');
 if (!isset(MG_TINH_TRANG[$tt])) {
     $tt = '';
@@ -247,6 +238,7 @@ foreach ($pdo->query("SELECT " . MG_SQL_TINH_TRANG . " AS tinh_trang, COUNT(*) A
     $dem[$r['tinh_trang']] = (int)$r['n'];
 }
 
+// tạo link giữ nguyên bộ lọc mã giảm giá
 function mg_url(array $doi = []): string
 {
     global $tt, $q, $trang;
@@ -255,6 +247,7 @@ function mg_url(array $doi = []): string
     return 'ma-giam-gia.php' . ($p ? '?' . http_build_query($p) : '');
 }
 
+// lấy câu lỗi của 1 ô nhập
 function mg_o_loi(array $loi, string $k): string
 {
     return isset($loi[$k]) ? '<div class="mg-err">' . e($loi[$k]) . '</div>' : '';

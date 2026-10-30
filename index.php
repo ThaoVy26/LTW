@@ -1,9 +1,9 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
 
+// lấy 4 combo mới nhất cho trang chủ
 $idCombo = (int)db()->query("SELECT id FROM DanhMuc WHERE ten_danh_muc = 'Combo' LIMIT 1")->fetchColumn();
 
-// 4 combo mới nhất (đảo lại để hiện theo thứ tự thêm vào)
 $st = db()->prepare(
     "SELECT sp.*, dm.ten_danh_muc FROM SanPham sp JOIN DanhMuc dm ON dm.id = sp.id_danh_muc
      WHERE sp.id_danh_muc = ? AND sp.trang_thai = 'dang_ban' ORDER BY sp.id DESC LIMIT 4"
@@ -11,14 +11,8 @@ $st = db()->prepare(
 $st->execute([$idCombo]);
 $combos = array_reverse($st->fetchAll());
 
-/*
- * Các slide của khung story ở hero.
- *   loai = 'anh'        → ảnh   (bỏ file vào assets/hero/)
- *   loai = 'video'      → video ngắn .mp4 (bỏ file vào assets/hero/), chạy hết video mới sang slide sau
- * Slide ảnh/video nào chưa có file thì tự ẩn.
- */
+// các slide ở đầu trang, muốn thêm ảnh hay video thì thêm 1 dòng
 $heroSlides = [
-    // Ảnh chào mừng đã có sẵn chữ → không cần tiêu đề, chỉ hiện nút
     ['loai' => 'anh',   'src' => 'assets/hero/chao-mung.webp', 'tieu_de' => '', 'mo_ta' => '', 'link' => 'customizer.php', 'nut' => 'Tự phối ngay →'],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-1.jpg', 'tieu_de' => 'Mỗi charm một câu chuyện', 'mo_ta' => 'Ghép chữ cái, cung hoàng đạo và lời nhắn riêng', 'link' => 'customizer.php'],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-2.jpg', 'tieu_de' => 'Charm Hình tone hồng', 'mo_ta' => 'Ngọt ngào cho những ngày đáng yêu', 'link' => 'customizer.php?bst=tone-hong'],
@@ -26,14 +20,13 @@ $heroSlides = [
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-4.jpg', 'tieu_de' => 'Quà tặng người thương', 'mo_ta' => 'Đóng hộp quà miễn phí cho mọi đơn', 'link' => 'shop.php?dm=' . $idCombo],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-5.jpg', 'tieu_de' => 'In ảnh & khắc chữ', 'mo_ta' => 'Gửi ảnh của bạn, Charm Atelier làm phần còn lại', 'link' => 'customizer.php?nhom=charm-ca-nhan'],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-6.jpg', 'tieu_de' => 'Tự phối vòng của riêng bạn', 'mo_ta' => 'Hơn 45 mẫu charm để lựa chọn', 'link' => 'customizer.php'],
-    // Thêm video: ['loai' => 'video', 'src' => 'assets/hero/ten-video.mp4', 'tieu_de' => '...', 'mo_ta' => '...', 'link' => '...'],
 ];
+// slide nào chưa có file thì tự ẩn
 $heroSlides = array_values(array_filter(
     $heroSlides,
     fn($s) => !isset($s['src']) || is_file(__DIR__ . '/' . $s['src'])
 ));
 
-// 6 nhóm charm (banner) — có bảng NhomCharm từ 03_charm_that.sql
 $nhomCharm = db()->query('SELECT * FROM NhomCharm ORDER BY thu_tu')->fetchAll();
 
 $tieuDe  = 'Trang chủ';
@@ -53,7 +46,6 @@ require __DIR__ . '/includes/header.php';
       </div>
 
       <div class="story" id="story" data-interval="5000" aria-roledescription="carousel" aria-label="Bộ sưu tập nổi bật">
-        <!-- Thanh tiến trình kiểu story -->
         <div class="story__bars">
           <?php foreach ($heroSlides as $i => $_): ?>
             <button type="button" class="story__bar" data-go="<?= $i ?>" aria-label="Xem slide <?= $i + 1 ?>"><span></span></button>

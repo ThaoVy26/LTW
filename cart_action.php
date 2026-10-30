@@ -1,10 +1,4 @@
 <?php
-/**
- * Xử lý mọi thao tác giỏ hàng (chỉ nhận POST):
- *   add | inc | dec | remove | coupon | coupon_remove
- * Gọi bằng form thường → chuyển hướng về trang trước kèm flash message.
- * Gọi bằng fetch (X-Requested-With) → trả JSON.
- */
 require_once __DIR__ . '/includes/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -13,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $quayLai = url_quay_lai($_POST['back'] ?? null, 'cart.php');
 
+// trả kết quả: ajax thì json, form thường thì quay lại trang
 function ket_thuc(bool $ok, string $thongBao, string $quayLai): never
 {
     if (la_ajax()) {
@@ -22,6 +17,7 @@ function ket_thuc(bool $ok, string $thongBao, string $quayLai): never
     chuyen_trang($quayLai);
 }
 
+// chặn request giả mạo
 if (!csrf_hop_le($_POST['csrf'] ?? null)) {
     ket_thuc(false, 'Phiên làm việc đã hết hạn, vui lòng thử lại.', $quayLai);
 }
@@ -29,12 +25,15 @@ if (!csrf_hop_le($_POST['csrf'] ?? null)) {
 $action = (string)($_POST['action'] ?? '');
 $key    = (string)($_POST['key'] ?? '');
 
+// xử lý từng thao tác trong giỏ: thêm, tăng giảm, xoá, mã giảm giá
 switch ($action) {
+    // thêm sản phẩm vào giỏ
     case 'add':
         $soLuong = max(1, (int)($_POST['so_luong'] ?? 1));
         [$ok, $msg] = gio_them_san_pham((int)($_POST['id'] ?? 0), $soLuong);
         ket_thuc($ok, $msg, $quayLai);
 
+    // tăng hoặc giảm số lượng (không vượt tồn kho)
     case 'inc':
     case 'dec':
         if (!isset($_SESSION['gio'][$key])) {
@@ -56,10 +55,12 @@ switch ($action) {
         unset($dong);
         ket_thuc(true, 'Đã cập nhật số lượng.', $quayLai);
 
+    // xoá 1 dòng khỏi giỏ
     case 'remove':
         unset($_SESSION['gio'][$key]);
         ket_thuc(true, 'Đã xoá sản phẩm khỏi giỏ.', $quayLai);
 
+    // áp mã giảm giá
     case 'coupon':
         $code = strtoupper(trim((string)($_POST['ma'] ?? '')));
         if ($code === '') {
@@ -74,6 +75,7 @@ switch ($action) {
         $_SESSION['ma_giam_gia'] = $code;
         ket_thuc(true, 'Đã áp dụng mã ' . $code . '.', $quayLai);
 
+    // bỏ mã giảm giá
     case 'coupon_remove':
         unset($_SESSION['ma_giam_gia']);
         ket_thuc(true, 'Đã bỏ mã giảm giá.', $quayLai);

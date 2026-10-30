@@ -1,4 +1,3 @@
-/* Chỉ áp dụng cho bốn trang quản lý sản phẩm, danh mục và charm. */
 .sp-admin { min-width: 0; }
 .sp-admin .ad-box { min-width: 0; }
 .sp-admin .ad-box__title { margin-bottom: 16px; }
@@ -39,7 +38,6 @@
 .sp-charm-table .ad-field__hint { display: block; }
 .sp-charm-table form { margin: 0; }
 .sp-table tbody tr:hover { background: var(--bg); }
-/* Dùng phân trang chung của admin, định dạng riêng trong phạm vi .sp-admin. */
 .sp-admin .dh-pagination { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 18px; }
 .sp-admin .dh-pagination a, .sp-admin .dh-pagination span { min-width: 34px; min-height: 36px; padding: 6px 10px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
 .sp-admin .dh-pagination a:hover { border-color: var(--pink); color: var(--pink-text); }

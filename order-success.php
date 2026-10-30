@@ -2,7 +2,6 @@
 require_once __DIR__ . '/includes/functions.php';
 
 $id = (int)($_GET['id'] ?? 0);
-// Chỉ cho xem đơn do chính phiên này đặt
 if (!in_array($id, $_SESSION['don_cua_toi'] ?? [], true)) {
     chuyen_trang('index.php');
 }

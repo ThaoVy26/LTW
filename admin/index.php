@@ -1,14 +1,11 @@
 <?php
-/**
- * Tổng quan: số liệu nhanh trong ngày và các đơn mới nhất.
- */
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 
 $pdo = db();
 
-// Doanh thu không tính đơn đã huỷ
 $homNay = $pdo->query(
     'SELECT COUNT(*) AS so_don, COALESCE(SUM(tong_tien), 0) AS doanh_thu
      FROM DonHang
@@ -16,6 +13,7 @@ $homNay = $pdo->query(
        AND trang_thai_don <> "huy"'
 )->fetch();
 
+// đếm nhanh: đơn chờ xác nhận, sản phẩm, khách
 $choXacNhan = (int)$pdo->query('SELECT COUNT(*) FROM DonHang WHERE trang_thai_don = "cho_xac_nhan"')->fetchColumn();
 $soSanPham  = (int)$pdo->query('SELECT COUNT(*) FROM SanPham')->fetchColumn();
 $soKhach    = (int)$pdo->query('SELECT COUNT(*) FROM KhachHang')->fetchColumn();

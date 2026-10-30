@@ -2,12 +2,14 @@
 require_once __DIR__ . '/../includes/vy_catalog.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin_ui.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_post();
     $id = (int)($_POST['id'] ?? 0);
     if (($_POST['action'] ?? '') === 'delete' && $id) {
         try {
+            // sản phẩm đã có trong đơn thì không cho xoá
             $s = db()->prepare('SELECT COUNT(*) FROM ChiTietDonHang WHERE id_san_pham=?');
             $s->execute([$id]);
             if ($s->fetchColumn()) throw new RuntimeException('Sản phẩm đã có trong đơn hàng, không thể xoá.');

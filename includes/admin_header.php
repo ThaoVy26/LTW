@@ -1,10 +1,4 @@
 <?php
-/**
- * Khung trang quản trị (đầu trang + menu bên trái). Trước khi include, trang đặt:
- *   $tieuDe = 'Tổng quan';    // tiêu đề tab và tiêu đề trang
- *   $menu   = 'tong-quan';    // khoá của mục menu đang mở (xem $menuAdmin bên dưới)
- * Kết thúc trang bằng includes/admin_footer.php.
- */
 require_once __DIR__ . '/admin_functions.php';
 
 $tieuDe ??= 'Tổng quan';

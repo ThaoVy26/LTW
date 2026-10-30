@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/functions.php';
 
+// chỉ nhận POST có csrf hợp lệ
 function require_post(): void
 {
     if (
@@ -18,6 +19,7 @@ function redirect(string $url): never
     chuyen_trang($url);
 }
 
+// upload ảnh: tối đa 3MB, chỉ nhận jpg, png, webp
 function upload_anh(string $field, string $old = ''): string
 {
     if (

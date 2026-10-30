@@ -1,7 +1,4 @@
 <?php
-/**
- * Trang 404 thân thiện. Dùng được trực tiếp hoặc include từ trang khác khi không tìm thấy dữ liệu.
- */
 require_once __DIR__ . '/includes/functions.php';
 
 http_response_code(404);

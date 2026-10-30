@@ -1,7 +1,4 @@
 <?php
-/**
- * Đăng xuất (chỉ nhận POST từ nút trên thanh trên).
- */
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 

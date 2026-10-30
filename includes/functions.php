@@ -1,50 +1,47 @@
 <?php
-/**
- * Hàm dùng chung cho mọi trang: escape, định dạng tiền, CSRF, flash message,
- * giỏ hàng (lưu trong SESSION, giá luôn đọc lại từ DB), mã giảm giá.
- */
 declare(strict_types=1);
 
-// Mốc "hôm nay" của thống kê phải khớp giờ Việt Nam (XAMPP mặc định dùng múi giờ khác)
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
+// bật session để giữ giỏ hàng và đăng nhập
 if (session_status() === PHP_SESSION_NONE) {
-    // Cookie phiên: JavaScript không đọc được, không gửi kèm khi bị nhúng từ trang khác
     session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax']);
     session_start();
 }
 require_once __DIR__ . '/../config/database.php';
 
+// phí ship 30k, đơn từ 500k trở lên thì miễn phí
 const PHI_VAN_CHUYEN   = 30000;
-const NGUONG_MIEN_PHI  = 500000;   // đơn từ mức này được miễn phí vận chuyển
+const NGUONG_MIEN_PHI  = 500000;
 const SP_MOI_TRANG   = 6;
 
-/* ---------------- Tiện ích chung ---------------- */
-
+// chống XSS, in ra html thì bọc qua hàm này
 function e($s): string
 {
     return htmlspecialchars((string)($s ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
-/** Thêm ?v=<thời gian sửa file> để trình duyệt tự tải lại CSS/JS mới (không cần Ctrl+F5). */
+// thêm ?v=giờ sửa file để trình duyệt không giữ ảnh/css cũ
 function phien_ban(string $duongDan): string
 {
     $file = __DIR__ . '/../' . $duongDan;
     return $duongDan . (is_file($file) ? '?v=' . filemtime($file) : '');
 }
 
+// đổi số sang dạng 250.000đ
 function tien($n): string
 {
     return number_format((float)$n, 0, ',', '.') . 'đ';
 }
 
+// chuyển trang rồi dừng
 function chuyen_trang(string $url): never
 {
     header('Location: ' . $url);
     exit;
 }
 
-/** Chỉ cho phép quay lại URL nội bộ (chống open-redirect). */
+// chỉ cho quay lại link trong web, chặn link ra ngoài
 function url_quay_lai(?string $url, string $macDinh = 'index.php'): string
 {
     $url = (string)$url;
@@ -54,11 +51,13 @@ function url_quay_lai(?string $url, string $macDinh = 'index.php'): string
     return $url;
 }
 
+// request này gửi bằng fetch hay form thường
 function la_ajax(): bool
 {
     return ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
 }
 
+// trả json cho js rồi dừng
 function tra_json(array $data, int $code = 200): never
 {
     http_response_code($code);
@@ -67,8 +66,7 @@ function tra_json(array $data, int $code = 200): never
     exit;
 }
 
-/* ---------------- Flash message ---------------- */
-
+// thông báo chỉ hiện 1 lần rồi mất
 function flash(string $loai, string $noiDung): void
 {
     $_SESSION['flash'][] = ['loai' => $loai, 'noi_dung' => $noiDung];
@@ -81,8 +79,7 @@ function lay_flash(): array
     return $ds;
 }
 
-/* ---------------- CSRF ---------------- */
-
+// chống giả mạo form (csrf)
 function csrf_token(): string
 {
     if (empty($_SESSION['csrf'])) {
@@ -101,9 +98,7 @@ function csrf_hop_le(?string $token): bool
     return is_string($token) && hash_equals(csrf_token(), $token);
 }
 
-/* ---------------- Hiển thị sản phẩm ---------------- */
-
-/** Icon SVG minh hoạ khi sản phẩm chưa có ảnh, chọn theo danh mục. */
+// icon thay cho ảnh khi sản phẩm chưa có ảnh
 function icon_san_pham(array $sp): string
 {
     $icons = [
@@ -116,7 +111,7 @@ function icon_san_pham(array $sp): string
         . 'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $path . '</svg>';
 }
 
-/** Khung ảnh sản phẩm: dùng ảnh thật nếu có, không thì icon + nền gradient. */
+// ảnh sản phẩm, chưa có ảnh thì hiện khung icon
 function anh_san_pham(array $sp, string $nhan = 'Ảnh sản phẩm'): string
 {
     if (!empty($sp['hinh_anh'])) {
@@ -128,6 +123,7 @@ function anh_san_pham(array $sp, string $nhan = 'Ảnh sản phẩm'): string
         . '<span class="ph__text">' . e($nhan) . '</span></div>';
 }
 
+// màu cho nhãn Bán chạy, Mới, Cặp đôi...
 function class_nhan(?string $nhan): string
 {
     return match ($nhan) {
@@ -139,13 +135,13 @@ function class_nhan(?string $nhan): string
     };
 }
 
-/** Chuỗi có phải đường dẫn file ảnh không (phân biệt với emoji tạm). */
+// kiểm tra đây là đường dẫn ảnh hay chỉ là emoji
 function la_anh(?string $hinh): bool
 {
     return (bool)preg_match('/\.(png|jpe?g|webp|gif|svg)$/i', (string)$hinh);
 }
 
-/** Charm: hinh_anh là đường dẫn ảnh thì hiện <img>, còn lại hiện emoji/chữ. */
+// hiện ảnh charm, không có ảnh thì hiện chữ
 function icon_charm(?string $hinh): string
 {
     $hinh = (string)$hinh;
@@ -155,7 +151,7 @@ function icon_charm(?string $hinh): string
     return e($hinh !== '' ? $hinh : '•');
 }
 
-/** Màu chấm tròn cho từng loại dây (bảng DayVong chưa có cột màu). */
+// màu chấm tròn cho từng loại dây
 function mau_day(string $tenDay): string
 {
     $t = mb_strtolower($tenDay);
@@ -168,18 +164,13 @@ function mau_day(string $tenDay): string
     };
 }
 
-/* ---------------- Giỏ hàng (SESSION) ----------------
- * $_SESSION['gio'] = [
- *   'sp_5' => ['loai' => 'san_pham', 'id' => 5, 'so_luong' => 2],
- *   'tk_12' => ['loai' => 'thiet_ke', 'id' => 12, 'so_luong' => 1],
- * ]
- */
-
+// giỏ hàng lưu trong session
 function gio(): array
 {
     return $_SESSION['gio'] ?? [];
 }
 
+// thêm sản phẩm vào giỏ, kiểm tra còn hàng không
 function gio_them_san_pham(int $idSp, int $soLuong = 1): array
 {
     $st = db()->prepare(
@@ -202,6 +193,7 @@ function gio_them_san_pham(int $idSp, int $soLuong = 1): array
     return [true, 'Đã thêm "' . $sp['ten_sp'] . '" vào giỏ.'];
 }
 
+// thêm vòng tự thiết kế vào giỏ (sửa lại thì thay dòng cũ)
 function gio_them_thiet_ke(int $idThietKe, ?string $thayKey = null): void
 {
     if ($thayKey !== null) {
@@ -210,15 +202,13 @@ function gio_them_thiet_ke(int $idThietKe, ?string $thayKey = null): void
     $_SESSION['gio']['tk_' . $idThietKe] = ['loai' => 'thiet_ke', 'id' => $idThietKe, 'so_luong' => 1];
 }
 
+// đếm tổng số món trong giỏ
 function gio_dem(): int
 {
     return array_sum(array_column(gio(), 'so_luong'));
 }
 
-/**
- * Lấy chi tiết từng dòng giỏ từ DB (tên, giá hiện tại...).
- * Dòng nào không còn trong DB thì tự xoá khỏi giỏ.
- */
+// lấy thông tin đầy đủ của từng dòng trong giỏ
 function gio_chi_tiet(): array
 {
     $dong = [];
@@ -251,11 +241,7 @@ function gio_chi_tiet(): array
     return $dong;
 }
 
-/** Tính tiền giỏ + mã giảm giá đang áp dụng. */
-/**
- * Tìm mã và kiểm tra điều kiện áp dụng theo giá trị giỏ hàng.
- * Trả về [mã hoặc null, lý do khi không dùng được].
- */
+// kiểm tra mã giảm giá: còn hạn, đủ đơn tối thiểu, còn lượt dùng
 function kiem_tra_ma_giam_gia(string $code, int $tamTinh): array
 {
     $ma = tim_ma_giam_gia($code);
@@ -277,6 +263,7 @@ function kiem_tra_ma_giam_gia(string $code, int $tamTinh): array
     return [$ma, ''];
 }
 
+// tính tiền giỏ hàng: tạm tính, ship, giảm giá, tổng
 function gio_tinh_tien(?array $dong = null): array
 {
     $dong ??= gio_chi_tiet();
@@ -284,12 +271,15 @@ function gio_tinh_tien(?array $dong = null): array
     foreach ($dong as $d) {
         $tam += $d['don_gia'] * $d['so_luong'];
     }
+    // dưới 500k thì tính phí ship
     $ship = ($dong && $tam < NGUONG_MIEN_PHI) ? PHI_VAN_CHUYEN : 0;
     $ma   = null;
     $giam = 0;
+    // có mã giảm giá thì áp vào
     if (!empty($_SESSION['ma_giam_gia'])) {
         [$ma, $lyDo] = kiem_tra_ma_giam_gia($_SESSION['ma_giam_gia'], $tam);
         if ($ma) {
+            // giảm theo % hoặc theo số tiền, có trần giảm tối đa
             $giam = $ma['loai_giam'] === 'phan_tram'
                 ? (int)round($tam * $ma['gia_tri'] / 100)
                 : (int)$ma['gia_tri'];
@@ -299,13 +289,13 @@ function gio_tinh_tien(?array $dong = null): array
             $giam = min($giam, $tam + $ship);
         } else {
             unset($_SESSION['ma_giam_gia']);
-            flash('loi', $lyDo);   // vd: giỏ giảm xuống dưới mức đơn tối thiểu
+            flash('loi', $lyDo);
         }
     }
     return ['tam' => $tam, 'ship' => $ship, 'giam' => $giam, 'tong' => $tam + $ship - $giam, 'ma' => $ma];
 }
 
-/** Mã hợp lệ: đang hoạt động và trong khoảng ngày (nếu có). */
+// tìm mã đang bật và còn hạn
 function tim_ma_giam_gia(string $code): ?array
 {
     $st = db()->prepare(
@@ -318,8 +308,7 @@ function tim_ma_giam_gia(string $code): ?array
     return $st->fetch() ?: null;
 }
 
-/* ---------------- Thiết kế tuỳ chỉnh ---------------- */
-
+// lấy 1 thiết kế kèm size, dây và các charm trong từng ô
 function lay_thiet_ke(int $id): ?array
 {
     $st = db()->prepare(
@@ -345,8 +334,7 @@ function lay_thiet_ke(int $id): ?array
     return $tk;
 }
 
-/* ---------------- Trang chính sách (footer) ---------------- */
-
+// danh sách trang chính sách ở chân trang
 function ds_chinh_sach(): array
 {
     return [

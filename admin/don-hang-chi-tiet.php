@@ -1,16 +1,14 @@
 <?php
-/**
- * Chi tiết đơn hàng + đổi trạng thái (+ hoàn kho khi huỷ). (Mỹ Anh, B6)
- * Đổi trạng thái chỉ nhận POST có CSRF; logic nằm ở don_doi_trang_thai() trong includes/don_hang.php.
- */
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/don_hang.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 
 $pdo = db();
 $id  = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
 
+// admin đổi trạng thái đơn (huỷ thì hoàn kho)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_hop_le($_POST['csrf'] ?? null)) {
         flash('loi', 'Phiên làm việc đã hết hạn, vui lòng thử lại.');
@@ -18,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         [$ok, $tb] = don_doi_trang_thai($id, (string)($_POST['trang_thai_moi'] ?? ''));
         flash($ok ? 'ok' : 'loi', $tb);
     }
-    chuyen_trang('don-hang-chi-tiet.php?id=' . $id);   // PRG: tải lại trang không gửi lại form
+    chuyen_trang('don-hang-chi-tiet.php?id=' . $id);
 }
 
 $st = $pdo->prepare(
@@ -41,7 +39,6 @@ $tiepTheo = DON_CHUYEN_HOP_LE[$tt] ?? [];
 $anh     = don_anh_dinh_kem($don['ghi_chu']);
 $ghiChu  = don_ghi_chu_sach($don['ghi_chu']);
 
-// Nhãn nút cho từng bước chuyển
 $nhanNut = [
     'dang_giao' => ['Xác nhận & giao hàng', 'btn--primary'],
     'hoan_tat'  => ['Hoàn tất đơn',          'btn--primary'],

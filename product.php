@@ -1,7 +1,9 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
 
+// trang chi tiết sản phẩm
 $id = (int)($_GET['id'] ?? 0);
+// lấy sản phẩm, đã ẩn hoặc ngừng bán thì ra trang 404
 $st = db()->prepare(
     "SELECT sp.*, dm.ten_danh_muc, c.kieu AS kieu_charm, b.slug AS slug_bst, b.ten_bo_suu_tap
      FROM SanPham sp JOIN DanhMuc dm ON dm.id = sp.id_danh_muc
@@ -12,10 +14,11 @@ $st = db()->prepare(
 $st->execute([$id]);
 $sp = $st->fetch();
 if (!$sp) {
-    require __DIR__ . '/404.php';   // trang 404 thân thiện, mã trạng thái 404
+    require __DIR__ . '/404.php';
     exit;
 }
 
+// sản phẩm liên quan: cùng danh mục, lấy ngẫu nhiên 4 cái
 $st = db()->prepare(
     "SELECT sp.*, dm.ten_danh_muc FROM SanPham sp JOIN DanhMuc dm ON dm.id = sp.id_danh_muc
      WHERE sp.id_danh_muc = ? AND sp.id <> ? AND sp.trang_thai = 'dang_ban'

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/vy_catalog.php';
 require_once __DIR__ . '/../includes/auth.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 $id = (int)($_GET['id'] ?? $_POST['id'] ?? 0);
 $item = null;
@@ -28,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $s = db()->prepare('SELECT COUNT(*) FROM DanhMuc WHERE id=?');
         $s->execute([$cat]);
         if (!$s->fetchColumn()) throw new RuntimeException('Danh mục không tồn tại.');
+        // upload ảnh mới, không chọn ảnh thì giữ ảnh cũ
         $image = upload_anh('hinh_anh', $item['hinh_anh'] ?? '');
         if ($id) {
             $s = db()->prepare('UPDATE SanPham SET ten_sp=?,id_danh_muc=?,gia=?,gia_nhap=?,so_luong_ton=?,hinh_anh=?,mo_ta=?,trang_thai=? WHERE id=?');

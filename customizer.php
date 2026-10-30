@@ -1,13 +1,7 @@
 <?php
-/**
- * Trang Tự thiết kế: PHP lấy size / dây / bộ sưu tập / charm từ CSDL,
- * đổ ra JSON cho customizer.js xử lý tương tác (kéo thả, hoàn tác, tính giá).
- * Lưu thiết kế & thêm giỏ gọi api/design.php (server tính lại giá).
- */
 require_once __DIR__ . '/includes/functions.php';
 
 $sizes = db()->query('SELECT id, ten_size, so_charm_toi_da FROM KichThuocTay ORDER BY so_charm_toi_da')->fetchAll();
-// Không bán dây trắng nữa (vẫn giữ trong CSDL để các đơn / thiết kế cũ còn đọc được)
 $days  = db()->query("SELECT id, ten_day, gia_charm_bac FROM DayVong WHERE ten_day NOT LIKE '%Trắng%' ORDER BY ten_day LIKE '%Đen%', id")->fetchAll();
 $bsts  = db()->query(
     'SELECT b.id, b.ten_bo_suu_tap, b.slug, b.hinh_anh, n.ten_nhom, n.slug AS slug_nhom
@@ -24,7 +18,6 @@ $data = [
     'edit'   => null,
     'csrf'   => csrf_token(),
 ];
-// Mở sẵn 1 bộ sưu tập: customizer.php?bst=tone-hong hoặc ?nhom=charm-hinh
 $moBst  = (string)($_GET['bst'] ?? '');
 $moNhom = (string)($_GET['nhom'] ?? '');
 foreach ($bsts as $b) {
@@ -42,7 +35,6 @@ foreach ($bsts as $b) {
     }
 }
 
-// Sửa thiết kế đã có trong giỏ: customizer.php?edit=ID
 $editId = (int)($_GET['edit'] ?? 0);
 if ($editId && ($tk = lay_thiet_ke($editId))) {
     $slots = array_fill(0, (int)$tk['so_charm_toi_da'], null);
@@ -51,7 +43,6 @@ if ($editId && ($tk = lay_thiet_ke($editId))) {
             $slots[$s['vi_tri_slot']] = $s['id_charm'] !== null ? (int)$s['id_charm'] : null;
         }
     }
-    // Charm dài chiếm thêm ô kế tiếp (đánh dấu -1)
     foreach ($tk['slots'] as $s) {
         if ($s['kieu'] === 'dai' && array_key_exists($s['vi_tri_slot'] + 1, $slots)) {
             $slots[$s['vi_tri_slot'] + 1] = -1;
@@ -61,7 +52,6 @@ if ($editId && ($tk = lay_thiet_ke($editId))) {
         'id'       => $editId,
         'cart_key' => isset($_SESSION['gio']['tk_' . $editId]) ? 'tk_' . $editId : null,
         'size_id'  => (int)$tk['id_kich_thuoc'],
-        // thiết kế cũ dùng dây đã ngừng bán → chuyển sang dây đầu tiên còn bán
         'chain_id' => in_array((int)$tk['id_day_vong'], array_column($days, 'id'), false) ? (int)$tk['id_day_vong'] : (int)$days[0]['id'],
         'slots'    => $slots,
     ];

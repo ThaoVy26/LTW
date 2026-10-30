@@ -1,29 +1,27 @@
 <?php
-/**
- * Thống kê: lọc theo mốc nhanh hoặc khoảng ngày, biểu đồ doanh thu, charm / sản phẩm bán chạy,
- * danh sách đơn trong kỳ. Đơn đã huỷ không tính vào doanh thu.
- */
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/don_hang.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 
 const TK_MOC_NHANH   = ['hom_nay' => 'Hôm nay', 'hom_qua' => 'Hôm qua', '7_ngay' => '7 ngày qua', 'thang' => 'Tháng này'];
-const TK_TOI_DA_NGAY = 366;     // khoảng tuỳ chọn tối đa
-const TK_NGAY_THEO_NGAY = 62;   // dài hơn thì gộp biểu đồ theo tháng
+const TK_TOI_DA_NGAY = 366;
+const TK_NGAY_THEO_NGAY = 62;
 const TK_DON_MOI_TRANG = 10;
 
 $pdo     = db();
 $homNay  = new DateTimeImmutable('today');
 $huy     = 'huy';
 
+// đọc ngày từ url, sai định dạng thì bỏ
 function tk_doc_ngay(?string $s): ?DateTimeImmutable
 {
     $d = DateTimeImmutable::createFromFormat('!Y-m-d', (string)$s);
     return ($d && $d->format('Y-m-d') === $s) ? $d : null;
 }
 
-/** Số tròn để làm trục tung (1, 2, 2.5, 5, 10 × luỹ thừa 10). */
+// làm tròn mốc trên của trục tung cho đẹp
 function tk_so_tron(float $max): float
 {
     if ($max <= 0) {
@@ -38,7 +36,7 @@ function tk_so_tron(float $max): float
     return 10 * $m;
 }
 
-/** 1.500.000 -> "1,5tr", 50.000 -> "50k" (chỉ để ghi trục). */
+// rút gọn số tiền: 1,2tr, 450k
 function tk_rut_gon(float $n): string
 {
     if ($n >= 1000000) {
@@ -50,7 +48,7 @@ function tk_rut_gon(float $n): string
     return (string)(int)$n;
 }
 
-/** Biểu đồ cột bằng SVG thuần, không cần thư viện. */
+// vẽ biểu đồ cột doanh thu bằng svg
 function tk_ve_cot(array $nhan, array $doanhThu, array $soDon): string
 {
     $n = count($nhan);
@@ -85,10 +83,9 @@ function tk_ve_cot(array $nhan, array $doanhThu, array $soDon): string
     return $svg . '</svg>';
 }
 
-// ---------- Đọc bộ lọc ----------
 $moc     = (string)($_GET['moc'] ?? '7_ngay');
 $loiLoc  = '';
-$tu = $den = null;      // khoảng [tu, den): den là đầu ngày hôm sau của ngày cuối
+$tu = $den = null;
 
 if ($moc === 'tu_chon') {
     $a = tk_doc_ngay($_GET['tu'] ?? null);
@@ -121,7 +118,6 @@ $kyTu  = $tu->format('Y-m-d');
 $kyDen = $den->format('Y-m-d');
 $trang = max(1, (int)($_GET['trang'] ?? 1));
 
-// ---------- Số liệu tổng hợp ----------
 $st = $pdo->prepare('SELECT COUNT(*) AS so_don, COALESCE(SUM(tong_tien), 0) AS doanh_thu
                      FROM DonHang WHERE ngay_dat >= ? AND ngay_dat < ? AND trang_thai_don <> ?');
 $st->execute([$kyTu, $kyDen, $huy]);
@@ -133,9 +129,9 @@ $st = $pdo->prepare('SELECT COALESCE(SUM(c.so_luong), 0)
 $st->execute([$kyTu, $kyDen, $huy]);
 $soSanPham = (int)$st->fetchColumn();
 
-// Lợi nhuận: chỉ tính sản phẩm bán sẵn đã có giá nhập (thiết kế tuỳ chỉnh chưa có giá vốn)
 $loiNhuan = null;
 try {
+    // lợi nhuận = (giá bán - giá nhập) x số lượng
     $st = $pdo->prepare('SELECT COALESCE(SUM((c.don_gia - s.gia_nhap) * c.so_luong), 0)
                          FROM ChiTietDonHang c
                          JOIN DonHang d ON d.id = c.id_don_hang
@@ -144,10 +140,9 @@ try {
     $st->execute([$kyTu, $kyDen, $huy]);
     $loiNhuan = (float)$st->fetchColumn();
 } catch (PDOException $ex) {
-    $loiNhuan = null;   // chưa chạy file SQL thêm cột gia_nhap
+    $loiNhuan = null;
 }
 
-// ---------- Doanh thu theo ngày (hoặc theo tháng nếu khoảng dài) ----------
 $theoThang = $soNgay > TK_NGAY_THEO_NGAY;
 $dangKey   = $theoThang ? '%Y-%m' : '%Y-%m-%d';
 $st = $pdo->prepare("SELECT DATE_FORMAT(ngay_dat, '$dangKey') AS k, COUNT(*) AS so_don, COALESCE(SUM(tong_tien), 0) AS dt
@@ -173,7 +168,6 @@ if ($theoThang) {
     }
 }
 
-// ---------- Charm và sản phẩm bán chạy ----------
 $st = $pdo->prepare(
     'SELECT ch.id, ch.ten_charm, ch.hinh_anh, SUM(c.so_luong) AS luot
      FROM DonHang d
@@ -196,7 +190,6 @@ $st = $pdo->prepare(
 $st->execute([$kyTu, $kyDen, $huy]);
 $topSp = $st->fetchAll();
 
-// ---------- Danh sách đơn trong kỳ (gồm cả đơn đã huỷ) ----------
 $st = $pdo->prepare('SELECT COUNT(*) FROM DonHang WHERE ngay_dat >= ? AND ngay_dat < ?');
 $st->execute([$kyTu, $kyDen]);
 $tongDon = (int)$st->fetchColumn();
@@ -213,7 +206,7 @@ $st->bindValue(4, ($trang - 1) * TK_DON_MOI_TRANG, PDO::PARAM_INT);
 $st->execute();
 $dsDon = $st->fetchAll();
 
-/** Link giữ nguyên bộ lọc hiện tại. */
+// tạo link giữ nguyên khoảng ngày đang chọn
 function tk_url(array $them = []): string
 {
     global $moc, $tu, $cuoi;

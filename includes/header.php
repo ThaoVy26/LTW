@@ -1,9 +1,4 @@
 <?php
-/**
- * Header dùng chung. Trước khi include, trang đặt:
- *   $tieuDe  = 'Sản phẩm';     // tiêu đề tab
- *   $menu    = 'san-pham';     // trang-chu | san-pham | tu-thiet-ke | gio-hang
- */
 $tieuDe ??= 'Trang chủ';
 $menu   ??= '';
 $moTa   ??= 'Charm Atelier: bán và tự thiết kế vòng tay Italian Charm. Chọn size, chọn dây, kéo thả charm theo cách của riêng bạn.';

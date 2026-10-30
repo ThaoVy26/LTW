@@ -1,13 +1,10 @@
 <?php
-/**
- * Cấu hình kết nối MySQL (XAMPP mặc định: user root, không mật khẩu).
- * Mỗi thành viên nếu cấu hình khác thì sửa ở đây, KHÔNG commit mật khẩu thật.
- */
 const DB_HOST = '127.0.0.1';
 const DB_NAME = '52400092_52400313_52400041';
 const DB_USER = 'root';
 const DB_PASS = '';
 
+// kết nối mysql 1 lần rồi dùng lại (PDO)
 function db(): PDO
 {
     static $pdo = null;

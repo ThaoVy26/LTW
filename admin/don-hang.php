@@ -1,17 +1,14 @@
 <?php
-/**
- * Quản lý đơn hàng: danh sách, lọc theo trạng thái, tìm kiếm, phân trang. (Mỹ Anh, B6)
- */
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/don_hang.php';
 require_once __DIR__ . '/../includes/admin_ui.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 
 const DON_MOI_TRANG = 10;
 $pdo = db();
 
-// --- Đọc bộ lọc từ URL (chỉ nhận giá trị hợp lệ) ---
 $tt = (string)($_GET['tt'] ?? '');
 if (!isset(DON_TRANG_THAI[$tt])) {
     $tt = '';
@@ -20,7 +17,7 @@ $q     = mb_substr(trim((string)($_GET['q'] ?? '')), 0, 50);
 $trang = max(1, (int)($_GET['trang'] ?? 1));
 
 $where = [];
-$tham  = [];   // mỗi phần tử: [giá trị, kiểu PDO]
+$tham  = [];
 if ($tt !== '') {
     $where[] = 'd.trang_thai_don = ?';
     $tham[]  = [$tt, PDO::PARAM_STR];
@@ -29,7 +26,6 @@ if ($q !== '') {
     $dk     = 'd.ho_ten_nhan LIKE ? OR d.sdt_nhan LIKE ?';
     $tham[] = ['%' . $q . '%', PDO::PARAM_STR];
     $tham[] = ['%' . $q . '%', PDO::PARAM_STR];
-    // Gõ "#CA000012", "CA12" hoặc "12" thì tìm theo mã đơn
     if (($maDon = don_tach_ma($q)) !== null) {
         $dk     .= ' OR d.id = ?';
         $tham[]  = [$maDon, PDO::PARAM_INT];
@@ -38,7 +34,6 @@ if ($q !== '') {
 }
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
-// --- Tổng số đơn → số trang ---
 $st = $pdo->prepare("SELECT COUNT(*) FROM DonHang d $whereSql");
 foreach ($tham as $i => [$v, $kieu]) {
     $st->bindValue($i + 1, $v, $kieu);
@@ -48,7 +43,6 @@ $tong    = (int)$st->fetchColumn();
 $soTrang = max(1, (int)ceil($tong / DON_MOI_TRANG));
 $trang   = min($trang, $soTrang);
 
-// --- Lấy đúng 1 trang (LIMIT/OFFSET phải bind kiểu số nguyên) ---
 $st = $pdo->prepare(
     "SELECT d.id, d.ho_ten_nhan, d.sdt_nhan, d.phuong_thuc_tt, d.tong_tien, d.trang_thai_don, d.ngay_dat,
             (SELECT COUNT(*) FROM ChiTietDonHang c WHERE c.id_don_hang = d.id) AS so_dong
@@ -64,14 +58,13 @@ $st->bindValue(count($tham) + 2, ($trang - 1) * DON_MOI_TRANG, PDO::PARAM_INT);
 $st->execute();
 $dsDon = $st->fetchAll();
 
-// --- Số đơn theo từng trạng thái (cho các tab) ---
 $demTt = array_fill_keys(array_keys(DON_TRANG_THAI), 0);
 foreach ($pdo->query('SELECT trang_thai_don, COUNT(*) AS n FROM DonHang GROUP BY trang_thai_don') as $r) {
     $demTt[$r['trang_thai_don']] = (int)$r['n'];
 }
 $tatCa = array_sum($demTt);
 
-/** Link giữ nguyên bộ lọc hiện tại, đổi/ghi đè vài tham số. */
+// tạo link giữ nguyên bộ lọc đơn hàng
 function don_url(array $doi = []): string
 {
     global $tt, $q, $trang;

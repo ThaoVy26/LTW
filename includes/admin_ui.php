@@ -1,14 +1,7 @@
 <?php
-/**
- * Thành phần giao diện dùng chung cho các trang danh sách trong admin (Mỹ Anh).
- * Cần include SAU includes/functions.php (dùng e()).
- */
 declare(strict_types=1);
 
-/**
- * Thanh phân trang. $url là hàm nhận số trang và trả về URL (đã giữ nguyên bộ lọc).
- * Trả về chuỗi rỗng khi chỉ có 1 trang. Class .dh-pagination nằm trong assets/css/admin-don-hang.css.
- */
+// vẽ thanh phân trang cho bảng admin
 function ad_phan_trang(int $trang, int $soTrang, callable $url): string
 {
     if ($soTrang <= 1) {
@@ -31,14 +24,14 @@ function ad_phan_trang(int $trang, int $soTrang, callable $url): string
     return $h . '</nav>';
 }
 
-/** Số nguyên dương từ chuỗi người dùng nhập ("10.000", "10,000", "10000"); không hợp lệ thì null. */
+// đọc số nguyên từ ô nhập, bỏ dấu chấm dấu phẩy
 function ad_so_nguyen(string $s): ?int
 {
     $s = str_replace(['.', ',', ' '], '', trim($s));
     return ($s !== '' && ctype_digit($s) && strlen($s) <= 9) ? (int)$s : null;
 }
 
-/** Ngày dạng Y-m-d hợp lệ thì trả lại chính chuỗi đó, sai thì null. */
+// kiểm tra ngày có đúng dạng năm-tháng-ngày không
 function ad_ngay(string $s): ?string
 {
     $d = DateTime::createFromFormat('!Y-m-d', $s);

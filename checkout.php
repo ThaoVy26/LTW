@@ -1,8 +1,4 @@
 <?php
-/**
- * Thanh toán: kiểm tra dữ liệu phía server, lưu KhachHang → DonHang → ChiTietDonHang
- * trong 1 transaction, trừ tồn kho, xoá giỏ rồi chuyển sang trang đặt hàng thành công.
- */
 require_once __DIR__ . '/includes/functions.php';
 
 $dong = gio_chi_tiet();
@@ -11,6 +7,7 @@ if (!$dong) {
     chuyen_trang('cart.php');
 }
 
+// các cách thanh toán
 $dsPhuongThuc = [
     'COD'    => ['Thanh toán khi nhận hàng (COD)', 'Trả tiền mặt cho shipper'],
     'BANK'   => ['Chuyển khoản ngân hàng', 'Shop gửi số tài khoản qua email/SĐT'],
@@ -20,11 +17,13 @@ $dsPhuongThuc = [
 $du    = ['ho_ten' => '', 'sdt' => '', 'email' => '', 'dia_chi' => '', 'ghi_chu' => '', 'pttt' => 'COD'];
 $loi   = [];
 
+// khách bấm đặt hàng
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($du as $k => $_) {
         $du[$k] = trim((string)($_POST[$k] ?? ''));
     }
 
+    // kiểm tra thông tin khách nhập
     if (!csrf_hop_le($_POST['csrf'] ?? null))           $loi['chung']   = 'Phiên làm việc đã hết hạn, vui lòng thử lại.';
     if (mb_strlen($du['ho_ten']) < 2)                    $loi['ho_ten']  = 'Vui lòng nhập họ và tên.';
     if (!preg_match('/^0\d{9}$/', $du['sdt']))           $loi['sdt']     = 'Số điện thoại gồm 10 số, bắt đầu bằng 0.';
@@ -32,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (mb_strlen($du['dia_chi']) < 5)                   $loi['dia_chi'] = 'Vui lòng nhập địa chỉ nhận hàng.';
     if (!isset($dsPhuongThuc[$du['pttt']]))              $loi['pttt']    = 'Vui lòng chọn phương thức thanh toán.';
 
-    // Ảnh đính kèm (charm khắc theo yêu cầu) — tuỳ chọn
+    // ảnh khách đính kèm (nếu có), chỉ nhận jpg png webp tối đa 3MB
     $tenAnh = null;
     if (!empty($_FILES['anh']['name']) && $_FILES['anh']['error'] !== UPLOAD_ERR_NO_FILE) {
         $f    = $_FILES['anh'];
@@ -43,17 +42,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         else                              $tenAnh = 'yc_' . date('Ymd_His') . '_' . bin2hex(random_bytes(3)) . '.' . $duoi;
     }
 
-    // Kiểm tra tồn kho lần cuối
+    // kiểm tra còn đủ hàng không
     foreach ($dong as $d) {
         if ($d['loai'] === 'san_pham' && $d['so_luong'] > $d['ton']) {
             $loi['chung'] = '"' . $d['ten'] . '" chỉ còn ' . $d['ton'] . ' sản phẩm.';
         }
     }
 
+    // không có lỗi thì lưu đơn
     if (!$loi) {
         $tien = gio_tinh_tien($dong);
         $pdo  = db();
         try {
+            // lưu đơn trong 1 transaction, lỗi thì huỷ hết
             $pdo->beginTransaction();
 
             if ($tenAnh) {
@@ -61,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $ghiChu = $du['ghi_chu'] . ($tenAnh ? ($du['ghi_chu'] ? ' | ' : '') . 'Ảnh: uploads/' . $tenAnh : '');
 
-            // Cùng số điện thoại thì dùng lại hồ sơ khách cũ (cập nhật thông tin mới nhất), không tạo khách mới
+            // khách cũ (cùng số điện thoại) thì cập nhật, chưa có thì tạo mới
             $tim = $pdo->prepare('SELECT id FROM KhachHang WHERE so_dien_thoai = ? ORDER BY id DESC LIMIT 1');
             $tim->execute([$du['sdt']]);
             $idKh = (int)$tim->fetchColumn();
@@ -74,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $idKh = (int)$pdo->lastInsertId();
             }
 
+            // tạo đơn hàng
             $pdo->prepare(
                 'INSERT INTO DonHang (id_khach_hang, id_ma_giam_gia, ho_ten_nhan, sdt_nhan, dia_chi_giao,
                      phuong_thuc_tt, ghi_chu, tam_tinh, phi_van_chuyen, giam_gia, tong_tien)
@@ -92,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $truKho = $pdo->prepare('UPDATE SanPham SET so_luong_ton = so_luong_ton - ? WHERE id = ? AND so_luong_ton >= ?');
             $ganKh  = $pdo->prepare('UPDATE ThietKeTuyChinh SET id_khach_hang = ? WHERE id = ?');
 
+            // lưu từng dòng hàng và trừ kho, hết hàng thì báo lỗi
             foreach ($dong as $d) {
                 $laSp = $d['loai'] === 'san_pham';
                 $insCt->execute([
@@ -108,10 +111,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
+            // xong thì xoá giỏ, chuyển sang trang cảm ơn
             $pdo->commit();
             unset($_SESSION['gio'], $_SESSION['ma_giam_gia']);
             $_SESSION['don_cua_toi'][] = $idDon;
             chuyen_trang('order-success.php?id=' . $idDon);
+        // lỗi thì huỷ hết và xoá luôn ảnh đã up
         } catch (Throwable $ex) {
             $pdo->rollBack();
             if ($tenAnh && is_file(__DIR__ . '/uploads/' . $tenAnh)) {
@@ -129,6 +134,7 @@ $menu    = 'gio-hang';
 $scripts = ['assets/js/checkout.js'];
 require __DIR__ . '/includes/header.php';
 
+// lấy câu lỗi của 1 ô nhập
 function o_loi(array $loi, string $k): string
 {
     return isset($loi[$k]) ? '<div class="field-error">' . e($loi[$k]) . '</div>' : '';

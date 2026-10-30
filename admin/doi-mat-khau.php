@@ -1,13 +1,12 @@
 <?php
-/**
- * Đổi mật khẩu của tài khoản đang đăng nhập.
- */
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 
 $loi = '';
 
+// đổi mật khẩu admin
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_hop_le($_POST['csrf'] ?? null)) {
         $loi = 'Phiên làm việc đã hết hạn, vui lòng thử lại.';

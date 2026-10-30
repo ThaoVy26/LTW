@@ -1,12 +1,8 @@
 <?php
-/**
- * Khách tra cứu đơn hàng bằng SĐT + mã đơn, không cần tài khoản. (Mỹ Anh, B7)
- * - Phải khớp CẢ HAI điều kiện; không khớp thì chỉ báo một câu chung để không lộ mã đơn nào tồn tại.
- * - Sai liên tiếp 5 lần thì tạm khoá 5 phút (đếm trong SESSION, giống đăng nhập admin).
- */
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/don_hang.php';
 
+// tra cứu sai 5 lần thì khoá 5 phút
 const TRA_CUU_TOI_DA  = 5;
 const TRA_CUU_KHOA_GIAY = 300;
 
@@ -16,6 +12,7 @@ $loi   = '';
 $don   = null;
 $dong  = [];
 
+// khách bấm tra cứu: số điện thoại và mã đơn phải khớp nhau
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sdt   = trim((string)($_POST['sdt'] ?? ''));
     $maDon = trim((string)($_POST['ma_don'] ?? ''));
@@ -28,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!preg_match('/^0\d{9}$/', $sdt)) {
         $loi = 'Số điện thoại gồm 10 số, bắt đầu bằng 0.';
     } elseif (($idDon = don_tach_ma($maDon)) === null) {
-        // Chấp nhận "12", "#12", "CA000012", "#CA000012"
         $loi = 'Mã đơn không hợp lệ. Ví dụ: #CA000012.';
     } else {
         $st = db()->prepare('SELECT * FROM DonHang WHERE id = ? AND sdt_nhan = ?');
@@ -44,12 +40,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $tc = ['sai' => 0, 'khoa_den' => time() + TRA_CUU_KHOA_GIAY];
             }
             $_SESSION['tra_cuu'] = $tc;
-            $loi = 'Không tìm thấy đơn hàng.';   // cố ý dùng chung một câu
+            $loi = 'Không tìm thấy đơn hàng.';
         }
     }
 }
 
-// Các bước hiển thị cho đơn bình thường
+// các bước hiện trên thanh tiến trình của đơn
 $cacBuoc = ['cho_xac_nhan' => 'Đã đặt hàng', 'dang_giao' => 'Đang giao', 'hoan_tat' => 'Hoàn tất'];
 $viTri   = $don ? array_search($don['trang_thai_don'], array_keys($cacBuoc), true) : false;
 

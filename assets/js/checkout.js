@@ -1,6 +1,6 @@
-/* checkout.js — kiểm tra form trước khi gửi (server vẫn kiểm tra lại) + xem trước ảnh upload */
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("checkout-form");
+  // luật kiểm tra từng ô trước khi gửi form
   const rules = {
     ho_ten: (v) => v.trim().length >= 2 || "Vui lòng nhập họ và tên.",
     sdt: (v) => /^0\d{9}$/.test(v.trim()) || "Số điện thoại gồm 10 số, bắt đầu bằng 0.",
@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dia_chi: (v) => v.trim().length >= 5 || "Vui lòng nhập địa chỉ nhận hàng.",
   };
 
+  // kiểm tra 1 ô, sai thì hiện lỗi ngay dưới ô
   function check(input) {
     const rule = rules[input.name]; if (!rule) return true;
     const result = rule(input.value);
@@ -20,14 +21,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   Object.keys(rules).forEach((name) => form[name].addEventListener("blur", (e) => check(e.target)));
+  // còn ô sai thì chặn không cho gửi
   form.addEventListener("submit", (e) => {
     const ok = Object.keys(rules).map((n) => check(form[n])).every(Boolean);
     if (!ok) { e.preventDefault(); form.querySelector(".has-error input")?.focus(); }
   });
 
-  // Upload ảnh: kéo thả + xem trước
   const box = document.getElementById("upload"), file = document.getElementById("anh");
   const text = document.getElementById("upload-text"), img = document.getElementById("upload-preview");
+  // xem trước ảnh khách đính kèm
   function preview() {
     const f = file.files[0]; if (!f) return;
     if (!f.type.startsWith("image/")) { text.textContent = "Vui lòng chọn file ảnh."; return; }
@@ -35,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
     img.src = URL.createObjectURL(f); img.hidden = false;
   }
   file.addEventListener("change", preview);
+  // kéo thả ảnh vào khung upload
   box.addEventListener("dragover", (e) => { e.preventDefault(); box.classList.add("is-over"); });
   box.addEventListener("dragleave", () => box.classList.remove("is-over"));
   box.addEventListener("drop", (e) => {

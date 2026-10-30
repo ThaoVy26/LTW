@@ -1,17 +1,19 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
 
+// giá cao nhất của thanh lọc giá
 const GIA_TRAN = 1000000;
 
-/* ---- Đọc bộ lọc từ URL ---- */
+// đọc bộ lọc từ url: danh mục, từ khoá, giá, sắp xếp, trang
 $dm     = (int)($_GET['dm'] ?? 0);
 $tuKhoa = trim((string)($_GET['q'] ?? ''));
 $giaMax = (int)($_GET['max'] ?? GIA_TRAN);
 $giaMax = max(0, min(GIA_TRAN, $giaMax));
 $sapXep = (string)($_GET['sort'] ?? 'pho-bien');
 $trang  = max(1, (int)($_GET['page'] ?? 1));
-$nhom   = (string)($_GET['nhom'] ?? '');   // lọc nhóm charm (chỉ dùng trong danh mục Charm)
+$nhom   = (string)($_GET['nhom'] ?? '');
 
+// các kiểu sắp xếp
 $dsSapXep = [
     'pho-bien' => ['Phổ biến',      'COALESCE(n.thu_tu, 0), COALESCE(b.id, 0), COALESCE(c.thu_tu, 0), sp.id'],
     'moi'      => ['Mới nhất',      'sp.id DESC'],
@@ -23,7 +25,7 @@ if (!isset($dsSapXep[$sapXep])) {
     $sapXep = 'pho-bien';
 }
 
-/* ---- Danh mục kèm số lượng sản phẩm ---- */
+// danh mục kèm số sản phẩm (không đếm charm đang ẩn)
 $danhMuc = db()->query(
     "SELECT dm.id, dm.ten_danh_muc, COUNT(sp.id) AS so_sp
      FROM DanhMuc dm
@@ -33,7 +35,6 @@ $danhMuc = db()->query(
 )->fetchAll();
 $tongSp = array_sum(array_column($danhMuc, 'so_sp'));
 
-/* ---- Đang xem danh mục Charm → hiện nút lọc theo nhóm charm ---- */
 $idDmCharm = (int)db()->query("SELECT id FROM DanhMuc WHERE ten_danh_muc = 'Charm' LIMIT 1")->fetchColumn();
 $dsNhom = [];
 if ($dm && $dm === $idDmCharm) {
@@ -49,7 +50,7 @@ if ($dm && $dm === $idDmCharm) {
     $nhom = '';
 }
 
-/* ---- Truy vấn sản phẩm (prepared statement) ---- */
+// ghép các điều kiện lọc
 $where  = ["sp.trang_thai = 'dang_ban'", "(c.id IS NULL OR c.trang_thai = 'hien')", 'sp.gia <= ?'];
 $params = [$giaMax];
 if ($dm) {
@@ -65,11 +66,11 @@ if ($nhom !== '') {
     $params[] = $nhom;
 }
 $whereSql = implode(' AND ', $where);
-// Nối sang charm gốc để biết nhóm / bộ sưu tập (sản phẩm thường thì các cột này NULL)
 $joinCharm = 'LEFT JOIN Charm c ON c.id = sp.id_charm
               LEFT JOIN BoSuuTapCharm b ON b.id = c.id_bo_suu_tap
               LEFT JOIN NhomCharm n ON n.id = b.id_nhom';
 
+// đếm kết quả để chia trang
 $st = db()->prepare("SELECT COUNT(*) FROM SanPham sp $joinCharm WHERE $whereSql");
 $st->execute($params);
 $tongKetQua = (int)$st->fetchColumn();
@@ -77,6 +78,7 @@ $soTrang    = max(1, (int)ceil($tongKetQua / SP_MOI_TRANG));
 $trang      = min($trang, $soTrang);
 $offset     = ($trang - 1) * SP_MOI_TRANG;
 
+// lấy sản phẩm của trang hiện tại
 $st = db()->prepare(
     "SELECT sp.*, dm.ten_danh_muc, c.kieu AS kieu_charm FROM SanPham sp JOIN DanhMuc dm ON dm.id = sp.id_danh_muc
      $joinCharm
@@ -85,7 +87,7 @@ $st = db()->prepare(
 $st->execute($params);
 $sanPham = $st->fetchAll();
 
-/** Tạo URL giữ nguyên bộ lọc, chỉ đổi vài tham số. */
+// tạo link giữ nguyên bộ lọc, chỉ đổi 1 tham số
 function url_loc(array $doi): string
 {
     $q = array_merge($_GET, $doi);
@@ -205,7 +207,6 @@ require __DIR__ . '/includes/header.php';
       </div>
     </form>
 
-    <!-- Form dùng chung cho các nút "Thêm giỏ" (shop.js gửi bằng fetch) -->
     <form id="add-form" method="post" action="cart_action.php" hidden>
       <?= csrf_field() ?>
       <input type="hidden" name="action" value="add">

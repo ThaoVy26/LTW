@@ -8,7 +8,7 @@ $tieuDe = 'Giỏ hàng';
 $menu   = 'gio-hang';
 require __DIR__ . '/includes/header.php';
 
-/** Nút nhỏ gửi 1 thao tác giỏ hàng. */
+// vẽ nút + - xoá trong giỏ (mỗi nút là 1 form nhỏ)
 function nut_gio(string $action, string $key, string $nhan, string $class = '', string $aria = ''): string
 {
     return '<form method="post" action="cart_action.php" class="inline">' . csrf_field()

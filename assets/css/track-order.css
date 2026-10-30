@@ -1,4 +1,3 @@
-/* Giao diện trang Tra cứu đơn hàng (track-order.php) — Mỹ Anh. */
 .track-form { padding: 32px; margin-bottom: 24px; }
 .track-steps { display: flex; justify-content: space-between; list-style: none; margin: 8px 0 4px; padding: 0; position: relative; }
 .track-steps::before { content: ""; position: absolute; left: 12%; right: 12%; top: 15px; height: 3px; background: var(--line); }

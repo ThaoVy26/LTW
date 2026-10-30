@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/vy_catalog.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/admin_ui.php';
+// phải đăng nhập admin mới vào được
 yeu_cau_admin();
 $bst = max(0, (int)($_GET['bst'] ?? 0));
 $page = max(1, (int)($_GET['page'] ?? 1));
@@ -17,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $price = filter_var($_POST['gia'] ?? null, FILTER_VALIDATE_INT);
         $status = $_POST['trang_thai'] ?? '';
         if ($name === '' || mb_strlen($name) > 150 || $price === false || $price < 0 || !in_array($status, ['hien', 'an'], true)) throw new RuntimeException('Dữ liệu charm không hợp lệ.');
+        // upload ảnh mới, không chọn ảnh thì giữ ảnh cũ
         $image = upload_anh('hinh_anh', $old['hinh_anh'] ?? '');
         $s = db()->prepare('UPDATE Charm SET ten_charm=?,gia=?,hinh_anh=?,trang_thai=? WHERE id=?');
         $s->execute([$name, $price, $image, $status, $id]);

@@ -1,5 +1,3 @@
-/* Chỉ áp dụng khi in (media="print"): trang khách order-success.php và track-order.php.
-   Ẩn header, footer, nút và form, giữ lại phần thông tin đơn hàng. */
 .header, .footer, .flash-wrap, .no-print { display: none !important; }
 body { background: #fff !important; }
 .success, .card { box-shadow: none !important; border: 0 !important; }

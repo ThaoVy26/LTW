@@ -1,27 +1,20 @@
 <?php
-/**
- * Đăng nhập quản trị: kiểm tra mật khẩu, giữ phiên, chặn trang admin khi chưa đăng nhập.
- * Dùng trong các trang nằm trong thư mục admin/:
- *   require_once __DIR__ . '/../includes/functions.php';
- *   require_once __DIR__ . '/../includes/auth.php';
- *   yeu_cau_admin();
- */
 declare(strict_types=1);
 
 require_once __DIR__ . '/functions.php';
 
-const DANG_NHAP_SAI_TOI_DA = 5;     // sai quá số lần này thì tạm khoá
-const THOI_GIAN_KHOA       = 300;   // giây
+// sai 5 lần thì khoá 5 phút
+const DANG_NHAP_SAI_TOI_DA = 5;
+const THOI_GIAN_KHOA       = 300;
 const MAT_KHAU_TOI_THIEU   = 6;
 
-/* ---------------- Phiên đăng nhập ---------------- */
-
+// lấy admin đang đăng nhập
 function admin_hien_tai(): ?array
 {
     return $_SESSION['admin'] ?? null;
 }
 
-/** Gọi ở đầu mỗi trang admin: chưa đăng nhập thì về trang login. */
+// chưa đăng nhập thì đá về trang login
 function yeu_cau_admin(): void
 {
     if (admin_hien_tai() === null) {
@@ -29,15 +22,14 @@ function yeu_cau_admin(): void
     }
 }
 
+// đăng xuất, đổi lại session id
 function dang_xuat(): void
 {
     unset($_SESSION['admin']);
     session_regenerate_id(true);
 }
 
-/* ---------------- Chống đoán mật khẩu ---------------- */
-
-/** Số giây còn bị khoá, 0 nếu được phép thử. */
+// còn bao nhiêu giây bị khoá đăng nhập
 function giay_con_khoa(): int
 {
     $den = (int)($_SESSION['dn_khoa_den'] ?? 0);
@@ -50,6 +42,7 @@ function giay_con_khoa(): int
     return 0;
 }
 
+// đếm số lần đăng nhập sai, đủ 5 lần thì khoá
 function ghi_nhan_dang_nhap_sai(): void
 {
     $_SESSION['dn_sai'] = (int)($_SESSION['dn_sai'] ?? 0) + 1;
@@ -58,8 +51,7 @@ function ghi_nhan_dang_nhap_sai(): void
     }
 }
 
-/* ---------------- Đăng nhập / đổi mật khẩu ---------------- */
-
+// kiểm tra tài khoản và mật khẩu (mật khẩu lưu dạng hash)
 function dang_nhap(string $tenDangNhap, string $matKhau): bool
 {
     $st = db()->prepare('SELECT id, ten_dang_nhap, ho_ten, mat_khau_hash
@@ -83,7 +75,7 @@ function dang_nhap(string $tenDangNhap, string $matKhau): bool
     return true;
 }
 
-/** Trả về thông báo lỗi, hoặc null nếu đổi thành công. */
+// đổi mật khẩu, trả về câu báo lỗi nếu có (null là ổn)
 function doi_mat_khau(int $idTaiKhoan, string $cu, string $moi, string $nhapLai): ?string
 {
     if ($cu === '' || $moi === '' || $nhapLai === '') {
