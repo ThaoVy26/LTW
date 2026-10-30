@@ -11,15 +11,8 @@ $st = db()->prepare(
 $st->execute([$idCombo]);
 $combos = array_reverse($st->fetchAll());
 
-// Giá bộ khởi điểm = size nhỏ nhất × dây rẻ nhất
-$giaKhoiDiem = (int)db()->query(
-    'SELECT MIN(kt.so_charm_toi_da) * MIN(dv.gia_charm_bac) FROM KichThuocTay kt, DayVong dv'
-)->fetchColumn();
-
 /*
  * Các slide của khung story ở hero.
- *   loai = 'mau'        → vòng mẫu Sweet Pink Star (HTML)
- *   loai = 'khuyen_mai' → banner mã giảm giá (HTML)
  *   loai = 'anh'        → ảnh   (bỏ file vào assets/hero/)
  *   loai = 'video'      → video ngắn .mp4 (bỏ file vào assets/hero/), chạy hết video mới sang slide sau
  * Slide ảnh/video nào chưa có file thì tự ẩn.
@@ -30,7 +23,6 @@ $heroSlides = [
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-1.jpg', 'tieu_de' => 'Mỗi charm một câu chuyện', 'mo_ta' => 'Ghép chữ cái, cung hoàng đạo và lời nhắn riêng', 'link' => 'customizer.php'],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-2.jpg', 'tieu_de' => 'Charm Hình tone hồng', 'mo_ta' => 'Ngọt ngào cho những ngày đáng yêu', 'link' => 'customizer.php?bst=tone-hong'],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-3.jpg', 'tieu_de' => 'Charm Dây lủng lẳng', 'mo_ta' => 'Mặt treo chữ cái, nam châm đôi', 'link' => 'customizer.php?nhom=charm-day'],
-    ['loai' => 'khuyen_mai'],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-4.jpg', 'tieu_de' => 'Quà tặng người thương', 'mo_ta' => 'Đóng hộp quà miễn phí cho mọi đơn', 'link' => 'shop.php?dm=' . $idCombo],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-5.jpg', 'tieu_de' => 'In ảnh & khắc chữ', 'mo_ta' => 'Gửi ảnh của bạn, Charm Atelier làm phần còn lại', 'link' => 'customizer.php?nhom=charm-ca-nhan'],
     ['loai' => 'anh',   'src' => 'assets/hero/trang-chu-6.jpg', 'tieu_de' => 'Tự phối vòng của riêng bạn', 'mo_ta' => 'Hơn 45 mẫu charm để lựa chọn', 'link' => 'customizer.php'],
@@ -56,7 +48,7 @@ require __DIR__ . '/includes/header.php';
       <div class="hero__text">
         <span class="eyebrow">✨ ITALIAN CHARM BRACELET</span>
         <h1 class="hero__title">Mỗi chiếc charm, một câu chuyện của riêng bạn</h1>
-        <p class="hero__desc">Chọn dây, chọn size, ghép từng chiếc charm theo cách bạn muốn — vòng tay Italian Charm không đâu giống đâu.</p>
+        <p class="hero__desc">Chọn từng chiếc charm, phối theo phong cách riêng, tạo nên chiếc vòng tay mang đậm dấu ấn của bạn</p>
         <a class="btn btn--outline btn--lg" href="customizer.php">Tự thiết kế ngay</a>
       </div>
 
@@ -71,52 +63,6 @@ require __DIR__ . '/includes/header.php';
         <div class="story__track">
           <?php foreach ($heroSlides as $i => $s): ?>
             <div class="story__slide" role="group" aria-label="Slide <?= $i + 1 ?>/<?= count($heroSlides) ?>">
-
-              <?php if ($s['loai'] === 'mau'): ?>
-                <div class="hero-card">
-                  <div class="hero-card__top">
-                    <span class="pill">✨ BST Mùa Xuân <?= date('Y') ?></span>
-                    <span class="pill pill--solid">18 Modules</span>
-                  </div>
-                  <div class="sample">
-                    <div class="sample__head">
-                      <span>Vòng mẫu: <b>Sweet Pink Star</b></span>
-                      <span class="tag">9mm Standard</span>
-                    </div>
-                    <div class="sample__links">
-                      <?php foreach (['C', '❤️', 'A', '⭐', '🎀', 'R', 'M'] as $j => $m): ?>
-                        <span class="link-chip<?= $j % 2 ? ' link-chip--pink' : '' ?>"><?= $m ?></span>
-                      <?php endforeach; ?>
-                    </div>
-                    <p class="sample__note"><span class="dot"></span> Thép không gỉ 316L cao cấp chống gỉ &amp; sáng bóng</p>
-                  </div>
-                  <div class="hero-card__bottom">
-                    <div>
-                      <small>Giá bộ khởi điểm từ</small>
-                      <strong><?= tien($giaKhoiDiem) ?></strong>
-                    </div>
-                    <a class="btn btn--white btn--sm" href="customizer.php">Tự phối ngay →</a>
-                  </div>
-                </div>
-
-              <?php elseif ($s['loai'] === 'khuyen_mai'): ?>
-                <div class="hero-card">
-                  <div class="hero-card__top">
-                    <span class="pill">🎁 Ưu đãi tháng này</span>
-                    <span class="pill pill--solid">-15%</span>
-                  </div>
-                  <div class="promo">
-                    <p class="promo__label">Nhập mã khi thanh toán</p>
-                    <p class="promo__code">SALE15</p>
-                    <p class="promo__desc">Giảm 15% cho mọi đơn hàng · Dùng <b>FREESHIP</b> để miễn phí vận chuyển</p>
-                  </div>
-                  <div class="hero-card__bottom">
-                    <div><small>Áp dụng cho</small><strong>Toàn bộ sản phẩm</strong></div>
-                    <a class="btn btn--white btn--sm" href="shop.php">Mua ngay →</a>
-                  </div>
-                </div>
-
-              <?php else: ?>
                 <div class="media-slide">
                   <?php if ($s['loai'] === 'video'): ?>
                     <video src="<?= e($s['src']) ?>" muted playsinline preload="metadata"></video>
@@ -133,8 +79,6 @@ require __DIR__ . '/includes/header.php';
                     <a class="btn btn--white btn--sm media-slide__cta" href="<?= e($s['link']) ?>"><?= e($s['nut'] ?? 'Khám phá →') ?></a>
                   <?php endif; ?>
                 </div>
-              <?php endif; ?>
-
             </div>
           <?php endforeach; ?>
         </div>

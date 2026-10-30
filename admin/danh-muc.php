@@ -43,7 +43,7 @@ $rows = db()->query('SELECT d.*, (SELECT COUNT(*) FROM SanPham s WHERE s.id_danh
 $tieuDe = 'Danh mục';
 $menu = 'danh-muc';
 require __DIR__ . '/../includes/admin_header.php'; ?>
-<link rel="stylesheet" href="../assets/css/admin-san-pham.css">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-san-pham.css') ?>">
 <div class="sp-admin">
 <section class="ad-box">
   <h2 class="ad-box__title"><?= $edit ? 'Sửa danh mục' : 'Thêm danh mục' ?></h2>

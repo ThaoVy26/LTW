@@ -46,7 +46,7 @@ $cats = db()->query('SELECT id,ten_danh_muc FROM DanhMuc ORDER BY ten_danh_muc')
 $tieuDe = ($id ? 'Sửa sản phẩm' : 'Thêm sản phẩm');
 $menu = 'san-pham';
 require __DIR__ . '/../includes/admin_header.php'; ?>
-<link rel="stylesheet" href="../assets/css/admin-san-pham.css">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-san-pham.css') ?>">
 <div class="sp-admin">
 <section class="ad-box">
   <?php if ($error !== ''): ?><div class="flash flash--loi" role="alert"><?= e($error) ?></div><?php endif; ?>

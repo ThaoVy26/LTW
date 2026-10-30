@@ -3,7 +3,7 @@
 .kh-select { border: 1px solid #e3e3e8; border-radius: 12px; padding: 9px 14px; background: #fff; font: inherit; outline: none; }
 .kh-select:focus { border-color: var(--pink); box-shadow: 0 0 0 3px var(--pink-100); }
 .kh-link { font-weight: 700; color: var(--ink); }
-.kh-link:hover { color: var(--pink); }
+.kh-link:hover { color: var(--pink-text); }
 .kh-link + .badge { margin-left: 8px; }
 .kh-profile { margin-top: 12px; }
 .kh-name { font-size: 22px; font-weight: 700; margin-bottom: 12px; }

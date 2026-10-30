@@ -57,8 +57,8 @@ if ($sdt !== '') {
     $menu   = 'khach-hang';
     require __DIR__ . '/../includes/admin_header.php';
     ?>
-<link rel="stylesheet" href="../assets/css/admin-don-hang.css">
-<link rel="stylesheet" href="../assets/css/admin-khach-hang.css">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-don-hang.css') ?>">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-khach-hang.css') ?>">
 <div class="dh">
   <a class="dh-muted" href="khach-hang.php">← Danh sách khách hàng</a>
 
@@ -170,8 +170,8 @@ $tieuDe = 'Khách hàng';
 $menu   = 'khach-hang';
 require __DIR__ . '/../includes/admin_header.php';
 ?>
-<link rel="stylesheet" href="../assets/css/admin-don-hang.css">
-<link rel="stylesheet" href="../assets/css/admin-khach-hang.css">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-don-hang.css') ?>">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-khach-hang.css') ?>">
 <div class="dh">
   <div class="ad-cards kh-cards">
     <div class="ad-card"><div class="ad-card__label">Tổng số khách</div><div class="ad-card__value"><?= (int)$tomTat['khach'] ?></div><div class="ad-card__note">Tính theo số điện thoại</div></div>

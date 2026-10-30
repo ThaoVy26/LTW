@@ -265,8 +265,8 @@ $menu    = 'ma-giam-gia';
 $scripts = ['../assets/js/admin-ma-giam-gia.js'];
 require __DIR__ . '/../includes/admin_header.php';
 ?>
-<link rel="stylesheet" href="../assets/css/admin-don-hang.css">
-<link rel="stylesheet" href="../assets/css/admin-ma-giam-gia.css">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-don-hang.css') ?>">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-ma-giam-gia.css') ?>">
 <div class="dh">
 
   <?php if ($hienForm): ?>

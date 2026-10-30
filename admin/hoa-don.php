@@ -55,9 +55,9 @@ function hd_mo_ta_thiet_ke(int $idThietKe): string
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css">
-<link rel="stylesheet" href="../assets/css/admin.css">
-<link rel="stylesheet" href="../assets/css/hoa-don.css">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/style.css') ?>">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin.css') ?>">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/hoa-don.css') ?>">
 </head>
 <body class="hd">
 

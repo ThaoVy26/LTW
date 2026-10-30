@@ -9,7 +9,7 @@
 .mg-field input:focus, .mg-field select:focus { border-color: var(--pink); box-shadow: 0 0 0 3px var(--pink-100); }
 .mg-field input[readonly] { background: var(--bg); color: var(--muted); }
 #ma_code { text-transform: uppercase; }
-.mg-field.has-error input, .mg-field.has-error select { border-color: #f08aa6; }
+.mg-field.has-error input, .mg-field.has-error select { border-color: #fc93a0; }
 .mg-err { color: #9f1239; font-size: 13px; margin-top: 4px; }
 .mg-unit { font-weight: 500; color: var(--muted); }
 .mg-check { display: flex; align-items: center; gap: 8px; font-size: 14px; margin: 4px 0 18px; }
