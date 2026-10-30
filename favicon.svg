@@ -1,4 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#e0185f"/>
-  <path d="M32 47s-14-8.6-14-18.4C18 23 22.2 19 27 19c2.4 0 4.4 1.2 5 3 .6-1.8 2.6-3 5-3 4.8 0 9 4 9 9.6C46 38.4 32 47 32 47z" fill="#fff"/>
+  <rect width="64" height="64" rx="14" fill="#fc93a0"/>
+  <g fill="#fff">
+    <ellipse cx="23.5" cy="17" rx="6" ry="13" transform="rotate(-8 23.5 17)"/>
+    <ellipse cx="40.5" cy="17" rx="6" ry="13" transform="rotate(8 40.5 17)"/>
+    <circle cx="32" cy="42" r="15"/>
+  </g>
+  <g fill="#fc93a0">
+    <ellipse cx="23.5" cy="17" rx="2.6" ry="9" transform="rotate(-8 23.5 17)"/>
+    <ellipse cx="40.5" cy="17" rx="2.6" ry="9" transform="rotate(8 40.5 17)"/>
+    <circle cx="26.5" cy="40" r="2"/>
+    <circle cx="37.5" cy="40" r="2"/>
+    <path d="M29.5 45.5h5l-2.5 3z"/>
+  </g>
 </svg>
