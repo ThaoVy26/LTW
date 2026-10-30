@@ -1,0 +1,221 @@
+{
+  "date": "2026-10-30",
+  "main_commit": "899ea7f",
+  "tested_commit": "0b4fdd7",
+  "environment": {
+    "php": "8.0.30",
+    "mariadb": "10.4.32",
+    "database": "Fresh database in isolated MariaDB on port 3307"
+  },
+  "imports": [
+    {
+      "file": "01_schema.sql",
+      "status": "pass",
+      "duration_ms": 454
+    },
+    {
+      "file": "02_seed.sql",
+      "status": "pass",
+      "duration_ms": 61
+    },
+    {
+      "file": "03_charm_that.sql",
+      "status": "pass",
+      "duration_ms": 269
+    },
+    {
+      "file": "04_san_pham_charm.sql",
+      "status": "pass",
+      "duration_ms": 117
+    },
+    {
+      "file": "05_tach_charm.sql",
+      "status": "pass",
+      "duration_ms": 187
+    },
+    {
+      "file": "06_anh_san_pham.sql",
+      "status": "pass",
+      "duration_ms": 28
+    },
+    {
+      "file": "07_admin.sql",
+      "status": "pass",
+      "duration_ms": 41
+    },
+    {
+      "file": "08_vy_catalog.sql",
+      "status": "pass",
+      "duration_ms": 35
+    },
+    {
+      "file": "09_du_lieu_demo.sql",
+      "status": "pass",
+      "duration_ms": 27
+    },
+    {
+      "file": "10_chi_muc.sql",
+      "status": "pass",
+      "duration_ms": 104
+    },
+    {
+      "file": "11_ma_giam_gia.sql",
+      "status": "pass",
+      "duration_ms": 21
+    },
+    {
+      "file": "12_xoa_charm_mo.sql",
+      "status": "pass",
+      "duration_ms": 17
+    },
+    {
+      "file": "13_bo_sung_charm.sql",
+      "status": "pass",
+      "duration_ms": 1056
+    },
+    {
+      "file": "14_day_hong.sql",
+      "status": "pass",
+      "duration_ms": 5
+    },
+    {
+      "file": "15_cap_nhat_vong_tron.sql",
+      "status": "pass",
+      "duration_ms": 19
+    },
+    {
+      "file": "16_chuyen_combo_vong_hoa.sql",
+      "status": "pass",
+      "duration_ms": 18
+    }
+  ],
+  "counts": {
+    "products": 270,
+    "charms": 259,
+    "tables": 14,
+    "foreign_keys": 14
+  },
+  "browser_checks": [
+    "render login.php",
+    "authenticated",
+    "render san-pham.php?q=Combo&cat=2",
+    "product search/category filter",
+    "render san-pham.php?page=9999",
+    "product pagination clamps",
+    "render charm.php",
+    "charm page limited to 20",
+    "render charm.php?page=2",
+    "charm saves its row and preserves page",
+    "render charm.php?bst=5&page=9999",
+    "charm collection filter/pagination",
+    "render danh-muc.php",
+    "render san-pham-form.php",
+    "upload image preview",
+    "render san-pham.php?q=Review+product",
+    "upload path saved",
+    "render san-pham-form.php?id=352",
+    "product create persists cost",
+    "invalid CSRF rejected",
+    "render san-pham.php?q=Review+product",
+    "product edit and readable status",
+    "render danh-muc.php?edit=5",
+    "product/category create edit delete",
+    "render san-pham.php",
+    "no page overflow desktop san-pham.php",
+    "visible images load desktop san-pham.php",
+    "render san-pham-form.php?id=1",
+    "no page overflow desktop san-pham-form.php?id=1",
+    "visible images load desktop san-pham-form.php?id=1",
+    "render danh-muc.php",
+    "no page overflow desktop danh-muc.php",
+    "visible images load desktop danh-muc.php",
+    "render charm.php",
+    "no page overflow desktop charm.php",
+    "visible images load desktop charm.php",
+    "render san-pham.php",
+    "no page overflow tablet san-pham.php",
+    "visible images load tablet san-pham.php",
+    "render san-pham-form.php?id=1",
+    "no page overflow tablet san-pham-form.php?id=1",
+    "visible images load tablet san-pham-form.php?id=1",
+    "render danh-muc.php",
+    "no page overflow tablet danh-muc.php",
+    "visible images load tablet danh-muc.php",
+    "render charm.php",
+    "no page overflow tablet charm.php",
+    "visible images load tablet charm.php",
+    "render san-pham.php",
+    "no page overflow mobile san-pham.php",
+    "visible images load mobile san-pham.php",
+    "render san-pham-form.php?id=1",
+    "no page overflow mobile san-pham-form.php?id=1",
+    "visible images load mobile san-pham-form.php?id=1",
+    "render danh-muc.php",
+    "no page overflow mobile danh-muc.php",
+    "visible images load mobile danh-muc.php",
+    "render charm.php",
+    "no page overflow mobile charm.php",
+    "visible images load mobile charm.php"
+  ],
+  "broken_active_product_images": [
+    {
+      "id": "139",
+      "name": "Charm Dây Chữ A",
+      "image": "assets/img/charm/day-chu/g01.webp"
+    },
+    {
+      "id": "159",
+      "name": "Charm Dây Chữ W",
+      "image": "assets/img/charm/day-chu/g22.webp"
+    }
+  ],
+  "visual_findings": [
+    {
+      "file": "loi-anh-day-chu-A-desktop.png",
+      "url": "http://127.0.0.1:8091/admin/san-pham.php?q=Charm%20D%C3%A2y%20Ch%E1%BB%AF%20A",
+      "broken": [
+        "../assets/img/charm/day-chu/g01.webp"
+      ]
+    },
+    {
+      "file": "loi-anh-day-chu-W-desktop.png",
+      "url": "http://127.0.0.1:8091/admin/san-pham.php?q=Charm%20D%C3%A2y%20Ch%E1%BB%AF%20W",
+      "broken": [
+        "../assets/img/charm/day-chu/g22.webp"
+      ]
+    },
+    {
+      "file": "phan-trang-mau-moi-desktop.png",
+      "url": "http://127.0.0.1:8091/admin/san-pham.php",
+      "text": "rgb(255, 255, 255)",
+      "background": "rgb(252, 147, 160)",
+      "contrast": 2.14
+    }
+  ],
+  "plain_bracelet_status": [
+    {
+      "id": "3",
+      "ten_sp": "Vòng dây bạc trơn",
+      "trang_thai": "ngung_ban",
+      "hinh_anh": "assets/img/sp/vong-day-bac-tron.jpg"
+    },
+    {
+      "id": "6",
+      "ten_sp": "Vòng dây hồng nhám",
+      "trang_thai": "ngung_ban",
+      "hinh_anh": "assets/img/sp/vong-day-hong-nham.jpg"
+    },
+    {
+      "id": "11",
+      "ten_sp": "Vòng dây vàng trơn",
+      "trang_thai": "ngung_ban",
+      "hinh_anh": "assets/img/sp/vong-day-vang-tron.jpg"
+    },
+    {
+      "id": "14",
+      "ten_sp": "Vòng dây đen trơn",
+      "trang_thai": "ngung_ban",
+      "hinh_anh": "assets/img/sp/vong-day-den-tron.jpg"
+    }
+  ]
+}
