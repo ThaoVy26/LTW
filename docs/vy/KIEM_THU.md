@@ -22,6 +22,12 @@ Tổng cộng 60 điểm kiểm tra trình duyệt đã đạt, gồm các lư�
 
 ## Ảnh minh chứng
 
+Đã thay toàn bộ 12 ảnh bằng ảnh chụp **cửa sổ Chrome thật có thanh tab và thanh địa chỉ** ngày 30/10/2026. Chụp nguyên cửa sổ bằng Windows PrintWindow, không ghép ảnh trang với thanh địa chỉ giả. Import thành công SQL 01–11 trên MariaDB tạm độc lập, cổng 3307; bản web chụp ảnh chạy tại `127.0.0.1:8091`.
+
+Viewport CSS thực tế lúc chụp: desktop **1266×686**, tablet **786×686**, mobile **501×686**. Đây là kiểm tra responsive bằng thay đổi độ rộng cửa sổ Chrome trên máy tính; không phải thiết bị di động thật. Kích thước pixel ảnh lớn hơn do DPI Windows. Metadata từng ảnh nằm trong [capture-info.json](screenshots/capture-info.json).
+
+Trong đợt chụp lại, cả bốn trang đều tải thành công, không lỗi PHP, không tràn chiều ngang toàn trang, ảnh thu nhỏ đang nhìn thấy tải được. Bộ 60 điểm kiểm tra thao tác phía trên là kết quả ngày 29/10, không phải kiểm thử lại toàn bộ luồng ngày 30/10.
+
 | Trang | Desktop | Tablet | Mobile |
 |---|---|---|---|
 | Sản phẩm | [Ảnh](screenshots/san-pham-desktop.png) | [Ảnh](screenshots/san-pham-tablet.png) | [Ảnh](screenshots/san-pham-mobile.png) |
@@ -31,7 +37,7 @@ Tổng cộng 60 điểm kiểm tra trình duyệt đã đạt, gồm các lư�
 
 ## Cần kiểm tra khi tích hợp
 
-- Điện thoại thật; chụp lại có thanh địa chỉ để đưa vào báo cáo.
+- Điện thoại thật. Yêu cầu ảnh có thanh địa chỉ cho báo cáo đã được hoàn tất bằng bộ ảnh Chrome ngày 30/10.
 - Biểu đồ lợi nhuận khi có đơn hoàn tất; repo hiện chưa có trang `admin/thong-ke.php` của Quỳnh.
-- Luồng khách ẩn charm phải do Q8 xử lý; việc lưu trạng thái admin không tự thay đổi truy vấn trang khách.
-- Chạy lại bộ kiểm thử sau khi gộp migration 10–11 và chốt dữ liệu nhóm.
+- Luồng khách ẩn charm Q8 cần kiểm thử khi tích hợp; việc lưu trạng thái admin không tự thay đổi truy vấn trang khách.
+- Migration 10–11 đã import thành công để cập nhật ERD và chụp ảnh; vẫn cần kiểm thử toàn bộ luồng nghiệp vụ khi chốt dữ liệu nhóm.

@@ -1,0 +1,151 @@
+{
+  "date": "2026-10-30",
+  "method": "Windows PrintWindow of isolated visible Chrome window, including native browser address bar. No compositing.",
+  "database": "Isolated MariaDB 3307 with repository SQL 01–11",
+  "screenshots": [
+    {
+      "file": "san-pham-desktop.png",
+      "label": "desktop",
+      "url": "http://127.0.0.1:8091/admin/san-pham.php",
+      "title": "Sản phẩm · Quản trị Charm Atelier",
+      "width": 1266,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    },
+    {
+      "file": "san-pham-form-desktop.png",
+      "label": "desktop",
+      "url": "http://127.0.0.1:8091/admin/san-pham-form.php?id=1",
+      "title": "Sửa sản phẩm · Quản trị Charm Atelier",
+      "width": 1266,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    },
+    {
+      "file": "danh-muc-desktop.png",
+      "label": "desktop",
+      "url": "http://127.0.0.1:8091/admin/danh-muc.php",
+      "title": "Danh mục · Quản trị Charm Atelier",
+      "width": 1266,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    },
+    {
+      "file": "charm-desktop.png",
+      "label": "desktop",
+      "url": "http://127.0.0.1:8091/admin/charm.php",
+      "title": "Charm · Quản trị Charm Atelier",
+      "width": 1266,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    },
+    {
+      "file": "san-pham-tablet.png",
+      "label": "tablet",
+      "url": "http://127.0.0.1:8091/admin/san-pham.php",
+      "title": "Sản phẩm · Quản trị Charm Atelier",
+      "width": 786,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    },
+    {
+      "file": "san-pham-form-tablet.png",
+      "label": "tablet",
+      "url": "http://127.0.0.1:8091/admin/san-pham-form.php?id=1",
+      "title": "Sửa sản phẩm · Quản trị Charm Atelier",
+      "width": 786,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    },
+    {
+      "file": "danh-muc-tablet.png",
+      "label": "tablet",
+      "url": "http://127.0.0.1:8091/admin/danh-muc.php",
+      "title": "Danh mục · Quản trị Charm Atelier",
+      "width": 786,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    },
+    {
+      "file": "charm-tablet.png",
+      "label": "tablet",
+      "url": "http://127.0.0.1:8091/admin/charm.php",
+      "title": "Charm · Quản trị Charm Atelier",
+      "width": 786,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    },
+    {
+      "file": "san-pham-mobile.png",
+      "label": "mobile",
+      "url": "http://127.0.0.1:8091/admin/san-pham.php",
+      "title": "Sản phẩm · Quản trị Charm Atelier",
+      "width": 501,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    },
+    {
+      "file": "san-pham-form-mobile.png",
+      "label": "mobile",
+      "url": "http://127.0.0.1:8091/admin/san-pham-form.php?id=1",
+      "title": "Sửa sản phẩm · Quản trị Charm Atelier",
+      "width": 501,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    },
+    {
+      "file": "danh-muc-mobile.png",
+      "label": "mobile",
+      "url": "http://127.0.0.1:8091/admin/danh-muc.php",
+      "title": "Danh mục · Quản trị Charm Atelier",
+      "width": 501,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    },
+    {
+      "file": "charm-mobile.png",
+      "label": "mobile",
+      "url": "http://127.0.0.1:8091/admin/charm.php",
+      "title": "Charm · Quản trị Charm Atelier",
+      "width": 501,
+      "height": 686,
+      "ready": "complete",
+      "overflow": false,
+      "error": false,
+      "imageErrors": 0
+    }
+  ]
+}
