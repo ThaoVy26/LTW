@@ -1,29 +1,28 @@
-/* customizer.js — trang Tự thiết kế
- * Dữ liệu lấy từ thẻ <script id="cust-data"> do PHP in ra (đọc từ CSDL).
- * Tính năng: chọn size/dây/bộ sưu tập, bấm hoặc kéo thả charm vào ô,
- * đổi chỗ giữa các ô, hoàn tác/làm lại, Ngang/Dọc/Xoay 360, lưu & thêm giỏ qua API.
- */
 (() => {
+  // dữ liệu php in ra thẻ script (size, dây, bộ sưu tập, charm)
   const DATA = JSON.parse(document.getElementById("cust-data").textContent);
   const $ = (id) => document.getElementById(id);
   const tien = (n) => Number(n || 0).toLocaleString("vi-VN") + "đ";
   const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+  // tra charm theo id cho nhanh
   const charmById = new Map();
   DATA.collections.forEach((c) => c.charms.forEach((ch) => charmById.set(ch.id, { ...ch, bst: c.id })));
 
+  // trạng thái hiện tại của vòng đang thiết kế
   const state = {
     sizeId: DATA.sizes[0].id,
     chainId: DATA.chains[0].id,
     collectionId: DATA.collections[0]?.id,
-    slots: Array(DATA.sizes[0].so).fill(null), // mỗi ô: id charm | null (bạc trơn) | NOI (phần sau của charm dài)
-    selected: 0,          // ô đang chọn (bấm charm sẽ đặt vào ô này)
-    reached: 1,           // bước xa nhất đã làm (cho thanh 5 bước)
+    slots: Array(DATA.sizes[0].so).fill(null),
+    selected: 0,
+    reached: 1,
     history: [], future: [],
     editKey: null,
   };
 
   if (DATA.start) state.collectionId = DATA.start;
+  // mở lại thiết kế đã lưu thì nạp lại các ô
   if (DATA.edit) {
     state.sizeId = DATA.edit.size_id;
     state.chainId = DATA.edit.chain_id;
@@ -38,15 +37,15 @@
   const chain = () => DATA.chains.find((c) => c.id === state.chainId);
   const collection = () => DATA.collections.find((c) => c.id === state.collectionId);
 
-  /* ---------- Ô & charm dài ---------- */
-  const NOI = -1;                                          // ô thứ 2 của charm dài
+  // -1 là ô thứ 2 của charm dài
+  const NOI = -1;
   const laCharm = (v) => v > 0;
   const laDai = (v) => laCharm(v) && charmById.get(v).kieu === "dai";
-  const chu = (i) => (state.slots[i] === NOI ? i - 1 : i); // ô "chủ" của 1 vị trí
+  const chu = (i) => (state.slots[i] === NOI ? i - 1 : i);
   const soCharm = () => state.slots.filter(laCharm).length;
   const soTrong = () => state.slots.filter((v) => v === null).length;
 
-  /** Gỡ charm đang chiếm vị trí i (kể cả khi i là nửa sau của charm dài). Trả về id đã gỡ. */
+  // gỡ charm khỏi ô (charm dài thì gỡ cả 2 ô)
   function goTai(i) {
     if (i < 0 || i >= state.slots.length || state.slots[i] === null) return null;
     const c = chu(i), id = state.slots[c];
@@ -54,20 +53,17 @@
     if (laDai(id) && state.slots[c + 1] === NOI) state.slots[c + 1] = null;
     return id;
   }
-  /** Ô i có đặt được charm id không (các ô cần dùng đang trống). */
   const vuaCho = (id, i) => state.slots[i] === null && (!laDai(id) || state.slots[i + 1] === null);
-  /** Đặt charm vào i (giả định đã trống). */
+  // đặt charm vào ô (charm dài chiếm thêm ô kế bên)
   function datTai(id, i) {
     state.slots[i] = id;
     if (laDai(id)) state.slots[i + 1] = NOI;
   }
-  /** Hình charm: ảnh thật nếu có, không thì emoji/chữ. */
-  // mắt xích trống: ảnh bạc, hoặc ảnh hồng khi chọn dây Trơn Hồng
   const matBac = () => `<img class="slot__base" src="assets/img/link-${chain().ten.toLowerCase().includes("hồng") ? "hong" : "bac"}.webp?v=2" alt="" draggable="false">`;
   const hinh = (ch) => (ch.anh ? `<img src="${esc(ch.anh)}" alt="" draggable="false">` : `${matBac()}<span class="slot__face">${ch.icon}</span>`);
 
-  /* ---------- Thông báo ---------- */
   let msgTimer;
+  // hiện thông báo nhỏ dưới bảng tạm tính
   function msg(text, type = "ok", html = false) {
     const el = $("msg");
     el[html ? "innerHTML" : "textContent"] = text;
@@ -76,22 +72,26 @@
     if (!html) msgTimer = setTimeout(() => (el.textContent = ""), 4000);
   }
 
-  /* ---------- Lịch sử (hoàn tác / làm lại) ---------- */
   const snap = () => JSON.stringify({ sizeId: state.sizeId, slots: state.slots });
+  // nhớ trạng thái hiện tại để hoàn tác
   function remember() { state.history.push(snap()); state.future = []; if (state.history.length > 50) state.history.shift(); }
+  // quay về trạng thái đã nhớ
   function restore(json) { const s = JSON.parse(json); state.sizeId = s.sizeId; state.slots = s.slots; $("size").value = s.sizeId; }
+  // hoàn tác
   function undo() {
     if (!state.history.length) return msg("Không còn gì để hoàn tác.", "warn");
     state.future.push(snap()); restore(state.history.pop()); renderAll(); msg("Đã hoàn tác.");
   }
+  // làm lại
   function redo() {
     if (!state.future.length) return msg("Không còn gì để làm lại.", "warn");
     state.history.push(snap()); restore(state.future.pop()); renderAll(); msg("Đã làm lại.");
   }
 
+  // ghi nhận bước đã làm cho thanh 5 bước
   function reach(step) { state.reached = Math.max(state.reached, step); renderSteps(); }
 
-  /* ---------- Render ---------- */
+  // vẽ thanh 5 bước
   function renderSteps() {
     document.querySelectorAll("#steps li").forEach((li) => {
       const n = +li.dataset.step;
@@ -100,11 +100,13 @@
     });
   }
 
+  // vẽ ô chọn size
   function renderSize() {
     $("size").innerHTML = DATA.sizes.map((s) => `<option value="${s.id}">${esc(s.ten)}</option>`).join("");
     $("size").value = state.sizeId;
   }
 
+  // vẽ các chấm màu dây, đổi màu mắt xích theo dây
   function renderChains() {
     $("chains").innerHTML = DATA.chains.map((c) => `
       <button type="button" role="radio" aria-checked="${c.id === state.chainId}" aria-label="${esc(c.ten)}" title="${esc(c.ten)}"
@@ -119,6 +121,7 @@
       ten.includes("trắng") ? "grayscale(1) brightness(1.16) contrast(.85)" : "none");
   }
 
+  // vẽ ô chọn bộ sưu tập
   function renderCollections() {
     const nhom = [...new Set(DATA.collections.map((c) => c.nhom))];
     $("collection").innerHTML = nhom.map((n) => `<optgroup label="${esc(n)}">` +
@@ -127,6 +130,7 @@
     $("collection").value = state.collectionId;
   }
 
+  // vẽ lưới charm của bộ đang chọn
   function renderCharmGrid() {
     const col = collection();
     const nhanKieu = { dai: "Dài · 2 ô", day: "Dây treo" };
@@ -138,13 +142,14 @@
       </button>`).join("");
   }
 
+  // vẽ khung kéo thả, mỗi ô là 1 mắt xích
   function renderBracelet() {
     const n = state.slots.length;
     const b = $("bracelet");
     b.style.setProperty("--n", n);
     const sel = chu(state.selected);
     b.innerHTML = state.slots.map((id, i) => {
-      if (id === NOI) {   // nửa sau của charm dài: chỉ giữ chỗ
+      if (id === NOI) {
         return `<div class="slot is-cont${sel === i - 1 ? " is-selected" : ""}" data-i="${i}" title="${esc(charmById.get(state.slots[i - 1]).ten)}">
             <span class="slot__link"></span><span class="slot__num">${i + 1}</span></div>`;
       }
@@ -165,6 +170,7 @@
     $("size-hint").textContent = "Gợi ý: " + size().so + " charm";
   }
 
+  // tính tiền tạm tính: tiền dây mỗi ô + tiền charm
   function renderPrice() {
     const n = state.slots.length, c = chain();
     const used = state.slots.filter(laCharm).map((id) => charmById.get(id));
@@ -176,15 +182,16 @@
     $("total-price").textContent = tien(chainCost + charmCost);
   }
 
+  // vẽ lại khung, giá và thanh bước
   function renderAll() { renderBracelet(); renderPrice(); renderSteps(); }
 
-  /* ---------- Thao tác với ô ---------- */
-  /** Tìm chỗ trống phù hợp: ưu tiên ô đang chọn, rồi ô trống đầu tiên. */
+  // tìm ô trống vừa cho charm (charm dài cần 2 ô liền nhau)
   function oTrongCho(id) {
     if (vuaCho(id, state.selected)) return state.selected;
     return state.slots.findIndex((_, i) => vuaCho(id, i));
   }
 
+  // đặt charm vào vòng: ô đang chọn hoặc ô trống đầu tiên
   function placeCharm(charmId, index) {
     const n = state.slots.length;
     let i = index != null ? chu(index) : oTrongCho(charmId);
@@ -192,7 +199,7 @@
       return msg(laDai(charmId) ? "Không còn 2 ô trống liền nhau cho charm dài. Gỡ bớt charm hoặc kéo thả vào vị trí muốn thay."
                                 : "Khung đã đầy! Gỡ bớt charm hoặc kéo thả để thay.", "warn");
     }
-    if (laDai(charmId) && i >= n - 1) i = n - 2;   // charm dài thả vào ô cuối → lùi 1 ô
+    if (laDai(charmId) && i >= n - 1) i = n - 2;
     remember();
     goTai(i);
     if (laDai(charmId)) goTai(i + 1);
@@ -204,6 +211,7 @@
     msg(`Đã đặt "${charmById.get(charmId).ten}" vào ô ${i + 1}${laDai(charmId) ? "–" + (i + 2) : ""}.`);
   }
 
+  // gỡ charm khỏi ô
   function removeCharm(i) {
     if (state.slots[i] == null) return;
     remember();
@@ -213,7 +221,7 @@
     msg(`Đã gỡ "${charmById.get(id).ten}" khỏi ô ${c + 1}.`);
   }
 
-  /** Kéo charm sang ô khác: charm ở đích (nếu có) chuyển về chỗ cũ nếu vừa. */
+  // kéo charm sang ô khác, ô đích có charm thì đổi chỗ
   function moveCharm(from, to) {
     from = chu(from); to = chu(to);
     if (from === to) return;
@@ -232,6 +240,7 @@
     renderAll();
   }
 
+  // đổi size: giữ lại charm cũ nếu còn vừa
   function changeSize(newId) {
     const s = DATA.sizes.find((x) => x.id === newId);
     const lost = state.slots.slice(s.so).filter(laCharm).length + (laDai(state.slots[s.so - 1]) ? 1 : 0);
@@ -241,14 +250,14 @@
     remember();
     state.sizeId = newId;
     state.slots = Array.from({ length: s.so }, (_, i) => state.slots[i] ?? null);
-    if (laDai(state.slots[s.so - 1])) state.slots[s.so - 1] = null; // charm dài bị cắt đôi
+    if (laDai(state.slots[s.so - 1])) state.slots[s.so - 1] = null;
     state.selected = Math.min(state.selected, s.so - 1);
     reach(2);
     renderAll();
     msg(`Khung đã đổi thành ${s.so} ô theo size ${s.ten}.`);
   }
 
-  /* ---------- Gọi API lưu / thêm giỏ ---------- */
+  // gọi api để lưu thiết kế hoặc thêm vào giỏ
   async function send(action) {
     if (action === "cart" && !state.slots.some(laCharm)) return msg("Bạn chưa chọn charm nào!", "err");
     const btn = $(action === "cart" ? "add-cart" : "save");
@@ -275,7 +284,6 @@
     }
   }
 
-  /* ---------- Sự kiện ---------- */
   $("size").addEventListener("change", (e) => changeSize(+e.target.value));
 
   $("chains").addEventListener("click", (e) => {
@@ -287,12 +295,10 @@
     state.collectionId = +e.target.value; reach(4); renderCharmGrid();
   });
 
-  // Bấm charm trong lưới
   $("charm-grid").addEventListener("click", (e) => {
     const t = e.target.closest(".ctile"); if (t) placeCharm(+t.dataset.id);
   });
 
-  // Bấm ô: chọn ô / gỡ charm
   $("bracelet").addEventListener("click", (e) => {
     const x = e.target.closest("[data-remove]");
     if (x) return removeCharm(+x.dataset.remove);
@@ -301,8 +307,8 @@
     if (state.slots[state.selected] === null) msg(`Đã chọn ô ${state.selected + 1} — bấm 1 charm bên trái để đặt vào.`, "info");
   });
 
-  // Kéo thả (HTML5 Drag & Drop)
-  let drag = null; // {type:'charm', id} | {type:'slot', i}
+  // kéo thả charm bằng chuột (máy tính)
+  let drag = null;
   document.addEventListener("dragstart", (e) => {
     const tile = e.target.closest?.(".ctile");
     const slot = e.target.closest?.(".slot.is-filled");
@@ -314,7 +320,6 @@
     e.dataTransfer.setData("text/plain", "charm");
   });
   document.addEventListener("dragend", () => {
-    // Kéo charm từ vòng rồi thả ra ngoài (không vào ô nào) → gỡ charm
     if (drag?.type === "slot" && !drag.dropped && !$("stage").matches(":hover")) removeCharm(drag.i);
     drag = null;
     document.querySelectorAll(".slot.is-over, .slot.is-dragging").forEach((s) => s.classList.remove("is-over", "is-dragging"));
@@ -333,12 +338,11 @@
     if (drag.type === "charm") placeCharm(drag.id, to);
     else moveCharm(drag.i, to);
   });
-  // Kéo charm từ khung ra lưới = gỡ charm
   $("charm-grid").addEventListener("dragover", (e) => { if (drag?.type === "slot") e.preventDefault(); });
   $("charm-grid").addEventListener("drop", (e) => { if (drag?.type === "slot") { e.preventDefault(); drag.dropped = true; removeCharm(drag.i); } });
 
-  // Kéo đổi chỗ bằng tay trên điện thoại (kéo thả HTML5 không chạy trên màn hình cảm ứng)
-  let cham = null; // {from, ghost, x0, y0, started}
+  // kéo thả charm bằng ngón tay (điện thoại)
+  let cham = null;
   $("bracelet").addEventListener("pointerdown", (e) => {
     if (e.pointerType === "mouse") return;
     const s = e.target.closest(".slot.is-filled, .slot.is-cont");
@@ -376,7 +380,7 @@
   });
   document.addEventListener("pointercancel", () => { if (cham?.ghost) cham.ghost.remove(); cham = null; });
 
-  // Ngang / Dọc / Xoay 360
+  // nút Ngang, Dọc, Xoay 360
   document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
     const mode = b.dataset.mode, stage = $("stage");
     if (mode === "xoay") return open360();
@@ -385,7 +389,7 @@
     fitVertical();
   }));
 
-  /** Chế độ Dọc: xoay cả vòng 90°, tăng chiều cao khung cho vừa. */
+  // chế độ dọc: chỉnh chiều cao khung cho vừa
   function fitVertical() {
     const stage = $("stage"), b = $("bracelet");
     stage.style.minHeight = stage.classList.contains("is-vertical") ? b.offsetWidth + 80 + "px" : "";
@@ -401,13 +405,12 @@
   $("save").addEventListener("click", () => send("save"));
   $("add-cart").addEventListener("click", () => send("cart"));
 
-  // Thanh bước: bấm để cuộn tới khối tương ứng
   $("steps").addEventListener("click", (e) => {
     const li = e.target.closest("li"); if (!li) return;
     $("block-" + li.dataset.step)?.scrollIntoView({ behavior: "smooth", block: "center" });
   });
 
-  // Phím tắt
+  // phím tắt: Ctrl+Z, Ctrl+Y, Delete, mũi tên
   document.addEventListener("keydown", (e) => {
     if (["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); e.shiftKey ? redo() : undo(); }
@@ -417,13 +420,14 @@
     else if (e.key === "ArrowLeft") { state.selected = Math.max(0, state.selected - 1); renderBracelet(); }
   });
 
-  /* ---------- Xem vòng 360° (3D, tự xoay, kéo để xoay tay) ---------- */
+  // khung xem vòng 3d
   const v360 = { raf: 0, ang: 0, tilt: -22, auto: true, drag: null, last: 0, gl: null };
   const scripts = {};
   const loadScript = (src) => (scripts[src] ||= new Promise((ok, fail) => {
     const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = fail; document.head.appendChild(s);
   }));
 
+  // đổi các ô trên vòng thành danh sách cho bản 3d
   function items3d() {
     return state.slots.map((v, i) => {
       if (v === NOI) { const ch = charmById.get(state.slots[i - 1]); return ch.anh ? { type: "img", url: ch.anh, kind: "dai", part: 1 } : { type: "empty" }; }
@@ -432,23 +436,27 @@
       return ch.anh ? { type: "img", url: ch.anh, kind: ch.kieu, part: 0 } : { type: "icon", icon: ch.icon };
     });
   }
+  // chọn bộ ảnh mắt xích theo màu dây
   function tint3d() {
     const t = chain().ten.toLowerCase();
-    return t.includes("vàng") ? "vang" : t.includes("đen") ? "den" : t.includes("hồng") ? "hong" : t.includes("trắng") ? "trang" : "bac";
+    return t.includes("vàng") ? "vang" : t.includes("đen") ? "den" : t.includes("hồng") ? "hong" : "bac";
   }
 
+  // mỗi khung hình: tự xoay rồi vẽ lại
   function tick360(t) {
-    if (v360.auto && !v360.drag) v360.ang -= ((t - (v360.last || t)) / 1000) * 28;   // ~28°/giây
+    if (v360.auto && !v360.drag) v360.ang -= ((t - (v360.last || t)) / 1000) * 28;
     v360.last = t;
     v360.gl.pose(v360.ang, v360.tilt); v360.gl.render();
     v360.raf = requestAnimationFrame(tick360);
   }
 
+  // bật tắt tự xoay
   function setAuto(on) {
     v360.auto = on;
     $("v360-toggle").textContent = on ? "⏸ Dừng xoay" : "▶ Tiếp tục xoay";
   }
 
+  // mở khung 3d (chỉ tải three.js lúc bấm)
   async function open360() {
     if (!state.slots.some(laCharm)) return msg("Bạn chưa chọn charm nào để xem!", "warn");
     $("v360").hidden = false;
@@ -468,6 +476,7 @@
     $("v360-close").focus();
   }
 
+  // đóng khung 3d và dọn bộ nhớ
   function close360() {
     $("v360").hidden = true;
     document.body.classList.remove("v360-open");
@@ -490,6 +499,6 @@
   $("v360-scene").addEventListener("pointerup", endDrag);
   $("v360-scene").addEventListener("pointercancel", endDrag);
 
-  /* ---------- Khởi tạo ---------- */
+  // chạy lần đầu khi mở trang
   renderSize(); renderChains(); renderCollections(); renderCharmGrid(); renderAll();
 })();
