@@ -8,3 +8,6 @@ UPDATE SanPham
 DELETE FROM SanPham WHERE ten_sp IN ('Combo Love Story', 'Combo Sporty Chic')
   AND NOT EXISTS (SELECT 1 FROM ChiTietDonHang d WHERE d.id_san_pham = SanPham.id);
 UPDATE SanPham SET gia_nhap = ROUND(gia * 0.6) WHERE gia > 0 AND gia_nhap = 0;
+UPDATE SanPham SET trang_thai = 'dang_ban'
+WHERE hinh_anh IN ('assets/img/sp/vong-day-bac-tron.jpg', 'assets/img/sp/vong-day-vang-tron.jpg',
+                   'assets/img/sp/vong-day-den-tron.jpg', 'assets/img/sp/vong-day-hong-nham.jpg');
