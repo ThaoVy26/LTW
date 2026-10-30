@@ -13,8 +13,8 @@ Nguồn: `origin/main` tại **899ea7f**, đã gộp vào `vy-catalog` tại **0
 
 | Vấn đề | Bằng chứng và cách tái hiện | Ảnh |
 |---|---|---|
-| Thiếu hai ảnh charm | Tìm “Charm Dây Chữ A” hoặc “Charm Dây Chữ W” ở sản phẩm. DB vẫn trỏ đến `assets/img/charm/day-chu/g01.webp` và `g22.webp`, nhưng cả hai file không có trong repo mới; trình duyệt hiển thị ảnh vỡ. ID sản phẩm trên DB vừa import là 139 và 159. Hai charm gốc cũng dùng các đường dẫn này. | [A](screenshots/loi-anh-day-chu-A-desktop.png), [W](screenshots/loi-anh-day-chu-W-desktop.png) |
-| Số trang đang chọn khó đọc sau đổi màu | Cuộn cuối danh sách sản phẩm/charm: `.sp-admin .dh-pagination .is-active` dùng chữ trắng `rgb(255,255,255)` trên nền `rgb(252,147,160)`; tỷ lệ tương phản tính được khoảng **2,14:1**. Bố cục không vỡ nhưng chữ số khá nhạt. Có thể dùng chữ màu đậm hoặc nền nút đậm hơn khi người phụ trách chốt màu. | [Phân trang](screenshots/phan-trang-mau-moi-desktop.png) |
+| Thiếu hai ảnh charm | Tìm “Charm Dây Chữ A” hoặc “Charm Dây Chữ W” ở sản phẩm. DB vẫn trỏ đến `assets/img/charm/day-chu/g01.webp` và `g22.webp`, nhưng cả hai file không có trong repo mới; trình duyệt hiển thị ảnh vỡ. ID sản phẩm trên DB vừa import là 139 và 159. Hai charm gốc cũng dùng các đường dẫn này. | `loi-anh-day-chu-A-desktop.png`, `loi-anh-day-chu-W-desktop.png` |
+| Số trang đang chọn khó đọc sau đổi màu | Cuộn cuối danh sách sản phẩm/charm: `.sp-admin .dh-pagination .is-active` dùng chữ trắng `rgb(255,255,255)` trên nền `rgb(252,147,160)`; tỷ lệ tương phản tính được khoảng **2,14:1**. Bố cục không vỡ nhưng chữ số khá nhạt. Có thể dùng chữ màu đậm hoặc nền nút đậm hơn khi người phụ trách chốt màu. | `phan-trang-mau-moi-desktop.png` |
 | Bốn vòng trơn có ảnh nhưng vẫn ngừng bán | SQL 09 ngừng bán sản phẩm thiếu ảnh; SQL 15 điền ảnh nhưng không bật bán lại. Sau import tuần tự, “Vòng dây bạc trơn”, “Vòng dây vàng trơn”, “Vòng dây đen trơn”, “Vòng dây hồng nhám” đều có ảnh nhưng `trang_thai = 'ngung_ban'`. Nếu mục tiêu là bán bốn mẫu này, cần cập nhật trạng thái ở migration phù hợp. | Trạng thái chi tiết trong [kết quả JSON](ket-qua-01-16.json) |
 
 Các vấn đề được ghi nhận để nhóm xử lý theo đúng phần việc.
@@ -55,16 +55,16 @@ Kết quả này dành cho **import lần đầu từ DB trống**; không khẳ
 
 Kiểm tra bố cục trên Chrome ở viewport **1440×1000**, **768×1024**, **390×844**: không tràn chiều ngang toàn trang; bảng rộng cuộn trong khung riêng. Ảnh thu nhỏ ở vùng nhìn thấy của các trang mặc định tải được. Việc quét toàn bộ ảnh sản phẩm đang bán mới phát hiện hai đường dẫn thiếu ở trên.
 
-## Ảnh cho Mỹ Anh lấy từ vy-catalog
+## Ảnh gửi riêng cho Mỹ Anh
 
-12 ảnh chính đã chụp lại theo màu mới, có thanh tab và thanh địa chỉ Chrome thật. Đây là ảnh chụp nguyên cửa sổ bằng Windows PrintWindow, không ghép thanh địa chỉ. Không gửi qua dịch vụ nhắn tin; ảnh được đưa lên `vy-catalog` theo yêu cầu.
+12 ảnh chính đã chụp lại theo màu mới, có thanh tab và thanh địa chỉ Chrome thật. Đây là ảnh chụp nguyên cửa sổ bằng Windows PrintWindow, không ghép thanh địa chỉ. Theo yêu cầu mới, toàn bộ ảnh chụp giao diện đã được gỡ khỏi bản hiện tại của nhánh Git và chỉ giữ ở máy trong `docs/vy/screenshots/` để người dùng gửi riêng cho Mỹ Anh. Bảng dưới ghi tên file local; các ảnh không được kèm trong repository. ERD PNG/SVG vẫn được lưu trên Git.
 
 | Trang | Desktop | Tablet | Mobile |
 |---|---|---|---|
-| Sản phẩm | [Ảnh](screenshots/san-pham-desktop.png) | [Ảnh](screenshots/san-pham-tablet.png) | [Ảnh](screenshots/san-pham-mobile.png) |
-| Form sản phẩm | [Ảnh](screenshots/san-pham-form-desktop.png) | [Ảnh](screenshots/san-pham-form-tablet.png) | [Ảnh](screenshots/san-pham-form-mobile.png) |
-| Danh mục | [Ảnh](screenshots/danh-muc-desktop.png) | [Ảnh](screenshots/danh-muc-tablet.png) | [Ảnh](screenshots/danh-muc-mobile.png) |
-| Charm | [Ảnh](screenshots/charm-desktop.png) | [Ảnh](screenshots/charm-tablet.png) | [Ảnh](screenshots/charm-mobile.png) |
+| Sản phẩm | `san-pham-desktop.png` | `san-pham-tablet.png` | `san-pham-mobile.png` |
+| Form sản phẩm | `san-pham-form-desktop.png` | `san-pham-form-tablet.png` | `san-pham-form-mobile.png` |
+| Danh mục | `danh-muc-desktop.png` | `danh-muc-tablet.png` | `danh-muc-mobile.png` |
+| Charm | `charm-desktop.png` | `charm-tablet.png` | `charm-mobile.png` |
 
 Ảnh có thanh địa chỉ được chụp ở viewport thực tế **1266×686**, **786×686**, **501×686** do giới hạn kích thước cửa sổ Chrome của máy chụp. “Tablet/mobile” là cửa sổ thu hẹp trên máy tính, chưa phải thiết bị thật. Ở cửa sổ hẹp Chrome rút gọn URL; ảnh desktop hiện đầy đủ đường dẫn. Metadata kích thước, URL và màu thực tế: [capture-info.json](screenshots/capture-info.json).
 

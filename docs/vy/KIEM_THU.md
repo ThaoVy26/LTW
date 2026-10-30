@@ -1,6 +1,6 @@
 # Kiểm thử phần sản phẩm
 
-**Kết quả mới nhất sau đổi màu và import 01–16:** [KIEM_THU_01_16.md](KIEM_THU_01_16.md). Ảnh trong thư mục `screenshots/` đã được thay bằng bản màu mới từ main `899ea7f`. Các phần ghi kết quả ngày 29/10 bên dưới được giữ làm lịch sử kiểm thử.
+**Kết quả mới nhất sau đổi màu và import 01–16:** [KIEM_THU_01_16.md](KIEM_THU_01_16.md). Ảnh màu mới từ main `899ea7f` chỉ giữ local trong `docs/vy/screenshots/` để người dùng gửi riêng cho Mỹ Anh, không kèm trong bản hiện tại của repository. Các phần ghi kết quả ngày 29/10 bên dưới được giữ làm lịch sử kiểm thử.
 
 Ngày: 29/10/2026. PHP 8.0.30, MariaDB qua XAMPP, Chrome headless. Dùng DB kiểm thử riêng dựng từ schema 01–09, không sửa dữ liệu DB local. Tài khoản/mật khẩu kiểm thử chỉ tồn tại trong DB kiểm thử.
 
@@ -32,10 +32,10 @@ Trong đợt chụp lại, cả bốn trang mặc định đều tải thành c�
 
 | Trang | Desktop | Tablet | Mobile |
 |---|---|---|---|
-| Sản phẩm | [Ảnh](screenshots/san-pham-desktop.png) | [Ảnh](screenshots/san-pham-tablet.png) | [Ảnh](screenshots/san-pham-mobile.png) |
-| Form sản phẩm | [Ảnh](screenshots/san-pham-form-desktop.png) | [Ảnh](screenshots/san-pham-form-tablet.png) | [Ảnh](screenshots/san-pham-form-mobile.png) |
-| Danh mục | [Ảnh](screenshots/danh-muc-desktop.png) | [Ảnh](screenshots/danh-muc-tablet.png) | [Ảnh](screenshots/danh-muc-mobile.png) |
-| Charm | [Ảnh](screenshots/charm-desktop.png) | [Ảnh](screenshots/charm-tablet.png) | [Ảnh](screenshots/charm-mobile.png) |
+| Sản phẩm | `san-pham-desktop.png` | `san-pham-tablet.png` | `san-pham-mobile.png` |
+| Form sản phẩm | `san-pham-form-desktop.png` | `san-pham-form-tablet.png` | `san-pham-form-mobile.png` |
+| Danh mục | `danh-muc-desktop.png` | `danh-muc-tablet.png` | `danh-muc-mobile.png` |
+| Charm | `charm-desktop.png` | `charm-tablet.png` | `charm-mobile.png` |
 
 ## Cần kiểm tra khi tích hợp
 

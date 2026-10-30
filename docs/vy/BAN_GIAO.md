@@ -2,7 +2,7 @@
 
 Cập nhật 30/10/2026. Nhánh triển khai: `vy-catalog`.
 
-**Bản mới sau khi pull màu mới và SQL 01–16:** [KIEM_THU_01_16.md](KIEM_THU_01_16.md). Import 16/16 file thành công; bốn trang không vỡ bố cục nhưng có hai ảnh thiếu, phân trang khó đọc và bốn vòng trơn vẫn ngừng bán. Bộ ảnh trong `screenshots/` đã cập nhật theo main `899ea7f` để Mỹ Anh lấy.
+**Bản mới sau khi pull màu mới và SQL 01–16:** [KIEM_THU_01_16.md](KIEM_THU_01_16.md). Import 16/16 file thành công; bốn trang không vỡ bố cục nhưng có hai ảnh thiếu, phân trang khó đọc và bốn vòng trơn vẫn ngừng bán. Ảnh chụp màu mới chỉ giữ local trong `docs/vy/screenshots/` để người dùng gửi riêng cho Mỹ Anh, không kèm trong bản hiện tại của repository.
 
 | Mục | Kết quả | Trạng thái |
 |---|---|---|
@@ -43,4 +43,4 @@ Thứ tự các file chuẩn đã kiểm thử:
 
 Chỉ sửa bốn trang admin của Vy, tạo CSS riêng, file SQL 09 và tài liệu/ảnh bàn giao. Không thay đổi file của thành viên khác. CSS bảng rộng cuộn trong khung bảng trên mobile, không kéo rộng toàn trang. Tên `includes/vy_catalog.php` và `08_vy_catalog.sql` được giữ nguyên theo yêu cầu.
 
-Ảnh hiện tại được chụp trực tiếp cửa sổ Chrome riêng bằng Windows PrintWindow, có thanh tab và thanh địa chỉ thật, không ghép khung trình duyệt. Dữ liệu là bộ mẫu từ SQL 01–16 chạy ở máy chủ kiểm thử `127.0.0.1:8091`; địa chỉ này chỉ phục vụ chụp ảnh, không phải link triển khai. Xem kích thước và URL từng ảnh trong `screenshots/capture-info.json`. Bản mobile/tablet là cửa sổ desktop thu hẹp để kiểm tra responsive, không phải ảnh chụp thiết bị thật. Trên cửa sổ hẹp Chrome có thể rút gọn URL; bộ ảnh desktop hiển thị đầy đủ đường dẫn trang. Ảnh được đẩy lên `vy-catalog` để người dùng/Mỹ Anh lấy, không gửi qua dịch vụ nhắn tin riêng.
+Ảnh hiện tại được chụp trực tiếp cửa sổ Chrome riêng bằng Windows PrintWindow, có thanh tab và thanh địa chỉ thật, không ghép khung trình duyệt. Dữ liệu là bộ mẫu từ SQL 01–16 chạy ở máy chủ kiểm thử `127.0.0.1:8091`; địa chỉ này chỉ phục vụ chụp ảnh, không phải link triển khai. Xem kích thước và URL từng ảnh trong `screenshots/capture-info.json`. Bản mobile/tablet là cửa sổ desktop thu hẹp để kiểm tra responsive, không phải ảnh chụp thiết bị thật. Trên cửa sổ hẹp Chrome có thể rút gọn URL; bộ ảnh desktop hiển thị đầy đủ đường dẫn trang. Ảnh chụp giao diện được giữ local để người dùng gửi riêng cho Mỹ Anh; `.gitignore` ngăn đưa lại các PNG trong thư mục `screenshots/` lên Git. Báo cáo, metadata và ERD vẫn được lưu trên `vy-catalog`.
