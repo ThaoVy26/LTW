@@ -84,7 +84,7 @@ $tieuDe = 'Đơn hàng';
 $menu   = 'don-hang';
 require __DIR__ . '/../includes/admin_header.php';
 ?>
-<link rel="stylesheet" href="../assets/css/admin-don-hang.css">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-don-hang.css') ?>">
 <div class="dh">
   <p class="dh__sub"><?= $tong ?> đơn<?= ($tt !== '' || $q !== '') ? ' khớp bộ lọc' : '' ?></p>
 

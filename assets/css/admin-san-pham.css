@@ -42,7 +42,7 @@
 /* Dùng phân trang chung của admin, định dạng riêng trong phạm vi .sp-admin. */
 .sp-admin .dh-pagination { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 18px; }
 .sp-admin .dh-pagination a, .sp-admin .dh-pagination span { min-width: 34px; min-height: 36px; padding: 6px 10px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
-.sp-admin .dh-pagination a:hover { border-color: var(--pink); color: var(--pink); }
+.sp-admin .dh-pagination a:hover { border-color: var(--pink); color: var(--pink-text); }
 .sp-admin .dh-pagination .is-active { background: var(--pink); border-color: var(--pink); color: #fff; }
 .sp-admin .dh-pagination .is-disabled { opacity: .4; }
 @media (max-width: 820px) {

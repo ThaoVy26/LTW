@@ -1,0 +1,3 @@
+USE 52400092_52400313_52400041;
+INSERT INTO DayVong (ten_day, gia_charm_bac)
+SELECT 'Trơn Hồng', 8000 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM DayVong WHERE ten_day = 'Trơn Hồng');

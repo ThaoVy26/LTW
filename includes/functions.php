@@ -120,7 +120,7 @@ function icon_san_pham(array $sp): string
 function anh_san_pham(array $sp, string $nhan = 'Ảnh sản phẩm'): string
 {
     if (!empty($sp['hinh_anh'])) {
-        return '<img src="' . e($sp['hinh_anh']) . '" alt="' . e($sp['ten_sp']) . '" loading="lazy">';
+        return '<img src="' . e(phien_ban($sp['hinh_anh'])) . '" alt="' . e($sp['ten_sp']) . '" loading="lazy">';
     }
     $tone = ['Vòng cơ bản' => 'tone-gray', 'Combo' => 'tone-pink', 'Charm' => 'tone-yellow'];
     return '<div class="ph ' . ($tone[$sp['ten_danh_muc'] ?? ''] ?? 'tone-gray') . '">'
@@ -150,7 +150,7 @@ function icon_charm(?string $hinh): string
 {
     $hinh = (string)$hinh;
     if (la_anh($hinh)) {
-        return '<img src="' . e($hinh) . '" alt="">';
+        return '<img src="' . e(phien_ban($hinh)) . '" alt="">';
     }
     return e($hinh !== '' ? $hinh : '•');
 }
@@ -163,6 +163,7 @@ function mau_day(string $tenDay): string
         str_contains($t, 'vàng')  => 'linear-gradient(135deg,#fff3b0,#e9c74f)',
         str_contains($t, 'trắng') => '#f1f3f8',
         str_contains($t, 'đen')   => '#1f2937',
+        str_contains($t, 'hồng')  => 'linear-gradient(135deg,#fde4e8,#e99aab)',
         default                   => 'linear-gradient(135deg,#f5f6f8,#b9bec7)',
     };
 }

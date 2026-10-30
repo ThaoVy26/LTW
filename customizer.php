@@ -7,8 +7,8 @@
 require_once __DIR__ . '/includes/functions.php';
 
 $sizes = db()->query('SELECT id, ten_size, so_charm_toi_da FROM KichThuocTay ORDER BY so_charm_toi_da')->fetchAll();
-// Dây đen xếp cuối cho giống thứ tự trên Figma (bạc, vàng, trắng, đen)
-$days  = db()->query("SELECT id, ten_day, gia_charm_bac FROM DayVong ORDER BY ten_day LIKE '%Đen%', id")->fetchAll();
+// Không bán dây trắng nữa (vẫn giữ trong CSDL để các đơn / thiết kế cũ còn đọc được)
+$days  = db()->query("SELECT id, ten_day, gia_charm_bac FROM DayVong WHERE ten_day NOT LIKE '%Trắng%' ORDER BY ten_day LIKE '%Đen%', id")->fetchAll();
 $bsts  = db()->query(
     'SELECT b.id, b.ten_bo_suu_tap, b.slug, b.hinh_anh, n.ten_nhom, n.slug AS slug_nhom
      FROM BoSuuTapCharm b LEFT JOIN NhomCharm n ON n.id = b.id_nhom
@@ -33,7 +33,7 @@ foreach ($bsts as $b) {
         'id' => (int)$b['id'], 'ten' => $b['ten_bo_suu_tap'], 'nhom' => $b['ten_nhom'] ?? 'Khác', 'bia' => $b['hinh_anh'],
         'charms' => array_map(fn($c) => [
             'id'   => (int)$c['id'], 'ten' => $c['ten_charm'], 'gia' => (int)$c['gia'], 'kieu' => $c['kieu'],
-            'anh'  => la_anh($c['hinh_anh']) ? $c['hinh_anh'] : null,
+            'anh'  => la_anh($c['hinh_anh']) ? phien_ban($c['hinh_anh']) : null,
             'icon' => icon_charm($c['hinh_anh']),
         ], $ds),
     ];
@@ -61,7 +61,8 @@ if ($editId && ($tk = lay_thiet_ke($editId))) {
         'id'       => $editId,
         'cart_key' => isset($_SESSION['gio']['tk_' . $editId]) ? 'tk_' . $editId : null,
         'size_id'  => (int)$tk['id_kich_thuoc'],
-        'chain_id' => (int)$tk['id_day_vong'],
+        // thiết kế cũ dùng dây đã ngừng bán → chuyển sang dây đầu tiên còn bán
+        'chain_id' => in_array((int)$tk['id_day_vong'], array_column($days, 'id'), false) ? (int)$tk['id_day_vong'] : (int)$days[0]['id'],
         'slots'    => $slots,
     ];
 }
@@ -76,9 +77,6 @@ require __DIR__ . '/includes/header.php';
     <div class="cust-head">
       <h1 class="page-title page-title--lg">Thiết kế vòng Italian Charm của bạn</h1>
       <p class="muted">Chọn size, chọn dây và những chiếc charm yêu thích để tạo một chiếc vòng mang dấu ấn riêng.</p>
-      <?php if ($data['edit']): ?>
-        <p class="flash flash--info">Bạn đang sửa thiết kế #<?= $editId ?>. Bấm "Thêm vào giỏ" để cập nhật giỏ hàng.</p>
-      <?php endif; ?>
     </div>
 
     <ol class="steps card" id="steps">
@@ -165,5 +163,18 @@ require __DIR__ . '/includes/header.php';
     </div>
   </div>
 </main>
+<div class="v360" id="v360" hidden role="dialog" aria-modal="true" aria-label="Xem vòng xoay 360 độ">
+  <div class="v360__box">
+    <div class="v360__head">
+      <h3>Vòng của bạn · xoay 360°</h3>
+      <button type="button" class="v360__close" id="v360-close" aria-label="Đóng">×</button>
+    </div>
+    <div class="v360__scene" id="v360-scene"></div>
+    <div class="v360__bar">
+      <button type="button" class="btn btn--light" id="v360-toggle">⏸ Dừng xoay</button>
+      <span class="muted small">Kéo hoặc vuốt để tự xoay vòng, kéo lên/xuống để đổi góc nhìn</span>
+    </div>
+  </div>
+</div>
 <script id="cust-data" type="application/json"><?= json_encode($data, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 <?php require __DIR__ . '/includes/footer.php'; ?>

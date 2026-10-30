@@ -52,7 +52,7 @@ $tieuDe = 'Chi tiết đơn hàng';
 $menu   = 'don-hang';
 require __DIR__ . '/../includes/admin_header.php';
 ?>
-<link rel="stylesheet" href="../assets/css/admin-don-hang.css">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-don-hang.css') ?>">
 <div class="dh">
   <div class="dh__head">
     <a class="dh-muted" href="don-hang.php">← Danh sách đơn hàng</a>

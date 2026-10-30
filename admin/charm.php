@@ -45,7 +45,7 @@ $collections = db()->query('SELECT id, ten_bo_suu_tap FROM BoSuuTapCharm ORDER B
 $tieuDe = 'Charm';
 $menu = 'charm';
 require __DIR__ . '/../includes/admin_header.php'; ?>
-<link rel="stylesheet" href="../assets/css/admin-san-pham.css">
+<link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-san-pham.css') ?>">
 <div class="sp-admin">
 <section class="ad-box">
   <form method="get" class="sp-filters">
