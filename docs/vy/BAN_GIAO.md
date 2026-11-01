@@ -1,14 +1,16 @@
 # Phần việc của Vy — đối chiếu KEHOACH2
 
-Cập nhật 29/10/2026. Nhánh triển khai: `vy-hoan-thien`.
+Cập nhật 30/10/2026. Nhánh triển khai: `vy-catalog`.
+
+**Bản mới sau khi pull màu mới và SQL 01–16:** [KIEM_THU_01_16.md](KIEM_THU_01_16.md). Import 16/16 file thành công; bốn trang không vỡ bố cục nhưng có hai ảnh thiếu, phân trang khó đọc và bốn vòng trơn vẫn ngừng bán. Ảnh chụp màu mới chỉ giữ local trong `docs/vy/screenshots/` để người dùng gửi riêng cho Mỹ Anh, không kèm trong bản hiện tại của repository.
 
 | Mục | Kết quả | Trạng thái |
 |---|---|---|
 | V1 | Bốn trang dùng `ad-box`, bảng `ad-table`, nút chung, ảnh nhỏ, nhãn trạng thái tiếng Việt; form sản phẩm hai cột và xem trước ảnh; charm lọc theo bộ sưu tập, phân trang 20 dòng, lưu riêng từng dòng | Đã triển khai và thử trên Chrome |
 | V2 | `database/09_du_lieu_demo.sql`: điền đường dẫn ảnh thật cho mẫu có ảnh, ngừng bán mẫu còn thiếu ảnh, giá nhập mẫu bằng 60% giá bán khi giá nhập đang bằng 0 | Đã import và thử chạy lại trên DB kiểm thử |
-| V3 | [ERD PNG](erd.png), [SVG](erd.svg), [nguồn Graphviz](erd.dot), [danh sách khóa ngoại](ERD.md) | Đủ 14 bảng, 14 khóa ngoại theo schema repo 01–09; cần đối chiếu lại sau migration 10–11 của Quỳnh |
+| V3 | [ERD PNG](erd.png), [SVG](erd.svg), [nguồn Graphviz](erd.dot), [danh sách khóa ngoại](ERD.md) | Đã đối chiếu schema 01–16, đủ 14 bảng, 14 khóa ngoại và ba cột mới của MaGiamGia |
 | V4 | [Kịch bản quay và ghép video](KICH_BAN_VIDEO.md) | Chờ ba thành viên quay phần của mình; chưa có video MP4 hoàn chỉnh |
-| V5 | [Kết quả kiểm thử](KIEM_THU.md), 12 ảnh desktop/tablet/mobile trong `screenshots/` | Đã thử trên Chrome headless; chưa thử điện thoại thật |
+| V5 | [Kết quả kiểm thử](KIEM_THU.md), 12 ảnh desktop/tablet/mobile trong `screenshots/` | Đã chụp lại cửa sổ Chrome thật có thanh địa chỉ ngày 30/10; chưa thử điện thoại thật |
 
 ## Dùng dữ liệu mẫu
 
@@ -27,11 +29,18 @@ Thứ tự các file chuẩn đã kiểm thử:
 7. `07_admin.sql`
 8. `08_vy_catalog.sql`
 9. `09_du_lieu_demo.sql`
+10. `10_chi_muc.sql`
+11. `11_ma_giam_gia.sql`
+12. `12_xoa_charm_mo.sql`
+13. `13_bo_sung_charm.sql`
+14. `14_day_hong.sql`
+15. `15_cap_nhat_vong_tron.sql`
+16. `16_chuyen_combo_vong_hoa.sql`
 
-`01_vy_starter.sql` và `03_admin.sql` là file thử local cũ, không thuộc chuỗi import chuẩn này. Migration 10–11 do Quỳnh phụ trách.
+`01_vy_starter.sql` và `03_admin.sql` là file thử local cũ, không thuộc chuỗi import chuẩn này. Toàn bộ 01–16 đã được import từ DB trống trên MySQL tạm độc lập.
 
 ## Phạm vi và giới hạn
 
 Chỉ sửa bốn trang admin của Vy, tạo CSS riêng, file SQL 09 và tài liệu/ảnh bàn giao. Không thay đổi file của thành viên khác. CSS bảng rộng cuộn trong khung bảng trên mobile, không kéo rộng toàn trang. Tên `includes/vy_catalog.php` và `08_vy_catalog.sql` được giữ nguyên theo yêu cầu.
 
-Ảnh chụp hiện tại là ảnh vùng hiển thị trang từ Chrome headless, không bao gồm thanh địa chỉ. Khi đưa vào báo cáo theo yêu cầu của nhóm, cần chụp lại trong trình duyệt có thanh địa chỉ và dữ liệu đã chốt. Chưa gửi tài liệu cho thành viên khác.
+Ảnh hiện tại được chụp trực tiếp cửa sổ Chrome riêng bằng Windows PrintWindow, có thanh tab và thanh địa chỉ thật, không ghép khung trình duyệt. Dữ liệu là bộ mẫu từ SQL 01–16 chạy ở máy chủ kiểm thử `127.0.0.1:8091`; địa chỉ này chỉ phục vụ chụp ảnh, không phải link triển khai. Xem kích thước và URL từng ảnh trong `screenshots/capture-info.json`. Bản mobile/tablet là cửa sổ desktop thu hẹp để kiểm tra responsive, không phải ảnh chụp thiết bị thật. Trên cửa sổ hẹp Chrome có thể rút gọn URL; bộ ảnh desktop hiển thị đầy đủ đường dẫn trang. Ảnh chụp giao diện được giữ local để người dùng gửi riêng cho Mỹ Anh; `.gitignore` ngăn đưa lại các PNG trong thư mục `screenshots/` lên Git. Báo cáo, metadata và ERD vẫn được lưu trên `vy-catalog`.

@@ -1,5 +1,7 @@
 # Kiểm thử phần sản phẩm
 
+**Kết quả mới nhất sau đổi màu và import 01–16:** [KIEM_THU_01_16.md](KIEM_THU_01_16.md). Ảnh màu mới từ main `899ea7f` chỉ giữ local trong `docs/vy/screenshots/` để người dùng gửi riêng cho Mỹ Anh, không kèm trong bản hiện tại của repository. Các phần ghi kết quả ngày 29/10 bên dưới được giữ làm lịch sử kiểm thử.
+
 Ngày: 29/10/2026. PHP 8.0.30, MariaDB qua XAMPP, Chrome headless. Dùng DB kiểm thử riêng dựng từ schema 01–09, không sửa dữ liệu DB local. Tài khoản/mật khẩu kiểm thử chỉ tồn tại trong DB kiểm thử.
 
 ## Đã đạt
@@ -22,16 +24,22 @@ Tổng cộng 60 điểm kiểm tra trình duyệt đã đạt, gồm các lư�
 
 ## Ảnh minh chứng
 
+Đã thay toàn bộ 12 ảnh bằng ảnh chụp **cửa sổ Chrome thật có thanh tab và thanh địa chỉ** ngày 30/10/2026 theo màu mới của main `899ea7f`. Chụp nguyên cửa sổ bằng Windows PrintWindow, không ghép ảnh trang với thanh địa chỉ giả. Import thành công SQL 01–16 trên MariaDB tạm độc lập, cổng 3307; bản web chụp ảnh chạy tại `127.0.0.1:8091`. Có thêm ba ảnh minh chứng lỗi ảnh và màu phân trang; xem báo cáo mới.
+
+Viewport CSS thực tế lúc chụp: desktop **1266×686**, tablet **786×686**, mobile **501×686**. Đây là kiểm tra responsive bằng thay đổi độ rộng cửa sổ Chrome trên máy tính; không phải thiết bị di động thật. Kích thước pixel ảnh lớn hơn do DPI Windows. Metadata từng ảnh nằm trong [capture-info.json](screenshots/capture-info.json).
+
+Trong đợt chụp lại, cả bốn trang mặc định đều tải thành công, không lỗi PHP, không tràn chiều ngang toàn trang, ảnh thu nhỏ đang nhìn thấy tải được. Bộ 60 điểm kiểm tra thao tác đã được chạy lại trên màu mới và dữ liệu 01–16; kết quả và các vấn đề còn lại nằm trong báo cáo mới.
+
 | Trang | Desktop | Tablet | Mobile |
 |---|---|---|---|
-| Sản phẩm | [Ảnh](screenshots/san-pham-desktop.png) | [Ảnh](screenshots/san-pham-tablet.png) | [Ảnh](screenshots/san-pham-mobile.png) |
-| Form sản phẩm | [Ảnh](screenshots/san-pham-form-desktop.png) | [Ảnh](screenshots/san-pham-form-tablet.png) | [Ảnh](screenshots/san-pham-form-mobile.png) |
-| Danh mục | [Ảnh](screenshots/danh-muc-desktop.png) | [Ảnh](screenshots/danh-muc-tablet.png) | [Ảnh](screenshots/danh-muc-mobile.png) |
-| Charm | [Ảnh](screenshots/charm-desktop.png) | [Ảnh](screenshots/charm-tablet.png) | [Ảnh](screenshots/charm-mobile.png) |
+| Sản phẩm | `san-pham-desktop.png` | `san-pham-tablet.png` | `san-pham-mobile.png` |
+| Form sản phẩm | `san-pham-form-desktop.png` | `san-pham-form-tablet.png` | `san-pham-form-mobile.png` |
+| Danh mục | `danh-muc-desktop.png` | `danh-muc-tablet.png` | `danh-muc-mobile.png` |
+| Charm | `charm-desktop.png` | `charm-tablet.png` | `charm-mobile.png` |
 
 ## Cần kiểm tra khi tích hợp
 
-- Điện thoại thật; chụp lại có thanh địa chỉ để đưa vào báo cáo.
+- Điện thoại thật. Yêu cầu ảnh có thanh địa chỉ cho báo cáo đã được hoàn tất bằng bộ ảnh Chrome ngày 30/10.
 - Biểu đồ lợi nhuận khi có đơn hoàn tất; repo hiện chưa có trang `admin/thong-ke.php` của Quỳnh.
-- Luồng khách ẩn charm phải do Q8 xử lý; việc lưu trạng thái admin không tự thay đổi truy vấn trang khách.
-- Chạy lại bộ kiểm thử sau khi gộp migration 10–11 và chốt dữ liệu nhóm.
+- Luồng khách ẩn charm Q8 cần kiểm thử khi tích hợp; việc lưu trạng thái admin không tự thay đổi truy vấn trang khách.
+- SQL 01–16 đã import thành công từ DB trống để cập nhật ERD và chụp ảnh; vẫn cần kiểm thử toàn bộ luồng nghiệp vụ khi chốt dữ liệu nhóm.
