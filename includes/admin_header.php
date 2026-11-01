@@ -12,6 +12,7 @@ $menuAdmin = [
     'charm'     => ['charm.php',        'Charm'],
     'don-hang'  => ['don-hang.php',     'Đơn hàng'],
     'khach-hang' => ['khach-hang.php',  'Khách hàng'],
+    'tu-van'    => ['tu-van.php',       'Tư vấn'],
     'ma-giam-gia' => ['ma-giam-gia.php', 'Mã giảm giá'],
     'thong-ke'  => ['thong-ke.php',     'Thống kê'],
 ];
@@ -33,8 +34,9 @@ $menuAdmin = [
   <a class="logo" href="index.php">Charm Atelier.</a>
   <span class="ad-side__tag">Quản trị</span>
   <nav class="ad-menu">
+    <?php $tvChuaDoc = tu_van_chua_doc_admin(); ?>
     <?php foreach ($menuAdmin as $key => [$href, $ten]): ?>
-      <a href="<?= $href ?>" class="ad-menu__link<?= $menu === $key ? ' is-active' : '' ?>"><?= $ten ?></a>
+      <a href="<?= $href ?>" class="ad-menu__link<?= $menu === $key ? ' is-active' : '' ?>"><?= $ten ?><?php if ($key === 'tu-van' && $tvChuaDoc > 0): ?><span class="ad-menu__badge"><?= $tvChuaDoc ?></span><?php endif; ?></a>
     <?php endforeach; ?>
   </nav>
   <a class="ad-side__shop" href="../index.php" target="_blank" rel="noopener">Xem trang bán hàng ↗</a>

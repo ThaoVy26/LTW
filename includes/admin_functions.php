@@ -20,3 +20,9 @@ function class_trang_thai_don(?string $ma): string
 {
     return 'tt tt--' . preg_replace('/[^a-z_]/', '', (string)$ma);
 }
+
+// số tin của khách mà admin chưa đọc
+function tu_van_chua_doc_admin(): int
+{
+    return (int)db()->query("SELECT COUNT(*) FROM TinNhanTuVan WHERE nguoi_gui = 'khach' AND da_doc = 0")->fetchColumn();
+}

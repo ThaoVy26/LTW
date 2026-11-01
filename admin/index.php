@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/admin_functions.php';
 // phải đăng nhập admin mới vào được
 yeu_cau_admin();
 
@@ -15,7 +16,9 @@ $homNay = $pdo->query(
 
 // đếm nhanh: đơn chờ xác nhận, sản phẩm, khách
 $choXacNhan = (int)$pdo->query('SELECT COUNT(*) FROM DonHang WHERE trang_thai_don = "cho_xac_nhan"')->fetchColumn();
-$soSanPham  = (int)$pdo->query('SELECT COUNT(*) FROM SanPham')->fetchColumn();
+$tuVanMoi   = tu_van_chua_doc_admin();
+$yeuCauHuy  = (int)$pdo->query('SELECT COUNT(*) FROM DonHang WHERE yeu_cau_huy = 1 AND trang_thai_don <> "huy"')->fetchColumn();
+$soSanPham  =(int)$pdo->query('SELECT COUNT(*) FROM SanPham')->fetchColumn();
 $soKhach    = (int)$pdo->query('SELECT COUNT(*) FROM KhachHang')->fetchColumn();
 
 $donMoi = $pdo->query(
@@ -42,6 +45,14 @@ require __DIR__ . '/../includes/admin_header.php';
     <div class="ad-card__label">Đơn chờ xác nhận</div>
     <div class="ad-card__value"><?= $choXacNhan ?></div>
   </div>
+  <a class="ad-card" href="tu-van.php">
+    <div class="ad-card__label">Tin tư vấn chưa đọc</div>
+    <div class="ad-card__value"><?= $tuVanMoi ?></div>
+  </a>
+  <a class="ad-card" href="don-hang.php?yc=1">
+    <div class="ad-card__label">Yêu cầu huỷ đơn</div>
+    <div class="ad-card__value"><?= $yeuCauHuy ?></div>
+  </a>
   <div class="ad-card">
     <div class="ad-card__label">Sản phẩm · Khách hàng</div>
     <div class="ad-card__value"><?= $soSanPham ?> · <?= $soKhach ?></div>
