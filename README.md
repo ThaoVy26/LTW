@@ -15,7 +15,8 @@
    - `database/06_anh_san_pham.sql`: gắn ảnh thật cho sản phẩm vòng (ảnh trong `assets/img/sp/`)
    - `database/07_admin.sql`: bảng `TaiKhoan` và tài khoản quản trị (`admin` / `admin`)
    - `database/08_vy_catalog.sql`: thêm cột `SanPham.gia_nhap` và `Charm.trang_thai` (quản lý sản phẩm / charm)
-4. Mở http://localhost/charm_atelier/ (khách) và http://localhost/charm_atelier/admin/ (quản trị: `admin` / `admin`, nên đổi mật khẩu sau khi đăng nhập).
+   - `database/09` đến `database/18`: dữ liệu demo, chỉ mục, mã giảm giá, cập nhật charm; file 17 thêm tài khoản khách và yêu cầu huỷ đơn, file 18 thêm bảng tin nhắn tư vấn (import lần lượt từ 01 đến 18)
+4. Mở http://localhost/charm_atelier/ (khách) và http://localhost/charm_atelier/admin/ (quản trị: `admin` / `admin`, nên đổi mật khẩu sau khi đăng nhập). Tài khoản khách demo: `khach@demo.vn` / `khach123`.
 
 Hướng dẫn chi tiết từng bước: xem `readme.txt`.
 
@@ -58,8 +59,8 @@ charm_atelier/
 | Thanh toán: kiểm tra form (JS + PHP), 3 phương thức, upload ảnh, lưu đơn bằng transaction, trừ kho | ✅ |
 | Trang chính sách / FAQ | ✅ (nội dung tĩnh) |
 | Responsive điện thoại | ✅ |
-| Đăng nhập / đăng ký khách hàng | Không làm: khách mua không cần tài khoản, chỉ chủ shop (admin) đăng nhập |
-| Tra cứu đơn hàng bằng SĐT + mã đơn (`track-order.php`), in / lưu PDF | ✅ |
+| Đăng ký / đăng nhập khách bằng email (tuỳ chọn, vẫn mua được khi chưa đăng nhập), "Đơn của tôi", yêu cầu huỷ đơn (admin duyệt), chat tư vấn với shop (`tu-van.php`, admin trả lời ở mục Tư vấn) | ✅ |
+| In / lưu PDF hoá đơn | ✅ |
 | Ảnh sản phẩm / charm thật | ✅ |
 | Admin: đăng nhập, sản phẩm / danh mục / charm, đơn hàng (hoàn kho khi huỷ), khách hàng, mã giảm giá, hoá đơn | ✅ |
 | Admin: thống kê | ⏳ Đang làm (Quỳnh) |
