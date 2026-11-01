@@ -15,9 +15,14 @@ if (!isset(DON_TRANG_THAI[$tt])) {
 }
 $q     = mb_substr(trim((string)($_GET['q'] ?? '')), 0, 50);
 $trang = max(1, (int)($_GET['trang'] ?? 1));
+$yc    = (string)($_GET['yc'] ?? '') === '1' ? '1' : '';
 
 $where = [];
 $tham  = [];
+// lọc đơn khách yêu cầu huỷ
+if ($yc !== '') {
+    $where[] = "d.yeu_cau_huy = 1 AND d.trang_thai_don <> 'huy'";
+}
 if ($tt !== '') {
     $where[] = 'd.trang_thai_don = ?';
     $tham[]  = [$tt, PDO::PARAM_STR];
@@ -44,7 +49,7 @@ $soTrang = max(1, (int)ceil($tong / DON_MOI_TRANG));
 $trang   = min($trang, $soTrang);
 
 $st = $pdo->prepare(
-    "SELECT d.id, d.ho_ten_nhan, d.sdt_nhan, d.phuong_thuc_tt, d.tong_tien, d.trang_thai_don, d.ngay_dat,
+    "SELECT d.id, d.ho_ten_nhan, d.sdt_nhan, d.phuong_thuc_tt, d.tong_tien, d.trang_thai_don, d.ngay_dat, d.yeu_cau_huy,
             (SELECT COUNT(*) FROM ChiTietDonHang c WHERE c.id_don_hang = d.id) AS so_dong
      FROM DonHang d $whereSql
      ORDER BY d.ngay_dat DESC, d.id DESC
@@ -63,12 +68,13 @@ foreach ($pdo->query('SELECT trang_thai_don, COUNT(*) AS n FROM DonHang GROUP BY
     $demTt[$r['trang_thai_don']] = (int)$r['n'];
 }
 $tatCa = array_sum($demTt);
+$demYc = (int)$pdo->query("SELECT COUNT(*) FROM DonHang WHERE yeu_cau_huy = 1 AND trang_thai_don <> 'huy'")->fetchColumn();
 
 // tạo link giữ nguyên bộ lọc đơn hàng
 function don_url(array $doi = []): string
 {
-    global $tt, $q, $trang;
-    $p = array_merge(['tt' => $tt, 'q' => $q, 'trang' => $trang], $doi);
+    global $tt, $q, $trang, $yc;
+    $p = array_merge(['tt' => $tt, 'q' => $q, 'yc' => $yc, 'trang' => $trang], $doi);
     $p = array_filter($p, fn($v) => $v !== '' && $v !== null && $v !== 1);
     return 'don-hang.php' . ($p ? '?' . http_build_query($p) : '');
 }
@@ -79,17 +85,19 @@ require __DIR__ . '/../includes/admin_header.php';
 ?>
 <link rel="stylesheet" href="../<?= phien_ban('assets/css/admin-don-hang.css') ?>">
 <div class="dh">
-  <p class="dh__sub"><?= $tong ?> đơn<?= ($tt !== '' || $q !== '') ? ' khớp bộ lọc' : '' ?></p>
+  <p class="dh__sub"><?= $tong ?> đơn<?= ($tt !== '' || $q !== '' || $yc !== '') ? ' khớp bộ lọc' : '' ?></p>
 
   <nav class="dh-tabs" aria-label="Lọc theo trạng thái">
-    <a class="dh-tab<?= $tt === '' ? ' is-active' : '' ?>" href="<?= e(don_url(['tt' => '', 'trang' => 1])) ?>">Tất cả<small><?= $tatCa ?></small></a>
+    <a class="dh-tab<?= ($tt === '' && $yc === '') ? ' is-active' : '' ?>" href="<?= e(don_url(['tt' => '', 'yc' => '', 'trang' => 1])) ?>">Tất cả<small><?= $tatCa ?></small></a>
     <?php foreach (DON_TRANG_THAI as $ma => $ten): ?>
       <a class="dh-tab<?= $tt === $ma ? ' is-active' : '' ?>" href="<?= e(don_url(['tt' => $ma, 'trang' => 1])) ?>"><?= e($ten) ?><small><?= $demTt[$ma] ?></small></a>
     <?php endforeach; ?>
+    <a class="dh-tab<?= $yc !== '' ? ' is-active' : '' ?>" href="<?= e(don_url(['tt' => '', 'yc' => '1', 'trang' => 1])) ?>">Yêu cầu huỷ<small><?= $demYc ?></small></a>
   </nav>
 
   <form class="dh-search" method="get" action="don-hang.php">
     <?php if ($tt !== ''): ?><input type="hidden" name="tt" value="<?= e($tt) ?>"><?php endif; ?>
+    <?php if ($yc !== ''): ?><input type="hidden" name="yc" value="1"><?php endif; ?>
     <input type="search" name="q" value="<?= e($q) ?>" placeholder="Tìm theo mã đơn, tên hoặc số điện thoại…" maxlength="50">
     <button class="btn btn--primary btn--sm" type="submit">Tìm</button>
     <?php if ($q !== ''): ?><a class="btn btn--light btn--sm" href="<?= e(don_url(['q' => '', 'trang' => 1])) ?>">Xoá tìm kiếm</a><?php endif; ?>
@@ -116,7 +124,10 @@ require __DIR__ . '/../includes/admin_header.php';
             <td class="num"><?= (int)$d['so_dong'] ?></td>
             <td class="num"><b><?= tien($d['tong_tien']) ?></b></td>
             <td><?= e(DON_PHUONG_THUC[$d['phuong_thuc_tt']] ?? $d['phuong_thuc_tt']) ?></td>
-            <td><span class="<?= e(class_trang_thai_don($d['trang_thai_don'])) ?>"><?= e(don_nhan_trang_thai($d['trang_thai_don'])) ?></span></td>
+            <td><span class="<?= e(class_trang_thai_don($d['trang_thai_don'])) ?>"><?= e(don_nhan_trang_thai($d['trang_thai_don'])) ?></span>
+              <?php if ((int)$d['yeu_cau_huy'] === 1 && $d['trang_thai_don'] !== 'huy'): ?>
+                <div><span class="tt tt--yc-huy">Khách yêu cầu huỷ</span></div>
+              <?php endif; ?></td>
             <td class="num"><a class="btn btn--light btn--sm" href="don-hang-chi-tiet.php?id=<?= (int)$d['id'] ?>">Xem</a></td>
           </tr>
         <?php endforeach; ?>
