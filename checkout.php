@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/khach.php';
 
 $dong = gio_chi_tiet();
 if (!$dong) {
@@ -17,6 +18,14 @@ $dsPhuongThuc = [
 $du    = ['ho_ten' => '', 'sdt' => '', 'email' => '', 'dia_chi' => '', 'ghi_chu' => '', 'pttt' => 'COD'];
 $loi   = [];
 
+// đã đăng nhập thì điền sẵn họ tên, sđt, email
+$khach = khach_hien_tai();
+if ($khach && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    $du['ho_ten'] = $khach['ten'];
+    $du['sdt']    = $khach['sdt'];
+    $du['email']  = $khach['email'];
+}
+
 // khách bấm đặt hàng
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($du as $k => $_) {
@@ -27,7 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_hop_le($_POST['csrf'] ?? null))           $loi['chung']   = 'Phiên làm việc đã hết hạn, vui lòng thử lại.';
     if (mb_strlen($du['ho_ten']) < 2)                    $loi['ho_ten']  = 'Vui lòng nhập họ và tên.';
     if (!preg_match('/^0\d{9}$/', $du['sdt']))           $loi['sdt']     = 'Số điện thoại gồm 10 số, bắt đầu bằng 0.';
-    if ($du['email'] !== '' && !filter_var($du['email'], FILTER_VALIDATE_EMAIL)) $loi['email'] = 'Email không hợp lệ.';
+    $du['email'] = mb_strtolower($du['email']);
+    if (!filter_var($du['email'], FILTER_VALIDATE_EMAIL) || mb_strlen($du['email']) > 150) $loi['email'] = 'Vui lòng nhập email hợp lệ.';
     if (mb_strlen($du['dia_chi']) < 5)                   $loi['dia_chi'] = 'Vui lòng nhập địa chỉ nhận hàng.';
     if (!isset($dsPhuongThuc[$du['pttt']]))              $loi['pttt']    = 'Vui lòng chọn phương thức thanh toán.';
 
@@ -78,10 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // tạo đơn hàng
             $pdo->prepare(
                 'INSERT INTO DonHang (id_khach_hang, id_ma_giam_gia, ho_ten_nhan, sdt_nhan, dia_chi_giao,
-                     phuong_thuc_tt, ghi_chu, tam_tinh, phi_van_chuyen, giam_gia, tong_tien)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                     email_nhan, phuong_thuc_tt, ghi_chu, tam_tinh, phi_van_chuyen, giam_gia, tong_tien)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
             )->execute([
-                $idKh, $tien['ma']['id'] ?? null, $du['ho_ten'], $du['sdt'], $du['dia_chi'],
+                $idKh, $tien['ma']['id'] ?? null, $du['ho_ten'], $du['sdt'], $du['dia_chi'], $du['email'],
                 $du['pttt'], mb_substr($ghiChu, 0, 500) ?: null,
                 $tien['tam'], $tien['ship'], $tien['giam'], $tien['tong'],
             ]);
@@ -153,6 +163,9 @@ function o_loi(array $loi, string $k): string
         <section>
           <div class="card form-card">
             <h3 class="summary__title">Thông tin nhận hàng</h3>
+            <?php if (!$khach): ?>
+              <p class="muted goi-y-dang-nhap">Đã có tài khoản? <a href="dang-nhap.php?quay_lai=checkout.php">Đăng nhập</a></p>
+            <?php endif; ?>
             <div class="row2">
               <label class="field<?= isset($loi['ho_ten']) ? ' has-error' : '' ?>">
                 <span>Họ và tên *</span>
@@ -166,8 +179,8 @@ function o_loi(array $loi, string $k): string
               </label>
             </div>
             <label class="field<?= isset($loi['email']) ? ' has-error' : '' ?>">
-              <span>Email (tuỳ chọn)</span>
-              <input name="email" type="email" value="<?= e($du['email']) ?>" autocomplete="email">
+              <span>Email (để xem đơn trong tài khoản) *</span>
+              <input name="email" type="email" value="<?= e($du['email']) ?>" required autocomplete="email">
               <?= o_loi($loi, 'email') ?>
             </label>
             <label class="field<?= isset($loi['dia_chi']) ? ' has-error' : '' ?>">
@@ -201,6 +214,10 @@ function o_loi(array $loi, string $k): string
               <span id="upload-text">Kéo thả hoặc bấm để tải ảnh (charm khắc / in ảnh theo yêu cầu) · tối đa 3MB</span>
               <img id="upload-preview" alt="" hidden>
             </label>
+            <div class="upload-actions" id="upload-actions" hidden>
+              <button type="button" class="btn btn--light btn--sm" id="upload-doi">Thay ảnh</button>
+              <button type="button" class="btn btn--light btn--sm" id="upload-xoa">Xoá ảnh</button>
+            </div>
             <?= o_loi($loi, 'anh') ?>
           </div>
         </section>

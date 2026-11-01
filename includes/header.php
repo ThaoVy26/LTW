@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/khach.php';
 $tieuDe ??= 'Trang chủ';
 $menu   ??= '';
 $moTa   ??= 'Charm Atelier: bán và tự thiết kế vòng tay Italian Charm. Chọn size, chọn dây, kéo thả charm theo cách của riêng bạn.';
@@ -9,8 +10,9 @@ $menuItems = [
     'trang-chu'   => ['index.php', 'Trang chủ'],
     'san-pham'    => ['shop.php', 'Sản phẩm'],
     'tu-thiet-ke' => ['customizer.php', 'Tự thiết kế'],
-    'tra-cuu'     => ['track-order.php', 'Tra cứu đơn'],
 ];
+$khach     = khach_hien_tai();
+$tvChuaDoc = $khach ? tu_van_chua_doc_khach($khach['id']) : 0;
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -43,6 +45,21 @@ $menuItems = [
       <a href="cart.php" class="nav__link nav__cart<?= $menu === 'gio-hang' ? ' is-active' : '' ?>">
         Giỏ hàng <span class="cart-count" id="cart-count"><?= $soLuongGio ?></span>
       </a>
+      <?php if ($khach): ?>
+        <details class="nav__user">
+          <summary class="nav__link"><?= e($khach['ten']) ?><?php if ($tvChuaDoc > 0): ?><span class="nav__badge"><?= $tvChuaDoc ?></span><?php endif; ?></summary>
+          <div class="nav__menu">
+            <a href="don-cua-toi.php">Đơn của tôi</a>
+            <a href="tu-van.php">Tư vấn<?php if ($tvChuaDoc > 0): ?><span class="nav__badge"><?= $tvChuaDoc ?></span><?php endif; ?></a>
+            <form method="post" action="dang-xuat.php">
+              <?= csrf_field() ?>
+              <button type="submit">Đăng xuất</button>
+            </form>
+          </div>
+        </details>
+      <?php else: ?>
+        <a href="dang-nhap.php" class="nav__link<?= $menu === 'dang-nhap' ? ' is-active' : '' ?>">Đăng nhập</a>
+      <?php endif; ?>
     </nav>
   </div>
 </header>

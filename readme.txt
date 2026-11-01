@@ -15,7 +15,7 @@ Bước 1. Giải nén và chép thư mục "charm_atelier" vào  C:\xampp\htdoc
 Bước 2. Mở XAMPP Control Panel, bấm Start cho Apache và MySQL.
 
 Bước 3. Mở  http://localhost/phpmyadmin  -> chọn tab "Import" (Nhập)
-        và import LẦN LƯỢT, ĐÚNG THỨ TỰ từ 01 đến 16, từng file trong
+        và import LẦN LƯỢT, ĐÚNG THỨ TỰ từ 01 đến 18, từng file trong
         thư mục database/:
           01_schema.sql                  tạo CSDL và các bảng
           02_seed.sql                    dữ liệu mẫu (sản phẩm, mã giảm giá...)
@@ -33,6 +33,8 @@ Bước 3. Mở  http://localhost/phpmyadmin  -> chọn tab "Import" (Nhập)
           14_day_hong.sql                thêm dây "Trơn Hồng" cho trang Tự thiết kế
           15_cap_nhat_vong_tron.sql      cập nhật tên, mô tả, ảnh các vòng dây trơn
           16_chuyen_combo_vong_hoa.sql   chuyển "Vòng charm hoa" sang danh mục Combo
+          17_tai_khoan_khach.sql         tài khoản khách, yêu cầu huỷ đơn
+          18_tin_nhan_tu_van.sql         bảng tin nhắn cho chat tư vấn
         (Mỗi file chỉ import MỘT lần. Muốn làm lại từ đầu: xoá CSDL
         52400092_52400313_52400041 trong phpMyAdmin rồi import lại từ file 01.)
 
@@ -61,7 +63,10 @@ Mã giảm giá có sẵn để thử ở giỏ hàng:
 A. Khách đặt hàng:  Sản phẩm -> thêm vào giỏ (hoặc "Tự thiết kế" một vòng)
    -> Giỏ hàng (nhập mã giảm giá) -> Thanh toán (SĐT gồm 10 số, bắt đầu bằng 0)
    -> trang "Đặt hàng thành công" hiện mã đơn dạng #CA000001 (có nút In / Lưu PDF).
-B. Khách tra cứu đơn:  menu "Tra cứu đơn" -> nhập SĐT đã đặt + mã đơn.
+B. Khách xem đơn:  menu "Đăng nhập" (hoặc "Đăng ký") bằng email đã dùng khi đặt
+   -> "Đơn của tôi" (có nút yêu cầu huỷ đơn khi đơn còn chờ xác nhận).
+   Tài khoản demo: khach@demo.vn / khach123. Sau khi đăng nhập, vào menu tên tài khoản -> "Tư vấn"
+   để chat với shop; admin trả lời ở mục "Tư vấn" trong trang quản trị.
 C. Admin xử lý đơn:  Đơn hàng -> bấm vào đơn -> đổi trạng thái
    (Chờ xác nhận -> Đang giao -> Hoàn tất, hoặc Huỷ; huỷ đơn sẽ hoàn lại tồn kho).
    Nút "In hoá đơn" mở hoá đơn A4: bấm "In / Lưu PDF" và chọn "Lưu thành PDF".
@@ -73,11 +78,12 @@ Quy ước thống kê: đơn đã huỷ KHÔNG tính vào doanh thu, số đơn
 4. CẤU TRÚC THƯ MỤC CHÍNH
 ======================================================================
   index.php, shop.php, product.php, customizer.php, cart.php, checkout.php,
-  order-success.php, track-order.php     trang khách
+  order-success.php, dang-ky.php, dang-nhap.php, don-cua-toi.php, tu-van.php   trang khách
+  api/                                   api cho trang thiết kế và chat tư vấn
   admin/                                 trang quản trị (cần đăng nhập)
   includes/                              hàm dùng chung (functions, auth, đơn hàng...)
   config/database.php                    kết nối CSDL
-  database/                              file SQL 01 -> 16
+  database/                              file SQL 01 -> 18
   assets/                                CSS, JS, hình ảnh
   uploads/                               ảnh khách gửi khi đặt hàng
 
@@ -90,7 +96,7 @@ Quy ước thống kê: đơn đã huỷ KHÔNG tính vào doanh thu, số đơn
   Import file 01 trước rồi mới import các file còn lại.
 - phpMyAdmin báo "#1146 Table ... doesn't exist" hoặc "#1054 Unknown column":
   đã bỏ sót file hoặc import sai thứ tự. Xoá CSDL 52400092_52400313_52400041
-  rồi import lại từ 01 đến 16, đúng thứ tự.
+  rồi import lại từ 01 đến 18, đúng thứ tự.
 - File 10 hoặc 11 báo lỗi cú pháp ở "IF NOT EXISTS": đang dùng MySQL bản cũ.
   Hãy dùng MariaDB đi kèm XAMPP.
 - Charm hoặc sản phẩm bị lặp đôi: đã import một file (nhất là 13) hai lần.

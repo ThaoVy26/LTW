@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const rules = {
     ho_ten: (v) => v.trim().length >= 2 || "Vui lòng nhập họ và tên.",
     sdt: (v) => /^0\d{9}$/.test(v.trim()) || "Số điện thoại gồm 10 số, bắt đầu bằng 0.",
-    email: (v) => !v.trim() || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) || "Email không hợp lệ.",
+    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) || "Vui lòng nhập email hợp lệ.",
     dia_chi: (v) => v.trim().length >= 5 || "Vui lòng nhập địa chỉ nhận hàng.",
   };
 
@@ -30,12 +30,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const box = document.getElementById("upload"), file = document.getElementById("anh");
   const text = document.getElementById("upload-text"), img = document.getElementById("upload-preview");
   // xem trước ảnh khách đính kèm
+  const actions = document.getElementById("upload-actions");
+  const textMacDinh = text.textContent;
   function preview() {
     const f = file.files[0]; if (!f) return;
-    if (!f.type.startsWith("image/")) { text.textContent = "Vui lòng chọn file ảnh."; return; }
+    if (!f.type.startsWith("image/")) { xoaAnh(); text.textContent = "Vui lòng chọn file ảnh."; return; }
     text.textContent = f.name + " · " + Math.round(f.size / 1024) + " KB";
-    img.src = URL.createObjectURL(f); img.hidden = false;
+    if (img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
+    img.src = URL.createObjectURL(f); img.hidden = false; actions.hidden = false;
   }
+  // bỏ ảnh đã chọn, về lại khung trống
+  function xoaAnh() {
+    file.value = "";
+    if (img.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
+    img.removeAttribute("src"); img.hidden = true; actions.hidden = true;
+    text.textContent = textMacDinh;
+  }
+  document.getElementById("upload-doi").addEventListener("click", () => file.click());
+  document.getElementById("upload-xoa").addEventListener("click", xoaAnh);
   file.addEventListener("change", preview);
   // kéo thả ảnh vào khung upload
   box.addEventListener("dragover", (e) => { e.preventDefault(); box.classList.add("is-over"); });

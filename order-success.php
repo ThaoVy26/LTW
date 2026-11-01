@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/khach.php';
 
 $id = (int)($_GET['id'] ?? 0);
 if (!in_array($id, $_SESSION['don_cua_toi'] ?? [], true)) {
@@ -40,6 +41,12 @@ require __DIR__ . '/includes/header.php';
         <div class="summary__row"><span>Giảm giá:</span><span>-<?= tien($don['giam_gia']) ?></span></div>
         <div class="summary__total"><span>Tổng cộng:</span><span><?= tien($don['tong_tien']) ?></span></div>
       </div>
+
+      <?php if (khach_hien_tai() === null): ?>
+        <p class="muted no-print">Để xem lại đơn, hãy <a class="pink" href="dang-ky.php?quay_lai=don-cua-toi.php">đăng ký</a> hoặc <a class="pink" href="dang-nhap.php?quay_lai=don-cua-toi.php">đăng nhập</a> bằng email <b><?= e($don['email_nhan']) ?></b>.</p>
+      <?php else: ?>
+        <p class="no-print"><a class="pink" href="don-cua-toi.php">Xem trong Đơn của tôi</a></p>
+      <?php endif; ?>
 
       <div class="success__actions no-print">
         <button type="button" class="btn btn--light" onclick="window.print()">In / Lưu PDF</button>

@@ -56,7 +56,7 @@ function dang_nhap(string $tenDangNhap, string $matKhau): bool
 {
     $st = db()->prepare('SELECT id, ten_dang_nhap, ho_ten, mat_khau_hash
                          FROM TaiKhoan
-                         WHERE ten_dang_nhap = ? AND trang_thai = "hoat_dong"');
+                         WHERE ten_dang_nhap = ? AND trang_thai = "hoat_dong" AND vai_tro = "admin"');
     $st->execute([$tenDangNhap]);
     $tk = $st->fetch();
 

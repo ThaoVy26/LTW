@@ -13,14 +13,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!csrf_hop_le($_POST['csrf'] ?? null)) {
         flash('loi', 'Phiên làm việc đã hết hạn, vui lòng thử lại.');
     } else {
-        [$ok, $tb] = don_doi_trang_thai($id, (string)($_POST['trang_thai_moi'] ?? ''));
-        flash($ok ? 'ok' : 'loi', $tb);
+        $viec = (string)($_POST['viec'] ?? '');
+        if ($viec === 'dong_y_huy' || $viec === 'tu_choi_huy') {
+            // chỉ xử lý đơn đang có yêu cầu huỷ của khách
+            $st = $pdo->prepare('SELECT COUNT(*) FROM DonHang WHERE id = ? AND yeu_cau_huy = 1');
+            $st->execute([$id]);
+            if ((int)$st->fetchColumn() !== 1) {
+                flash('loi', 'Đơn này không có yêu cầu huỷ.');
+            } elseif ($viec === 'dong_y_huy') {
+                [$ok, $tb] = don_doi_trang_thai($id, 'huy');
+                if ($ok) {
+                    $pdo->prepare('UPDATE DonHang SET yeu_cau_huy = 0 WHERE id = ?')->execute([$id]);
+                }
+                flash($ok ? 'ok' : 'loi', $tb);
+            } else {
+                $pdo->prepare('UPDATE DonHang SET yeu_cau_huy = 0 WHERE id = ?')->execute([$id]);
+                flash('ok', 'Đã từ chối yêu cầu huỷ đơn ' . don_ma($id) . '.');
+            }
+        } else {
+            [$ok, $tb] = don_doi_trang_thai($id, (string)($_POST['trang_thai_moi'] ?? ''));
+            flash($ok ? 'ok' : 'loi', $tb);
+        }
     }
     chuyen_trang('don-hang-chi-tiet.php?id=' . $id);
 }
 
 $st = $pdo->prepare(
-    'SELECT d.*, k.email, m.ma_code
+    'SELECT d.*, k.email AS email_kh, m.ma_code
      FROM DonHang d
      LEFT JOIN KhachHang k ON k.id = d.id_khach_hang
      LEFT JOIN MaGiamGia m ON m.id = d.id_ma_giam_gia
@@ -107,6 +126,28 @@ require __DIR__ . '/../includes/admin_header.php';
     </div>
 
     <div>
+      <?php if ((int)$don['yeu_cau_huy'] === 1 && $tt !== 'huy'): ?>
+      <section class="ad-box dh-yc-huy">
+        <h2 class="ad-box__title">Khách yêu cầu huỷ</h2>
+        <p>Lý do: <b><?= e($don['ly_do_huy']) ?></b></p>
+        <p class="dh-muted">Gửi lúc <?= e(date('H:i d/m/Y', strtotime((string)$don['ngay_yeu_cau_huy']))) ?></p>
+        <div class="dh-actions">
+          <form method="post" action="don-hang-chi-tiet.php" onsubmit="return confirm('Đồng ý huỷ đơn này? Tồn kho sẽ được hoàn lại.');">
+            <?= csrf_field() ?>
+            <input type="hidden" name="id" value="<?= (int)$id ?>">
+            <input type="hidden" name="viec" value="dong_y_huy">
+            <button class="btn btn--sm btn--danger-soft" type="submit">Đồng ý huỷ</button>
+          </form>
+          <form method="post" action="don-hang-chi-tiet.php">
+            <?= csrf_field() ?>
+            <input type="hidden" name="id" value="<?= (int)$id ?>">
+            <input type="hidden" name="viec" value="tu_choi_huy">
+            <button class="btn btn--sm btn--light" type="submit">Từ chối</button>
+          </form>
+        </div>
+      </section>
+      <?php endif; ?>
+
       <section class="ad-box">
         <h2 class="ad-box__title">Cập nhật trạng thái</h2>
         <?php if ($tiepTheo): ?>
@@ -134,7 +175,7 @@ require __DIR__ . '/../includes/admin_header.php';
         <dl class="dh-info">
           <dt>Người nhận</dt><dd><?= e($don['ho_ten_nhan']) ?></dd>
           <dt>Điện thoại</dt><dd><?= e($don['sdt_nhan']) ?></dd>
-          <?php if (!empty($don['email'])): ?><dt>Email</dt><dd><?= e($don['email']) ?></dd><?php endif; ?>
+          <?php if (!empty($don['email_nhan'])): ?><dt>Email đặt hàng</dt><dd><?= e($don['email_nhan']) ?></dd><?php endif; ?>
           <dt>Địa chỉ</dt><dd><?= e($don['dia_chi_giao']) ?></dd>
           <dt>Thanh toán</dt><dd><?= e(DON_PHUONG_THUC[$don['phuong_thuc_tt']] ?? $don['phuong_thuc_tt']) ?></dd>
           <?php if ($ghiChu !== ''): ?><dt>Ghi chú</dt><dd><?= e($ghiChu) ?></dd><?php endif; ?>
