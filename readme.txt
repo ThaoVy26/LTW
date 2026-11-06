@@ -9,8 +9,9 @@ Công nghệ: PHP 8.x thuần + PDO, MySQL/MariaDB, HTML/CSS/JavaScript. Chạy 
 Yêu cầu: XAMPP (PHP 8.1 trở lên, MariaDB/MySQL đi kèm), trình duyệt, và kết nối
 Internet (font Google Fonts tải qua mạng).
 
-Bước 1. Giải nén và chép thư mục "charm_atelier" vào  C:\xampp\htdocs\
-        (đường dẫn sau khi chép:  C:\xampp\htdocs\charm_atelier\index.php)
+Bước 1. Giải nén và chép thư mục "LTW" vào  C:\xampp\htdocs\
+        (đường dẫn sau khi chép:  C:\xampp\htdocs\LTW\index.php).
+        Nếu thư mục giải nén có tên khác, hãy đổi tên thành "LTW".
 
 Bước 2. Mở XAMPP Control Panel, bấm Start cho Apache và MySQL.
 
@@ -42,8 +43,8 @@ Bước 4. Nếu MySQL của bạn có mật khẩu, sửa DB_PASS trong config/
         (XAMPP mặc định: user root, không mật khẩu, không cần sửa).
 
 Bước 5. Mở trình duyệt:
-          Trang khách hàng:  http://localhost/charm_atelier/
-          Trang quản trị:    http://localhost/charm_atelier/admin/
+          Trang khách hàng:  http://localhost/LTW/
+          Trang quản trị:    http://localhost/LTW/admin/
 
 ======================================================================
 2. TÀI KHOẢN VÀ DỮ LIỆU THỬ
@@ -103,15 +104,9 @@ Quy ước thống kê: đơn đã huỷ KHÔNG tính vào doanh thu, số đơn
   Xoá CSDL và import lại từ file 01.
 - Apache không Start được: cổng 80 đang bị chương trình khác dùng (Skype, IIS...).
   Tắt chương trình đó hoặc đổi cổng Apache trong XAMPP.
-- Mở trang bị 404 hoặc mất ảnh: thư mục phải đặt tên đúng "charm_atelier" và
-  nằm trong C:\xampp\htdocs\ (địa chỉ http://localhost/charm_atelier/).
+- Mở trang bị 404 hoặc mất ảnh: thư mục phải đặt tên đúng "LTW" và
+  nằm trong C:\xampp\htdocs\ (địa chỉ http://localhost/LTW/).
 - Lỗi font chữ: kiểm tra kết nối Internet (Google Fonts).
 - Đăng nhập admin báo không đúng: chưa import 07_admin.sql, hoặc nhập sai mật khẩu
   (tài khoản admin / charm2026). Sai 5 lần sẽ bị khoá 5 phút.
 - Không tải được ảnh khi đặt hàng: thư mục uploads/ cần cho phép ghi.
-
-======================================================================
-6. VIDEO DEMO
-======================================================================
-Link video: ____________________________________________
-(điền link sau khi upload video)
