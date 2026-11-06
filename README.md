@@ -4,7 +4,7 @@
 
 ## 1. Cài đặt (XAMPP)
 
-1. Copy thư mục `charm_atelier` vào `C:\xampp\htdocs\`.
+1. Copy thư mục `LTW` vào `C:\xampp\htdocs\`.
 2. Mở XAMPP Control Panel, bật **Apache** và **MySQL**.
 3. Vào http://localhost/phpmyadmin, chọn tab **Import** và import lần lượt:
    - `database/01_schema.sql`: tạo CSDL và các bảng
@@ -13,10 +13,10 @@
    - `database/04_san_pham_charm.sql`: đưa 46 charm vào trang Sản phẩm (mục Charm), bỏ mục Đồng hồ
    - `database/05_tach_charm.sql`: thêm 114 charm tách từ ảnh bảng mẫu (tổng 160 charm), sắp đúng thứ tự trong bảng mẫu (cột `Charm.thu_tu`)
    - `database/06_anh_san_pham.sql`: gắn ảnh thật cho sản phẩm vòng (ảnh trong `assets/img/sp/`)
-   - `database/07_admin.sql`: bảng `TaiKhoan` và tài khoản quản trị (`admin` / `admin`)
+   - `database/07_admin.sql`: bảng `TaiKhoan` và tài khoản quản trị (`admin` / `charm2026`)
    - `database/08_vy_catalog.sql`: thêm cột `SanPham.gia_nhap` và `Charm.trang_thai` (quản lý sản phẩm / charm)
    - `database/09` đến `database/18`: dữ liệu demo, chỉ mục, mã giảm giá, cập nhật charm; file 17 thêm tài khoản khách và yêu cầu huỷ đơn, file 18 thêm bảng tin nhắn tư vấn (import lần lượt từ 01 đến 18)
-4. Mở http://localhost/charm_atelier/ (khách) và http://localhost/charm_atelier/admin/ (quản trị: `admin` / `admin`, nên đổi mật khẩu sau khi đăng nhập). Tài khoản khách demo: `khach@demo.vn` / `khach123`.
+4. Mở http://localhost/LTW/ (khách) và http://localhost/LTW/admin/ (quản trị: `admin` / `charm2026`, nên đổi mật khẩu sau khi đăng nhập). Tài khoản khách demo: `khach@demo.vn` / `khach123`.
 
 Hướng dẫn chi tiết từng bước: xem `readme.txt`.
 
@@ -25,7 +25,7 @@ Nếu MySQL của bạn có mật khẩu, sửa trong `config/database.php`.
 ## 2. Cấu trúc thư mục
 
 ```
-charm_atelier/
+LTW/
 ├── config/database.php     # Kết nối PDO
 ├── includes/
 │   ├── functions.php       # Hàm dùng chung: tiền, CSRF, giỏ hàng (SESSION), mã giảm giá
@@ -43,7 +43,7 @@ charm_atelier/
 ├── api/design.php          # API lưu thiết kế vòng (JSON)
 ├── assets/css/style.css
 ├── assets/js/              # main.js, shop.js, customizer.js, checkout.js
-├── database/               # 01_schema.sql, 02_seed.sql
+├── database/               # 18 tệp SQL, import lần lượt từ 01 đến 18
 └── uploads/                # Ảnh khách gửi khi thanh toán
 ```
 
@@ -52,7 +52,7 @@ charm_atelier/
 | Trang / chức năng | Trạng thái |
 |---|---|
 | Trang chủ: hero, combo nổi bật lấy từ DB, thông tin mua hàng | ✅ |
-| Sản phẩm: danh mục (đếm SL), tìm kiếm, lọc giá, sắp xếp, phân trang, thêm giỏ AJAX, yêu thích | ✅ |
+| Sản phẩm: danh mục (đếm SL), tìm kiếm, lọc giá, sắp xếp, phân trang, thêm giỏ AJAX | ✅ |
 | Chi tiết sản phẩm + sản phẩm liên quan | ✅ |
 | Tự thiết kế: size, dây, bộ sưu tập, kéo thả / đổi chỗ, hoàn tác / làm lại, Ngang / Dọc / Xoay 360, tạm tính, lưu thiết kế, thêm giỏ, sửa thiết kế từ giỏ | ✅ |
 | Giỏ hàng: tăng / giảm / xoá, mã giảm giá (số tiền / %), kiểm tra tồn kho | ✅ |
@@ -63,7 +63,7 @@ charm_atelier/
 | In / lưu PDF hoá đơn | ✅ |
 | Ảnh sản phẩm / charm thật | ✅ |
 | Admin: đăng nhập, sản phẩm / danh mục / charm, đơn hàng (hoàn kho khi huỷ), khách hàng, mã giảm giá, hoá đơn | ✅ |
-| Admin: thống kê | ⏳ Đang làm (Quỳnh) |
+| Admin: thống kê | ✅ |
 
 ## 4. Ghi chú kỹ thuật
 
